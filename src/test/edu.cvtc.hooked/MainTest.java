@@ -1,60 +1,34 @@
 package edu.cvtc.hooked;
 
+import model.HookedApplication;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
-import java.util.Random;
-import java.util.Scanner;
 
 public class MainTest {
-    public static Connection createConnection() {
-        Connection result = null;
-        try {
-            result = DriverManager.getConnection("jdbc:sqlite:" + DATABASE_PATH);
-            Statement command = result.createStatement();
-            command.setQueryTimeout(TIMEOUT_STATEMENT_S);
-
-            command.executeUpdate("""
-                    CREATE TABLE IF NOT EXISTS game (
-                    id INTEGER PRIMARY KEY,
-                    at TEXT NOT NULL
-                    );""");
-
-            sqlInsertGame = result.prepareStatement("INSERT INTO game (at) VALUES (datetime('now'))");
-            sqlFetchGameCount = result.prepareStatement("SELECT COUNT(*) FROM game");
-            sqlFetchRecentGames = result.prepareStatement("SELECT COUNT(*) FROM game WHERE at > datetime('now', '-7 days')");
-            sqlReset = result.prepareStatement("DELETE FROM game");
-        }
-        catch (Exception e) {
-            System.err.println(e.getMessage());
-            e.printStackTrace();
-        }
-        return result;
+    @Test
+    void createConnection() throws SQLException {
+        Connection db = HookedApplication.createConnection();
+        assertNotNull(db);
+        assertFalse(db.isClosed());
+        db.close();
+        assertTrue(db.isClosed());
     }
 
-    public static String readLine() {
-        try {
-            if (scanner == null) scanner = new Scanner(System.in);
-            if (scanner.hasNextLine()) return scanner.nextLine();
-        } catch (Exception e) {
-            return "";
-        }
-        return "";
-    }
 
-    public static void resetScanner() {
-        if (scanner != null) scanner.close();
-        scanner = null;
-    }
-
-    public static ResultSet queryRaw(Connection db, String sql) {
-        ResultSet result = null;
-        try {
-            Statement statement = db.createStatement();
-            result = statement.executeQuery(sql);
+    @Test
+    void queryRaw() throws SQLException {
+        try (Connection db = HookedApplication.createConnection()) {
+            ResultSet rows = HookedApplication.queryRaw(db, "SELECT 5 AS result");
+            assertNotNull(rows);
+            assertTrue(rows.next());
+            int result = rows.getInt("result");
+            assertEquals(5, result);
+            rows.close();
         }
-        catch (Exception e) {
-            System.err.println(e.getMessage());
-            e.printStackTrace();
-        }
-        return result;
     }
 }
