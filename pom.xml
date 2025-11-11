@@ -14,12 +14,21 @@
         <java.version>21</java.version>
     </properties>
 
+    <packaging>war</packaging>
+
     <dependencies>
         <!-- JSP support (embedded Tomcat) -->
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
             <version>11.0.13</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- JSTL (Jakarta) -->
