@@ -12,7 +12,13 @@
         <h1>Logout</h1>
     </div>
 
-    <p>This will be replaced with logout</p>
+    <form action="Logout" method="post">
+        <input type="submit" id="logoutButton" value="Logout">
+    </form>
+
+    <form action="index.jsp" method="post">
+        <input type="submit" id="returnHome" value="Return Home">
+    </form>
 
 </div>
 </body>

@@ -9,12 +9,22 @@
 <div class="container">
 
     <div class="header">
-        <h1>createAccount</h1>
+        <h1>Create Your Account</h1>
     </div>
 
     <%@include file="layouts/navigation.jsp"%>
 
-    <p>temporary example file</p>
+    <h6></h6>
+
+    <form action="<%= request.getContextPath() %>/Login" method="post">
+        <h6>Username:</h6>
+        <input type="text" id="username" name="username" placeholder="Username">
+        <h6>Password:</h6>
+        <input type="text" id="password" name="password" placeholder="Password">
+        <h6>Email:</h6>
+        <input type="text" id="email" name="email" placeholder="User@gmail.com">
+        <input type="submit" value="login">
+    </form>
 
     <%@include file="layouts/footer.jsp"%>
 </div>

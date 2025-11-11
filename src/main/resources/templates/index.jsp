@@ -13,16 +13,19 @@
         <h1>Welcome to the Hooked website</h1>
     </div>
 
-    <%@include file="layouts/navigation.jsp"%>
+<%@include file="layouts/navigation.jsp"%>
 
-    <p>Hello, and welcome to Hooked.
-        <br> This is example text to prove the technology stack works
-        <br> If you are seeing this then the jsp and servlet are working.
+<img src="Images/imagename.jpg" alt="Image description"><br>
 
-        <%@include file="login.jsp"%>
-        <%@include file="logout.jsp"%>
+<p>Hello, and welcome to Hooked.
+    <br> This is example text to prove the technology stack works
+    <br> If you are seeing this then the jsp and servlet are working.
 
-        <%@include file="layouts/footer.jsp"%>
+    <form action="Login" method="post">
+        <input type="submit" id="loginButton" value="Login">
+    </form>
+
+    <%@include file="layouts/footer.jsp"%>
 </div>
 </body>
 </html>

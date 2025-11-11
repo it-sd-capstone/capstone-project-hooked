@@ -1,6 +1,26 @@
 body {
     background-color: seagreen;
     text-align: center;
+
+    /* unvisited link */
+    a:link {
+        color: blue;
+    }
+
+    /* visited link */
+    a:visited {
+        color: purple;
+    }
+
+    /* mouse over link */
+    a:hover {
+        color: red;
+    }
+
+    /* selected link */
+    a:active {
+        color: yellow;
+    }
 }
 
 ul li {
@@ -9,22 +29,58 @@ ul li {
     padding: 5px;
 }
 
-/* unvisited link */
-a:link {
-    color: red;
+.footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    height: 25px;
 }
 
-/* visited link */
-a:visited {
-    color: green;
+#passwordReset {
+    margin-left: -25px;
+    margin-right: 45px;
 }
 
-/* mouse over link */
-a:hover {
-    color: hotpink;
+#createAccount {
+    margin-right: 45px;
 }
 
-/* selected link */
-a:active {
-    color: blue;
+#password {
+    margin-left: 20px;
+    margin-right: 30px;
 }
+
+#loginButton {
+    background-color: dimgray;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 20px 0px 20px 0px;
+}
+
+#logoutButton {
+    background-color: dimgray;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 20px 0px 20px 0px;
+}
+
+#returnHome {
+    background-color: dimgray;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 20px 0px 20px 0px;
+}
+
+

@@ -14,7 +14,11 @@
 
     <%@include file="layouts/navigation.jsp"%>
 
-    <p>This will be replaced with about section</p>
+    <img src="Images/imagename.jpg" alt="Image description"> <br>
+
+    <p>Overview Paragraph</p>
+
+    <p>User Instructions</p>
 
     <%@include file="layouts/footer.jsp"%>
 </div>

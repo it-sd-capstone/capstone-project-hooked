@@ -21,8 +21,6 @@
         <a href="index.jsp">Home</a>
     </p>
 
-    <p>temporary example file</p>
-
     <%@include file="layouts/footer.jsp"%>
 </div>
 </body>

@@ -14,7 +14,11 @@
 
     <%@include file="layouts/navigation.jsp"%>
 
-    <p>This will be replaced with password reset</p>
+    <h6>Email to send reset form too:</h6>
+    <form action="<%= request.getContextPath() %>/Login" method="post">
+        <input type="text" id="email" name="email" placeholder="User@gmail.com">
+        <input type="submit" value="login">
+    </form>
 
     <%@include file="layouts/footer.jsp"%>
 </div>
