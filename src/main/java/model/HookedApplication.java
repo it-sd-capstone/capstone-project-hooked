@@ -1,22 +1,15 @@
 package model;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import java.sql.*;
 import java.util.Random;
 import java.util.Scanner;
 
-@SpringBootApplication
 public class HookedApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(HookedApplication.class, args);
-    }
 
     public static final String DATABASE_NAME = "hooked";
     public static final String DATABASE_PATH = DATABASE_NAME + ".db";
     private static final int TIMEOUT_STATEMENT_S = 5;
+
     private static Scanner scanner;
     private static Random rng;
 
@@ -78,18 +71,7 @@ public class HookedApplication {
                     BaitType STRING NOT NULL
                     );""");
 
-            // sqlInsertGame = result.prepareStatement("INSERT INTO game (at) VALUES (datetime('now'))");
-            // sqlFetchGameCount = result.prepareStatement("SELECT COUNT(*) FROM game");
-            // sqlFetchRecentGames = result.prepareStatement("SELECT COUNT(*) FROM game WHERE at > datetime('now', '-7 days')");
-            // sqlReset = result.prepareStatement("DELETE FROM game");
-
-//            sqlInsertIntoCatches = result.prepareStatement("INSERT INTO Catches (at) VALUES (?, ?, ?, ?, ?, ?)");
-//            sqlInsertIntoSpecies = result.prepareStatement("INSERT INTO Species (at) VALUES (?, ?, ?)");
-//            sqlInsertIntoUsers = result.prepareStatement("INSERT INTO Users (at) VALUES (?, ?, ?, ?)");
-//            sqlInsertIntoLocations = result.prepareStatement("INSERT INTO Locations (at) VALUES (?, ?)");
-//            sqlInsertIntoBaits = result.prepareStatement("INSERT INTO Baits (at) VALUES (?)");
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
         }
@@ -116,12 +98,10 @@ public class HookedApplication {
         try {
             Statement statement = db.createStatement();
             result = statement.executeQuery(sql);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.err.println(e.getMessage());
             e.printStackTrace();
         }
         return result;
     }
-
 }
