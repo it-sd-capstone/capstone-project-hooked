@@ -1,0 +1,30 @@
+body {
+    background-color: seagreen;
+    text-align: center;
+}
+
+ul li {
+    display: inline-block;
+    margin-right: 10px;
+    padding: 5px;
+}
+
+/* unvisited link */
+a:link {
+    color: red;
+}
+
+/* visited link */
+a:visited {
+    color: green;
+}
+
+/* mouse over link */
+a:hover {
+    color: hotpink;
+}
+
+/* selected link */
+a:active {
+    color: blue;
+}
