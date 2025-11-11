@@ -7,6 +7,15 @@ date and location can be entered and stored on the website for future reference 
 have the ability to share their entries with other site users or keep the information for their own records.
 
 # Installation:
+Prerequisites
+JDK 21 or higher, Git
+1) Set location to clone bash: cd project-folder
+2) Clone the repository bash: git clone git@github.com:it-sd-capstone/capstone-project-hooked.git
+3) Set folder directory: cd capstone-project-hooked
+4) Build the project bash: ./mvnw clean package -DskipTests
+5) java -jar target/app.jar
+6) Access the site http://localhost:5000
+
 May need to do file -> project structure -> artifacts -> + -> directory content -> templates
 
 # Testing
