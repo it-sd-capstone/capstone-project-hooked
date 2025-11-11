@@ -1,2 +1,5 @@
-controllers\TestServlet.class
-model\HookedApplication.class
+edu\cvtc\hooked\util\DbUtil.class
+edu\cvtc\hooked\controller\TestServlet.class
+edu\cvtc\hooked\controller\AppBootstrap.class
+edu\cvtc\hooked\model\User.class
+edu\cvtc\hooked\dao\UserDao.class

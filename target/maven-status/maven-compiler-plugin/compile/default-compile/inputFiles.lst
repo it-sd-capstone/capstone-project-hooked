@@ -1,2 +1,5 @@
-C:\Users\mike.truscott\Documents\CVTC\15_Developer Capstone\Project\Hooked_2\capstone-project-hooked\src\main\java\controllers\TestServlet.java
-C:\Users\mike.truscott\Documents\CVTC\15_Developer Capstone\Project\Hooked_2\capstone-project-hooked\src\main\java\model\HookedApplication.java
+C:\Users\mike.truscott\Documents\CVTC\15_Developer Capstone\Project\Hooked_2\capstone-project-hooked\src\main\java\edu\cvtc\hooked\controller\AppBootstrap.java
+C:\Users\mike.truscott\Documents\CVTC\15_Developer Capstone\Project\Hooked_2\capstone-project-hooked\src\main\java\edu\cvtc\hooked\controller\TestServlet.java
+C:\Users\mike.truscott\Documents\CVTC\15_Developer Capstone\Project\Hooked_2\capstone-project-hooked\src\main\java\edu\cvtc\hooked\dao\UserDao.java
+C:\Users\mike.truscott\Documents\CVTC\15_Developer Capstone\Project\Hooked_2\capstone-project-hooked\src\main\java\edu\cvtc\hooked\model\User.java
+C:\Users\mike.truscott\Documents\CVTC\15_Developer Capstone\Project\Hooked_2\capstone-project-hooked\src\main\java\edu\cvtc\hooked\util\DbUtil.java
