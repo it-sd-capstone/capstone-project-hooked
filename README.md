@@ -22,7 +22,7 @@ May need to do file -> project structure -> artifacts -> + -> directory content 
 Description: Automated tests are included in `MainTest.java` file under `edu.cvtc.hooked` package. These tests verify that the database connection and basic query functionality works.
 1. Open the project.
 2. Navigate to `src/test/java/edu/cvtc/hooked/MainTest.java`.
-3. Right-click the file and select Run MaintTest.
+3. Right-click the file and select Run MainTest.
 4. Make sure it passes both tests.
 
 # Deploy to AWS Elastic Beanstalk

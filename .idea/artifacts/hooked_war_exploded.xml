@@ -50,6 +50,7 @@
       </element>
       <element id="javaee-facet-resources" facet="hooked/web/Web" />
       <element id="dir-copy" path="$PROJECT_DIR$/../../DevCapstone/capstone-project-hooked/src/main/resources/templates" />
+      <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp/WEB-INF/classes/templates" />
     </root>
   </artifact>
 </component>

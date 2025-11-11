@@ -10,7 +10,7 @@
 
     <servlet>
         <servlet-name>IndexServlet</servlet-name>
-        <servlet-class>cvtc.edu.hooked.controllers.TestServlet</servlet-class>
+        <servlet-class>controllers.TestServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
