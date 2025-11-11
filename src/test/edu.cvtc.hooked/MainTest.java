@@ -4,11 +4,8 @@ import model.HookedApplication;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.sql.*;
-
+ 
 public class MainTest {
     @Test
     void createConnection() throws SQLException {
