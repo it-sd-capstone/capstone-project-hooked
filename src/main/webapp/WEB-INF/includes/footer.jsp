@@ -1,0 +1,1 @@
+<div class="footer">&copy Copyright 2025 Hooked</div>
