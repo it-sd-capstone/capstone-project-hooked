@@ -24,10 +24,10 @@
         <input type="text" id="lastName" name="lastName" placeholder="lastName">
 
         <h6>Username:</h6>
-        <input type="text" id="UserName" name="UserName" placeholder="UserName">
+        <input type="text" id="userName" name="userName" placeholder="userName">
 
         <h6>Password:</h6>
-        <input type="password" id="password" name="password" placeholder="password">
+        <input type="password" id="passwordHash" name="passwordHash" placeholder="passwordHash">
 
         <input type="submit" value="Create Account">
     </form>
