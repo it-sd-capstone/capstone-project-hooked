@@ -16,19 +16,19 @@
 
     <form action="<%= request.getContextPath() %>/Login" method="post">
         <h6>Username:</h6>
-        <input type="text" id="username" name="username" placeholder="Username">
+        <input type="text" id="UserName" name="UserName" placeholder="UserName">
+
         <h6>Password:</h6>
-        <input type="text" id="password" name="password" placeholder="Password">
-        <h6>Email:</h6>
-        <input type="text" id="email" name="email" placeholder="User@gmail.com">
-        <input type="submit" value="login">
+        <input type="password" id="password" name="password" placeholder="password">
+
+        <input type="submit" value="Login">
     </form>
 
     <br>
 
     <ul class="nav nav-tabs">
         <li><a id="passwordReset" href="passwordReset.jsp">Forgot Password?</a></li>
-        <li><a id="createAccount" href="createAccount.jsp">Don't Have an Account?</a></li>
+        <li><a id="createAccount" href="<%= request.getContextPath() %>/Register">Don't Have an Account?</a></li>
         <li><a href="index.jsp">Home</a></li>
     </ul>
 

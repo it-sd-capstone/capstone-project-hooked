@@ -9,9 +9,11 @@ import jakarta.servlet.ServletException;
 @WebServlet(name = "Logout", value = "/Logout")
 public class Logout extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        getServletContext().getRequestDispatcher("/logout.jsp").forward(request, response);
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
     }
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    }
 }

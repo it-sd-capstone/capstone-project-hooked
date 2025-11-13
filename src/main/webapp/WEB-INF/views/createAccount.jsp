@@ -16,14 +16,20 @@
 
     <h6></h6>
 
-    <form action="<%= request.getContextPath() %>/Login" method="post">
+    <form action="<%= request.getContextPath() %>/Register" method="post">
+        <h6>First Name:</h6>
+        <input type="text" id="firstName" name="firstName" placeholder="firstName">
+
+        <h6>Last Name:</h6>
+        <input type="text" id="lastName" name="lastName" placeholder="lastName">
+
         <h6>Username:</h6>
-        <input type="text" id="username" name="username" placeholder="Username">
+        <input type="text" id="UserName" name="UserName" placeholder="UserName">
+
         <h6>Password:</h6>
-        <input type="text" id="password" name="password" placeholder="Password">
-        <h6>Email:</h6>
-        <input type="text" id="email" name="email" placeholder="User@gmail.com">
-        <input type="submit" value="login">
+        <input type="password" id="password" name="password" placeholder="password">
+
+        <input type="submit" value="Create Account">
     </form>
 
     <%@include file="/WEB-INF/includes/footer.jsp"%>

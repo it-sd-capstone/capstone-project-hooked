@@ -12,13 +12,12 @@
     <h1>Logout</h1>
   </div>
 
-  <form action="Logout" method="post">
-    <input type="submit" id="logoutButton" value="Logout">
-  </form>
+  <p>You have been logged out Successfully.</p>
 
-  <form action="index.jsp" method="post">
-    <input type="submit" id="returnHome" value="Return Home">
-  </form>
+    <a href="<%= request.getContextPath() %>/Login" class="btn">Login Again</a>
+    <a href="index.jsp" class="btn">Return Home</a>
+
+    <%@include file="/WEB-INF/includes/footer.jsp"%>
 
 </div>
 </body>
