@@ -14,7 +14,7 @@ class UserDaoTest {
 
     @BeforeAll
     static void setupDatabase() {
-        // Make sure all the tables exist before any of these tests run
+        // Make sure all the tables exist before any of these tests run.
         DbUtil.ensureSchema();
     }
 
