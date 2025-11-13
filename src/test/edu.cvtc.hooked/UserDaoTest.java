@@ -14,18 +14,18 @@ class UserDaoTest {
 
     @BeforeAll
     static void setupDatabase() {
-        // make sure all the tables exist before any of these tests run
+        // Make sure all the tables exist before any of these tests run
         DbUtil.ensureSchema();
     }
 
     @Test
     void insertAndFindByUserName_roundTrip() throws Exception {
-        // using a unique username so it never conflicts with anything already in the DB
+        // Using a unique username so it never conflicts with anything already in the DB
         String uniqueUserName = "junitUser_" + System.currentTimeMillis();
 
         UserDao dao = new UserDao();
 
-        // build a user exactly how the app would create one
+        // Build a user exactly how the app would create one
         User newUser = new User(
                 "JUnit",
                 "Tester",
@@ -33,10 +33,10 @@ class UserDaoTest {
                 "fakeHash123"
         );
 
-        // try inserting the user into the database
+        // Try inserting the user into the database
         dao.insert(newUser);
 
-        // now make sure we can actually pull it back out
+        // Now make sure we can actually pull it back out
         Optional<User> foundOpt = dao.findByUserName(uniqueUserName);
         assertTrue(foundOpt.isPresent(), "User was inserted so it should be found");
 
@@ -45,7 +45,7 @@ class UserDaoTest {
         // DB should have assigned this
         assertNotNull(found.getUserId(), "DB should give the user an ID");
 
-        // confirm the rest of the fields match what I put in
+        // Confirm the rest of the fields match what I put in
         assertEquals("JUnit", found.getFirstName());
         assertEquals("Tester", found.getLastName());
         assertEquals(uniqueUserName, found.getUserName());
@@ -56,10 +56,10 @@ class UserDaoTest {
     void findByUserName_returnsEmptyForMissingUser() throws Exception {
         UserDao dao = new UserDao();
 
-        // pick a username that is guaranteed to not exist
+        // Pick a username that is guaranteed to not exist
         String missingUserName = "no_such_user_" + System.currentTimeMillis();
 
-        // should not find anyone with a username that doesn't exist
+        // Should not find anyone with a username that doesn't exist
         Optional<User> result = dao.findByUserName(missingUserName);
 
         assertTrue(result.isEmpty(), "Unknown username should come back as empty");
