@@ -1,5 +1,8 @@
 edu\cvtc\hooked\util\DbUtil.class
-edu\cvtc\hooked\controller\TestServlet.class
+edu\cvtc\hooked\controller\FrontController.class
+edu\cvtc\hooked\controller\Logout.class
 edu\cvtc\hooked\controller\AppBootstrap.class
-edu\cvtc\hooked\model\User.class
 edu\cvtc\hooked\dao\UserDao.class
+edu\cvtc\hooked\controller\Login.class
+edu\cvtc\hooked\model\User.class
+edu\cvtc\hooked\controller\IndexServlet.class
