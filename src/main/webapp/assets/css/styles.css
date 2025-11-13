@@ -1,16 +1,20 @@
 body {
     background-color: seagreen;
     text-align: center;
+    color: white;
 
     /* unvisited link */
     a:link {
-        color: blue;
+        color: yellow;
     }
 
-    /* visited link */
+    /* visited link Possibly overshadowed by FrontController
+    currently sets all links to visited after clicking any
+    link. Will need to be fixed or remove visited altogether
     a:visited {
-        color: purple;
+        color: lightblue;
     }
+     */
 
     /* mouse over link */
     a:hover {
@@ -19,7 +23,7 @@ body {
 
     /* selected link */
     a:active {
-        color: yellow;
+        color: purple;
     }
 }
 
@@ -81,6 +85,26 @@ ul li {
     font-size: 16px;
     cursor: pointer;
     margin: 20px 0px 20px 0px;
+}
+
+table {
+    margin-left: auto;
+    margin-right: auto;
+    border-spacing: 60px 20px;
+    border-collapse: collapse;
+    text-align: left;
+    background-color: dimgray;
+    border: 5px solid darkgray;
+}
+
+th, td {
+    border: 2px solid darkgray;
+    padding: 10px 20px;
+}
+
+label, input, select {
+    background-color: dimgray;
+    color: white;
 }
 
 

@@ -14,7 +14,7 @@
 
     <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
-    <img src="Images/imagename.jpg" alt="Image description"> <br>
+    <img src="<c:url value='/assets/img/walleye-1.jpg' />" alt="walleye image"><br>
 
     <p>Overview Paragraph</p>
 

@@ -14,24 +14,15 @@
 
     <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
-    <img src="Images/imagename.jpg" alt="Image description"><br><br>
+    <img src="<c:url value='/assets/img/temporarySpecies.jpg' />" alt="sturgeon image"><br><br>
 
     <form action="<%= request.getContextPath() %>/AddData" method="post">
         <label for="addSpecies">Species:</label>
-        <input type="text" id="addSpecies" name="addSpecies"> <br><br>
+        <input type="text" id="addSpecies" name="addSpecies">
         <input type="submit" value="Add Species">
     </form>
 
     <br>
-
-    <%--
-    <form action="${pageContext.request.contextPath}/SearchData" method="get">
-        <label for="searchSpecies">Search by Species:</label>
-        <input type="text" name="searchSpecies" id="searchSpecies">
-        <br><br>
-        <input type="submit">
-    </form>
-    --%>
 
     <form action="${pageContext.request.contextPath}/SearchData" method="get">
         <label for="speciesSearch">Choose a Species:</label>
@@ -53,9 +44,41 @@
             <option value="Sucker">Sucker</option>
             <option value="Yellow Perch">Yellow Perch</option>
         </select>
-        <br><br>
         <input type="submit" value="Search Species">
-    </form>
+    </form> <br><br>
+
+
+    <%--table will need to be update to use dyanmic info from the db--%>
+    <%--table could also be removed entirely in opt of a different way--%>
+    <table>
+        <thead>
+        <tr>
+            <th>Species</th>
+            <th>Length</th>
+            <th>Width</th>
+            <th>Location</th>
+            <th>Bait Used</th>
+            <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td>Bluegill</td>
+            <td>11 inches</td>
+            <td>1 lb</td>
+            <td>Mississippi River</td>
+            <td>Gulp! Minnow</td>
+            <td>Slip Bobber</td>
+        </tr>
+        <tr>
+            <td>ShovelNose Sturgeon</td>
+            <td>27 inches</td>
+            <td>5 lbs</td>
+            <td>Chippewa River</td>
+            <td>Nightcrawler</td>
+            <td>Fishing the edge of an eddy</td>
+        </tr>
+        </tbody>
 
 
     <%@include file="/WEB-INF/includes/footer.jsp"%>

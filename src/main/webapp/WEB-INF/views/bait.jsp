@@ -14,24 +14,15 @@
 
   <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
-  <img src="Images/imagename.jpg" alt="Image description"><br><br>
+  <img src="<c:url value='/assets/img/temporaryBait.jpg' />" alt="tackle box"><br><br>
 
   <form action="<%= request.getContextPath() %>/AddData" method="post">
     <label for="addBait">Bait:</label>
-    <input type="text" id="addBait" name="addBait"> <br><br>
+    <input type="text" id="addBait" name="addBait">
     <input type="submit" value="Add Bait">
   </form>
 
   <br>
-
-  <%--
-      <form action="${pageContext.request.contextPath}/SearchData" method="get">
-          <label for="searchBait">Search by Bait:</label>
-          <input type="text" name="searchBait" id="searchBait">
-          <br><br>
-          <input type="submit">
-      </form>
-  --%>
 
   <form action="${pageContext.request.contextPath}/SearchData" method="get">
     <label for="baitSearch">Choose a Location:</label>
@@ -53,9 +44,31 @@
       <option value="Swimbait">Swimbait</option>
       <option value="Topwater">Topwater</option>
     </select>
-    <br><br>
     <input type="submit" value="Search Baits">
-  </form>
+  </form> <br><br>
+
+  <%--table will need to be updated to use dyanmic info from the db--%>
+  <%--table could also be removed entirely in opt of a different way--%>
+  <table>
+    <thead>
+      <tr>
+        <th>Bait</th>
+        <th>Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <td>Nightcrawler</td>
+      <td>Carolina Rig</td>
+    </tr>
+    <tr>
+      <td>Plastic Worm</td>
+      <td>Wacky</td>
+    </tr>
+    </tbody>
+
+
+  </table>
 
   <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>

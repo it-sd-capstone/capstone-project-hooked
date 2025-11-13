@@ -12,7 +12,7 @@
         <h1>Login</h1>
     </div>
 
-    <img src="Images/imagename.jpg" alt="Image description"> <br>
+    <img src="<c:url value='/assets/img/walleye-1.jpg' />" alt="walleye image"><br>
 
     <form action="<%= request.getContextPath() %>/Login" method="post">
         <h6>Username:</h6>
