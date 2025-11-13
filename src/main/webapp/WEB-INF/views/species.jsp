@@ -55,7 +55,7 @@
         <tr>
             <th>Species</th>
             <th>Length</th>
-            <th>Width</th>
+            <th>Weight(lbs)</th>
             <th>Location</th>
             <th>Bait Used</th>
             <th>Notes</th>
