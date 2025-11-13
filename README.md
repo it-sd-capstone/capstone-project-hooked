@@ -24,20 +24,18 @@ select (hooked:war exploded) > click Apply and then OK.
 9) Access the application: open http://localhost:8080/hooked_war_exploded/ in your browser.
 
 # Testing
-Description: Automated tests are included in `MainTest.java` file under `edu.cvtc.hooked` package.
+Description: Automated tests are included in `MainTest.java`, `UserDaoTest.java` and `UserTest.java` file under `src/test/edu.cvtc.hooked` package.
 These tests verify that the database connection and basic query functionality works.
 1. Open the project.
 2. Navigate to `src/test/edu/cvtc/hooked/MainTest.java`.
 3. Right-click the file and select Run `MainTest`.
-4. Make sure it passes both tests.
-Automated tests for UserDao and User
-1) Open the project.
-2) Navigate to `src/test/edu/cvtc/hooked/UserDaoTest.java`.
-3) Right-click the file and select Run `UserDaoTest`.
-4) Make sure it passes both tests.
-5) Navigate to `src/test/edu/cvtc/hooked/UserTest.java`.
-6) Right-click the file and select Run `UserTest`.
-7) Make sure it passes all 8 tests.
+4. Make sure it passes both tests. 
+5. Navigate to `src/test/edu/cvtc/hooked/UserDaoTest.java`.
+6. Right-click the file and select Run `UserDaoTest`.
+7. Make sure it passes both tests.
+8. Navigate to `src/test/edu/cvtc/hooked/UserTest.java`.
+9. Right-click the file and select Run `UserTest`.
+10. Make sure it passes all 8 tests.
 
 # Deploy to AWS Elastic Beanstalk
 1) Build app.war bash: ./mvnw clean package -DskipTests
