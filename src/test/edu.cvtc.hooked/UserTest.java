@@ -75,7 +75,7 @@ public class UserTest {
 
     @Test
     public void testGetDisplayName() {
-        // Should return "firstName lastName".
+        // Should return "firstName lastName"
         User user = new User();
         user.setFirstName("Test");
         user.setLastName("User");
