@@ -9,17 +9,23 @@ public final class DbUtil {
 
     // Put the SQLite file under <catalina.base>/data/hooked.db
     public static String databasePath() {
-        String base = System.getProperty("catalina.base", ".");
-        Path dataDir = Paths.get(base, "data");
+        Path dataDir = Paths.get("data");
         try { Files.createDirectories(dataDir); } catch (Exception ignored) {}
         return dataDir.resolve("hooked.db").toString();
     }
 
+
+
     public static Connection getConnection() throws SQLException {
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Failed to load SQLite JDBC driver", e);
+        }
+
         Connection conn = DriverManager.getConnection("jdbc:sqlite:" + databasePath());
         try (Statement s = conn.createStatement()) {
             s.setQueryTimeout(TIMEOUT_STATEMENT_S);
-            // Important for SQLite foreign keys:
             s.execute("PRAGMA foreign_keys = ON");
         }
         return conn;

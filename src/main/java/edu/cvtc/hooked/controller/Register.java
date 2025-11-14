@@ -25,12 +25,34 @@ public class Register extends HttpServlet {
         UserDao dao = new UserDao();
 
         try {
+            // Get the database path
+            String dbPath = edu.cvtc.hooked.util.DbUtil.databasePath();
+            System.out.println("Database file being used: " + dbPath);
+
+
+            if (dao.findByUserName(userName).isPresent()) {
+                request.setAttribute("Error", "Username already taken. Please choose another.");
+                request.getRequestDispatcher("/WEB-INF/views/createAccount.jsp").forward(request, response);
+                return;
+            }
+
+            // Insert the user
             dao.insert(user);
-            response.sendRedirect(request.getContextPath()+"/Login");
+
+            // Print info after insert
+            System.out.println("Inserted user: " + userName + " into DB at " + dbPath);
+
+            // Crash to show console
+            //throw new RuntimeException("Crash after inserting user '" + userName + "' into DB at " + dbPath);
+
+            // Redirects to login.
+             response.sendRedirect(request.getContextPath() + "/Login");
+
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("Error", "Registration Failed");
+            request.setAttribute("Error", "Registration Failed: " + e.getMessage());
             request.getRequestDispatcher("/WEB-INF/views/createAccount.jsp").forward(request, response);
         }
     }
+
 }
