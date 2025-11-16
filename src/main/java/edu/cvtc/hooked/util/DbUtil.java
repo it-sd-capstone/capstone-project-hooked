@@ -48,11 +48,11 @@ public final class DbUtil {
 
             command.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS Species (
-                  SpeciesID   INTEGER PRIMARY KEY AUTOINCREMENT,
-                  SpeciesName TEXT NOT NULL,
-                  length      REAL NOT NULL,
-                  weight      REAL NOT NULL
-                )
+                  SpeciesID    INTEGER PRIMARY KEY AUTOINCREMENT,
+                  SpeciesName  VARCHAR(50) NOT NULL,
+                  Length       DECIMAL(5,2),
+                  Weight       DECIMAL(5,2)
+                );
             """);
 
             command.executeUpdate("""
