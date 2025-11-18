@@ -12,6 +12,9 @@
     <h1>Logout</h1>
   </div>
 
+  <form action="<%= request.getContextPath() %>/Logout" method="post">
+    <input type="submit" value="Logout">
+  </form>
   <p>You have been logged out Successfully.</p>
 
     <a href="<%= request.getContextPath() %>/Login" class="btn">Login Again</a>

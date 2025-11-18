@@ -10,32 +10,34 @@ import java.util.Optional;
 
 public class CatchDao {
 
-    // INSERT a new catch (like UserDao.insert)
+    // INSERT a new catch
     public void insert(Catch c) throws SQLException {
         String sql = """
-            INSERT INTO Catches(UserID, SpeciesID, LocationID, BaitID, DateCaught, Notes)
-            VALUES(?,?,?,?,?,?)
+            INSERT INTO Catches(UserID, SpeciesName, LocationName, BaitType, DateCaught, Notes, Length, Weight)
+            VALUES(?,?,?,?,?,?,?,?)
             """;
 
         try (Connection conn = DbUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, c.getUserId());
-            ps.setInt(2, c.getSpeciesId());
-            ps.setInt(3, c.getLocationId());
-            ps.setInt(4, c.getBaitId());
+            ps.setString(2, c.getSpeciesName());
+            ps.setString(3, c.getLocationName());
+            ps.setString(4, c.getBaitType());
 
             if (c.getDateCaught() != null && !c.getDateCaught().isBlank()) {
-                ps.setString(5, c.getDateCaught());   // e.g. "2025-11-17"
+                ps.setString(5, c.getDateCaught());
             } else {
                 ps.setNull(5, Types.VARCHAR);
             }
 
             ps.setString(6, c.getNotes());
+            ps.setDouble(7, c.getLength());
+            ps.setDouble(8, c.getWeight());
 
             ps.executeUpdate();
 
-            // optional: grab generated id
+            // Grab generated ID
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
                     c.setCatchId(rs.getInt(1));
@@ -44,10 +46,10 @@ public class CatchDao {
         }
     }
 
-    // Simple "search" – find one catch by its ID (like findByUserName)
+    // Find one catch by ID
     public Optional<Catch> findById(Integer catchId) throws SQLException {
         String sql = """
-            SELECT CatchID, UserID, SpeciesID, LocationID, BaitID, DateCaught, Notes
+            SELECT CatchID, UserID, SpeciesName, LocationName, BaitType, DateCaught, Notes, Length, Weight
             FROM Catches
             WHERE CatchID = ?
             """;
@@ -62,12 +64,17 @@ public class CatchDao {
                     Catch c = new Catch(
                             rs.getInt("CatchID"),
                             rs.getInt("UserID"),
-                            rs.getInt("SpeciesID"),
-                            rs.getInt("LocationID"),
-                            rs.getInt("BaitID"),
+                            rs.getString("SpeciesName"),
+                            rs.getString("LocationName"),
+                            rs.getString("BaitType"),
                             rs.getString("DateCaught"),
-                            rs.getString("Notes")
+                            rs.getString("Notes"),
+                            rs.getDouble("Length"),
+                            rs.getDouble("Weight")
                     );
+
+                    c.setLength(rs.getDouble("Length"));
+                    c.setWeight(rs.getDouble("Weight"));
                     return Optional.of(c);
                 }
                 return Optional.empty();
@@ -75,10 +82,10 @@ public class CatchDao {
         }
     }
 
-    // A slightly more "searchy" method: find all catches for a user
+    // Find all catches for a user
     public List<Catch> findByUserId(Integer userId) throws SQLException {
         String sql = """
-            SELECT CatchID, UserID, SpeciesID, LocationID, BaitID, DateCaught, Notes
+            SELECT CatchID, UserID, SpeciesName, LocationName, BaitType, DateCaught, Notes, Length, Weight
             FROM Catches
             WHERE UserID = ?
             ORDER BY DateCaught DESC, CatchID DESC
@@ -96,12 +103,16 @@ public class CatchDao {
                     Catch c = new Catch(
                             rs.getInt("CatchID"),
                             rs.getInt("UserID"),
-                            rs.getInt("SpeciesID"),
-                            rs.getInt("LocationID"),
-                            rs.getInt("BaitID"),
+                            rs.getString("SpeciesName"),
+                            rs.getString("LocationName"),
+                            rs.getString("BaitType"),
                             rs.getString("DateCaught"),
-                            rs.getString("Notes")
+                            rs.getString("Notes"),
+                            rs.getDouble("Length"),
+                            rs.getDouble("Weight")
                     );
+                    c.setLength(rs.getDouble("Length"));
+                    c.setWeight(rs.getDouble("Weight"));
                     results.add(c);
                 }
             }

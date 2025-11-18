@@ -24,21 +24,10 @@ public class Login extends HttpServlet {
 
         try {
             Optional<User> optUser = dao.findByUserName(userName);
-
             if (optUser.isPresent() && optUser.get().getPasswordHash().equals(passwordHash)) {
-
-                // Store user in session.
                 HttpSession session = request.getSession();
                 session.setAttribute("user", optUser.get());
-
-                // Redirect to home page.
-                response.sendRedirect(request.getContextPath() + "/IndexServlet");
-
-            } else {
-
-                // Login failed error.
-                request.setAttribute("Error", "Invalid username or password.");
-                request.getRequestDispatcher("/WEB-INF/views/login.jsp").forward(request, response);
+                getServletContext().getRequestDispatcher("/WEB-INF/views/index.jsp").forward(request, response);
             }
         } catch (SQLException e) {
             e.printStackTrace();

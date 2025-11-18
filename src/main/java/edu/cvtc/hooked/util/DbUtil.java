@@ -47,43 +47,18 @@ public final class DbUtil {
             """);
 
             command.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Species (
-                  SpeciesID    INTEGER PRIMARY KEY AUTOINCREMENT,
-                  SpeciesName  VARCHAR(50) NOT NULL,
-                  Length       DECIMAL(5,2),
-                  Weight       DECIMAL(5,2)
-                );
-            """);
-
-            command.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Locations (
-                  LocationID   INTEGER PRIMARY KEY AUTOINCREMENT,
-                  LocationName TEXT NOT NULL,
-                  State        TEXT NOT NULL
-                )
-            """);
-
-            command.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Baits (
-                  BaitID   INTEGER PRIMARY KEY AUTOINCREMENT,
-                  BaitType TEXT NOT NULL
-                )
-            """);
-
-            command.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS Catches (
-                  CatchID    INTEGER PRIMARY KEY AUTOINCREMENT,
-                  UserID     INTEGER NOT NULL,
-                  SpeciesID  INTEGER NOT NULL,
-                  LocationID INTEGER NOT NULL,
-                  BaitID     INTEGER NOT NULL,
-                  DateCaught DATE,
-                  Notes      TEXT,
-                  FOREIGN KEY (UserID)    REFERENCES Users(UserID),
-                  FOREIGN KEY (SpeciesID) REFERENCES Species(SpeciesID),
-                  FOREIGN KEY (LocationID) REFERENCES Locations(LocationID),
-                  FOREIGN KEY (BaitID)    REFERENCES Baits(BaitID)
-                )
+                    CatchID      INTEGER PRIMARY KEY AUTOINCREMENT,
+                    UserID       INTEGER NOT NULL,
+                    SpeciesName  VARCHAR(50) NOT NULL,
+                    LocationName TEXT NOT NULL,
+                    BaitType     TEXT NOT NULL,
+                    Length       DECIMAL(5,2),
+                    Weight       DECIMAL(5,2),
+                    DateCaught   DATE,
+                    Notes        TEXT,
+                    FOREIGN KEY (UserID) REFERENCES Users(UserID)
+                );
             """);
 
         } catch (Exception e) {
