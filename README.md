@@ -27,13 +27,13 @@ select (hooked:war exploded) > click Apply and then OK.
 Description: Automated tests are included in `MainTest.java`, `UserDaoTest.java` and `UserTest.java` file under `src/test/edu.cvtc.hooked` package.
 These tests verify that the database connection and basic query functionality works.
 1. Open the project.
-2. Navigate to `src/test/edu/cvtc/hooked/MainTest.java`.
+2. Navigate to `src/test/edu.cvtc.hooked/MainTest.java`.
 3. Right-click the file and select Run `MainTest`.
 4. Make sure it passes both tests. 
-5. Navigate to `src/test/edu/cvtc/hooked/UserDaoTest.java`.
+5. Navigate to `src/test/edu.cvtc.hooked/UserDaoTest.java`.
 6. Right-click the file and select Run `UserDaoTest`.
 7. Make sure it passes both tests.
-8. Navigate to `src/test/edu/cvtc/hooked/UserTest.java`.
+8. Navigate to `src/test/edu.cvtc.hooked/UserTest.java`.
 9. Right-click the file and select Run `UserTest`.
 10. Make sure it passes all 8 tests.
 
