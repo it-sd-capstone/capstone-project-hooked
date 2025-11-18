@@ -79,6 +79,7 @@
             <td>Fishing the edge of an eddy</td>
         </tr>
         </tbody>
+    </table>
 
 
     <%@include file="/WEB-INF/includes/footer.jsp"%>

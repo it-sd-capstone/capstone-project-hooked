@@ -23,8 +23,6 @@
         Here you can record your catches, locations, and bait you used! <br>
         This is a great place for every angler!</p>
 
-    <p>User Instructions</p>
-
     <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>
 </body>

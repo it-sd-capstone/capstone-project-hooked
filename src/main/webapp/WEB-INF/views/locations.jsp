@@ -65,6 +65,7 @@
       <td>Large Lake</td>
     </tr>
     </tbody>
+  </table>
 
   <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>

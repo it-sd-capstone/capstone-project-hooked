@@ -25,7 +25,7 @@
   <br>
 
   <form action="${pageContext.request.contextPath}/SearchData" method="get">
-    <label for="baitSearch">Choose a Location:</label>
+    <label for="baitSearch">Choose a Bait:</label>
     <select name="baitSearch" id="baitSearch" required>
       <option value="" disabled selected>Select a Bait</option>
       <option value="Crankbait">Crankbait</option>

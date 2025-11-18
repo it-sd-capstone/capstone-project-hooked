@@ -15,17 +15,19 @@
 
     <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
+    <div class="content">
     <img src="<c:url value='/assets/img/walleye-1.jpg' />" alt="walleye image"><br>
 
     <p>Hello, and welcome to Hooked.
         <br> This is example text to prove the technology stack works
         <br> If you are seeing this then the jsp and servlet are working.
+    </p>
 
-    <form action="Login" method="post">
-        <input type="submit" id="loginButton" value="Login">
-    </form>
+<%-- could put user instructions here, or repeat on every page. --%>
 
-    <%@include file="/WEB-INF/includes/footer.jsp"%>
+</div>
+
+<%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>
 </body>
 </html>
