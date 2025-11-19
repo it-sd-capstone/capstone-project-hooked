@@ -16,7 +16,7 @@
     <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
     <div class="content">
-    <img src="<c:url value='/assets/img/walleye-1.jpg' />" alt="walleye image"><br>
+    <img class="home-image" src="<c:url value='/assets/img/walleye-1.jpg' />" alt="walleye image"><br>
 
     <p>Hello, and welcome to Hooked.
         <br> This is example text to prove the technology stack works

@@ -1,10 +1,15 @@
+html, body {
+    overflow-x: hidden;
+}
+
 body {
     background-color: seagreen;
     text-align: center;
     color: white;
-    height: 100%;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
+    margin: 0;
 
     /* unvisited link */
     a:link {
@@ -114,11 +119,41 @@ input, select {
 
 img {
     max-width: 100%;
+    height: auto;
+    display: block;
 }
 
 #loginPic {
-    max-width: 25%;
+    max-width: 100%;
+    height: auto;
 }
+
+/* Home page image */
+.home-image {
+    max-width: 75%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Container */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+/* Content */
+.content {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 0 10px;
+    box-sizing: border-box;
+}
+
 
 
 
