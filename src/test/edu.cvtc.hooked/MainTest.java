@@ -1,5 +1,6 @@
 package edu.cvtc.hooked;
 
+import edu.cvtc.hooked.model.SpeciesRestrictions;
 import edu.cvtc.hooked.util.DbUtil;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,6 +26,21 @@ public class MainTest {
             int result = rows.getInt("result");
             assertEquals(5, result);
             rows.close();
+        }
+    }
+
+    @Test
+    void restrictions() throws SQLException, ClassNotFoundException {
+        try (Connection db = DbUtil.getConnection()) {
+            String speciesStr     = "bluegill";
+            double length = 20.00;
+            double weight = 10.00;
+
+            SpeciesRestrictions restrictions = SpeciesRestrictions.ALL.get(speciesStr);
+            assertNotNull(restrictions);
+
+            boolean invalid = (length > restrictions.getMaxLength()) || (weight > restrictions.getMaxWeight());
+            assertTrue(invalid);
         }
     }
 }
