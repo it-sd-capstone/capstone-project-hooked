@@ -40,7 +40,6 @@ public class AddCatchServlet extends HttpServlet {
             double length = (lengthStr != null && !lengthStr.isBlank()) ? Double.parseDouble(lengthStr) : 0.0;
             double weight = (weightStr != null && !weightStr.isBlank()) ? Double.parseDouble(weightStr) : 0.0;
 
-            // Create the Catch object using the updated constructor
             Catch c = new Catch(userId, speciesName, locationName, baitType, dateCaught, notes, length, weight);
 
             SpeciesRestrictions restrictions = SpeciesRestrictions.ALL.get(speciesStr);
@@ -49,16 +48,14 @@ public class AddCatchServlet extends HttpServlet {
                 req.setAttribute("error", "Unable to save catch: Unrecognized species");
                 req.getRequestDispatcher("/WEB-INF/views/addCatch.jsp").forward(req, resp);
             }
-            if (restrictions.getMaxLength() < length || restrictions.getMaxWeight() < weight) {
+            if (restrictions.getMaxLength() < length || restrictions.getMaxWeight() < weight || length <= 0 || weight <= 0) {
                 req.setAttribute("error", "Unable to save catch: Invalid size");
                 req.getRequestDispatcher("/WEB-INF/views/addCatch.jsp").forward(req, resp);
             }
 
-            // Insert into database
             CatchDao dao = new CatchDao();
             dao.insert(c);
 
-            // redirect after successful insert
             resp.sendRedirect(req.getContextPath() + "/WEB-INF/views/successfulAdd.jsp");
 
         } catch (Exception ex) {

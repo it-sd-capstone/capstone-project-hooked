@@ -120,4 +120,61 @@ public class CatchDao {
 
         return results;
     }
+
+    // Find by userID, or specified field
+    public List<Catch> searchOutput(Integer userId, String species, String location, String bait) throws SQLException {
+        List<Catch> results;
+
+            StringBuilder sb = new StringBuilder("SELECT * FROM CATCHES WHERE 1=1");
+            List<Object> parameters = new ArrayList<>();
+
+            if (userId != null) {
+                sb.append(" AND UserID = ?");
+                parameters.add(userId);
+            }
+            if (species != null && !species.isBlank()) {
+                sb.append(" AND SpeciesName = ?");
+                parameters.add(species);
+            }
+            if (location != null && !location.isBlank()) {
+                sb.append(" AND LocationName = ?");
+                parameters.add(location);
+            }
+            if (bait != null && !bait.isBlank()) {
+                sb.append(" AND BaitType = ?");
+                parameters.add(bait);
+            }
+
+            sb.append(" ORDER BY DateCaught DESC");
+
+            results = new ArrayList<>();
+
+            try (Connection conn = DbUtil.getConnection();
+                    PreparedStatement ps = conn.prepareStatement(sb.toString())) {
+
+                for (int i = 0; i < parameters.size(); i++) {
+                    ps.setObject(i + 1, parameters.get(i));
+                }
+                try (ResultSet rs = ps.executeQuery()) {
+
+                    while (rs.next()) {
+                        Catch catchObj = new Catch(
+                                rs.getInt("CatchID"),
+                                rs.getInt("UserID"),
+                                rs.getString("SpeciesName"),
+                                rs.getString("LocationName"),
+                                rs.getString("BaitType"),
+                                rs.getString("Notes"),
+                                rs.getString("DateCaught"),
+                                rs.getDouble("Length"),
+                                rs.getDouble("Weight")
+                        );
+                        results.add(catchObj);
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        return results;
+    }
 }

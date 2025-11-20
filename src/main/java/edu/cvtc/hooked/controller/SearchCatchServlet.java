@@ -3,6 +3,7 @@ package edu.cvtc.hooked.controller;
 import edu.cvtc.hooked.dao.CatchDao;
 import edu.cvtc.hooked.model.Catch;
 
+import edu.cvtc.hooked.util.DbUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -10,6 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @WebServlet("/searchCatches")
@@ -18,17 +21,25 @@ public class SearchCatchServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        handleSearch(req, resp);
+        try {
+            handleSearch(req, resp);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        handleSearch(req, resp);
+        try {
+            handleSearch(req, resp);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void handleSearch(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+            throws ServletException, IOException, SQLException {
 
         String userIdStr = req.getParameter("userId");
 
@@ -55,5 +66,24 @@ public class SearchCatchServlet extends HttpServlet {
             req.getRequestDispatcher("/WEB-INF/views/search.jsp").forward(req, resp);
         }
 
+        try {
+            Integer userId = Integer.valueOf(userIdStr);
+            String species = req.getParameter("speciesName");
+            String location = req.getParameter("locationName");
+            String bait = req.getParameter("baitType");
+
+            CatchDao dao = new CatchDao();
+            List <Catch> results = dao.searchOutput(userId, species, location, bait);
+
+            req.setAttribute("catchData", results);
+
+            req.getRequestDispatcher("/WEB-INF/views/searchResults.jsp").forward(req, resp);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            req.setAttribute("error", "Search failed: " + ex.getMessage());
+            req.getRequestDispatcher("/WEB-INF/views/search.jsp").forward(req, resp);
+        }
     }
 }
+
+

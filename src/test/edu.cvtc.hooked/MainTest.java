@@ -149,6 +149,14 @@ public class MainTest {
             String lengthStr = "11.0";
             String weightStr = "1.0";
 
+            String speciesStr2 = "shovelnose sturgeon";
+            String locationStr2 = "chippewa river";
+            String baitStr2 = "nightcrawler";
+            String dateCaught2 = "2025-8-25";
+            String notes2 = "fishing an eddy";
+            String lengthStr2 = "27.0";
+            String weightStr2 = "5.0";
+
             Integer userID = 1;
             String firstName = "Test";
             String lastName = "User";
@@ -188,6 +196,19 @@ public class MainTest {
                 System.out.println("Rows inserted: " + rows);
             }
 
+            try (PreparedStatement ps = db.prepareStatement(sql)) {
+                ps.setInt(1, (userId));
+                ps.setString(2, speciesStr2);
+                ps.setString(3, locationStr2);
+                ps.setString(4, baitStr2);
+                ps.setString(5, dateCaught2);
+                ps.setString(6, notes2);
+                ps.setDouble(7, Double.parseDouble(lengthStr2));
+                ps.setDouble(8, Double.parseDouble(weightStr2));
+                int rows = ps.executeUpdate();
+                System.out.println("Rows inserted: " + rows);
+            }
+
             try (PreparedStatement verifyUser = db.prepareStatement("SELECT * FROM Users WHERE UserID = ?")) {
                 verifyUser.setInt(1, userId);
                 ResultSet rs = verifyUser.executeQuery();
@@ -218,7 +239,12 @@ public class MainTest {
             CatchDao dao = new CatchDao();
 
             int userIDSearch = 1;
-            List<Catch> results = dao.findByUserId(userIDSearch);
+            String species = "bluegill";
+            String location = "mississippi river";
+            String bait = "gulp! minnow";
+
+            List<Catch> results = dao.searchOutput(userIDSearch, species, location, bait);
+            System.out.println(results);
 
             assertEquals(results.size(), 1);
         }
