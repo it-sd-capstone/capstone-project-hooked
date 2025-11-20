@@ -10,7 +10,7 @@ import java.io.IOException;
 // Map every route you want to support
 @WebServlet(urlPatterns = {
         "/index",
-        "/about", "/locations", "/species", "/bait", "/logout"
+        "/about", "/locations", "/species", "/bait", "/logout", "/add", "/search", "/statistics"
 })
 public class FrontController extends HttpServlet {
 
@@ -24,6 +24,9 @@ public class FrontController extends HttpServlet {
             case "/locations" -> "/WEB-INF/views/locations.jsp";
             case "/species"   -> "/WEB-INF/views/species.jsp";
             case "/bait"      -> "/WEB-INF/views/bait.jsp";
+            case "/search" -> "/WEB-INF/views/search.jsp";
+            case "/add"   -> "/WEB-INF/views/addCatch.jsp";
+            case "/statistics"      -> "/WEB-INF/views/statistics.jsp";
             case "/logout"    -> "/WEB-INF/views/logout.jsp"; // or do logout logic first
             default           -> "/WEB-INF/views/error.jsp";  // optional fallback page
         };

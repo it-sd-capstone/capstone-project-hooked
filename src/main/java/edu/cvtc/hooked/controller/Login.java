@@ -27,13 +27,11 @@ public class Login extends HttpServlet {
 
             if (optUser.isPresent() && optUser.get().getPasswordHash().equals(passwordHash)) {
 
-                // Store user in session.
                 HttpSession session = request.getSession();
                 session.setAttribute("user", optUser.get());
 
-                // Redirect to home page.
                 response.sendRedirect(request.getContextPath() + "/IndexServlet");
-
+                return;
             } else {
 
                 // Login failed error.

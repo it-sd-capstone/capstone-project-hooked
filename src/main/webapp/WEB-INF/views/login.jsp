@@ -19,7 +19,7 @@
         <input type="text" id="userName" name="userName" placeholder="userName">
 
         <h6>Password:</h6>
-        <input type="password" id="passwordHash" name="passwordHash" placeholder="passwordHash"> <br><br>
+        <input type="password" id="passwordHash" name="passwordHash" placeholder="password"> <br><br>
 
         <input type="submit" value="Login">
     </form>

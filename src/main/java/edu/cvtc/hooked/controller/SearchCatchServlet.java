@@ -32,7 +32,7 @@ public class SearchCatchServlet extends HttpServlet {
 
         String userIdStr = req.getParameter("userId");
 
-        // If no userId provided, just show the search form
+         // If no userId provided, just show the search form
         if (userIdStr == null || userIdStr.isBlank()) {
             req.getRequestDispatcher("/WEB-INF/views/search.jsp").forward(req, resp);
             return;
@@ -54,5 +54,6 @@ public class SearchCatchServlet extends HttpServlet {
             req.setAttribute("error", "Search failed: " + ex.getMessage());
             req.getRequestDispatcher("/WEB-INF/views/search.jsp").forward(req, resp);
         }
+
     }
 }
