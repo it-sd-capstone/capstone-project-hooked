@@ -164,8 +164,8 @@ public class CatchDao {
                                 rs.getString("SpeciesName"),
                                 rs.getString("LocationName"),
                                 rs.getString("BaitType"),
-                                rs.getString("Notes"),
                                 rs.getString("DateCaught"),
+                                rs.getString("Notes"),
                                 rs.getDouble("Length"),
                                 rs.getDouble("Weight")
                         );
