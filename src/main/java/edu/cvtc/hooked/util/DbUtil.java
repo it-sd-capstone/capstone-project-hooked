@@ -2,19 +2,25 @@ package edu.cvtc.hooked.util;
 
 import java.nio.file.*;
 import java.sql.*;
+import java.net.URL;
 
 public final class DbUtil {
 
     private static final int TIMEOUT_STATEMENT_S = 5;
 
-    // Put the SQLite file under <catalina.base>/data/hooked.db
     public static String databasePath() {
-        Path dataDir = Paths.get("data");
+        URL classUrl = DbUtil.class.getProtectionDomain().getCodeSource().getLocation();
+        Path classesPath = Paths.get(classUrl.getPath().substring(1)); // Remove leading /
+
+        Path projectRoot = classesPath.getParent()
+                .getParent()
+                .getParent()
+                .getParent();
+
+        Path dataDir = projectRoot.resolve("data");
         try { Files.createDirectories(dataDir); } catch (Exception ignored) {}
         return dataDir.resolve("hooked.db").toString();
     }
-
-
 
     public static Connection getConnection() throws SQLException {
         try {
@@ -31,7 +37,6 @@ public final class DbUtil {
         return conn;
     }
 
-    /** Create tables if they do not exist (call once on startup). */
     public static void ensureSchema() {
         try (Connection c = getConnection();
              Statement command = c.createStatement()) {
@@ -69,7 +74,6 @@ public final class DbUtil {
     public static ResultSet queryRaw(Connection db, String sql) throws SQLException {
         Statement st = db.createStatement();
         st.setQueryTimeout(TIMEOUT_STATEMENT_S);
-        // Caller must close the ResultSet; closing it will also close the Statement.
         return st.executeQuery(sql);
     }
 
