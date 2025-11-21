@@ -33,7 +33,20 @@
   <form action="${pageContext.request.contextPath}/addCatch" method="post">
 
     <label for="speciesName">Species:</label>
-    <input type="text" id="speciesName" name="speciesName" placeholder="ex. Bluegill" value="${param.speciesName}" required><br><br>
+    <select id="speciesName" name="speciesName" required>
+      <option value="" disabled
+              <c:if test="${empty param.speciesName}">selected</c:if>>
+        Select a species
+      </option>
+
+      <c:forEach var="s" items="${speciesList}">
+        <option value="${s}"
+                <c:if test="${param.speciesName == s}">selected</c:if>>
+            ${s}
+        </option>
+      </c:forEach>
+    </select>
+    <br><br>
 
     <label for="length">Length (inches):</label>
     <input type="number" step=".01" min="0" id="length" name="length" placeholder="ex. 11.00" value="${param.length}" required><br><br>
@@ -92,39 +105,5 @@
 
   <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>
-
-<script>
-  // Build an array of allowed species names from the server
-  const allowedSpecies = [
-    <c:forEach var="s" items="${speciesList}" varStatus="loop">
-    "${fn:escapeXml(s)}"<c:if test="${!loop.last}">,</c:if>
-    </c:forEach>
-  ].map(s => s.toLowerCase());
-
-  document.addEventListener('DOMContentLoaded', function () {
-    const speciesInput = document.getElementById('speciesName');
-    const warningEl = document.getElementById('speciesWarning');
-
-    speciesInput.addEventListener('blur', function () {
-      const val = speciesInput.value.trim().toLowerCase();
-
-      if (!val) {
-        warningEl.textContent = "";
-        return;
-      }
-
-      const isKnown = allowedSpecies.includes(val);
-
-      if (!isKnown) {
-        warningEl.textContent =
-                "Warning: this species is not recognized and may be rejected on submit.";
-      } else {
-        warningEl.textContent = "";
-      }
-    });
-  });
-</script>
-
-
 </body>
 </html>

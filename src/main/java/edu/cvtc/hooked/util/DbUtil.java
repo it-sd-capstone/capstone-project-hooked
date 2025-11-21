@@ -13,7 +13,7 @@ public final class DbUtil {
             // Use the user's home directory, which is writable on both
             // local dev and AWS Elastic Beanstalk.
             String userHome = System.getProperty("user.home");
-            
+
             Path dataDir = Paths.get(userHome, "hooked-data");
             Files.createDirectories(dataDir);
 
