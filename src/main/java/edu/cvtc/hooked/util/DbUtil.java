@@ -9,29 +9,23 @@ public final class DbUtil {
     private static final int TIMEOUT_STATEMENT_S = 5;
 
     public static String databasePath() {
-        try{
-            URL classUrl = DbUtil.class.getProtectionDomain().getCodeSource().getLocation();
-            Path classesPath = Paths.get(classUrl.toURI());
-
-            Path outDir      = classesPath.getParent()   // WEB-INF
-                    .getParent()   // hooked_war_exploded
-                    .getParent()   // artifacts
-                    .getParent();  // out
-
-            Path projectRoot = outDir.getParent();
-
-            Path dataDir = projectRoot.resolve("data");
+        try {
+            // Use the user's home directory, which is writable on both
+            // local dev and AWS Elastic Beanstalk.
+            String userHome = System.getProperty("user.home");
+            
+            Path dataDir = Paths.get(userHome, "hooked-data");
             Files.createDirectories(dataDir);
 
             String path = dataDir.resolve("hooked.db").toString();
-            System.out.println(">>> DB PATH = " + path);   // <--- add this line
+            System.out.println(">>> DB PATH = " + path);
             return path;
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to build DB path", e);
         }
-
     }
+
 
     public static Connection getConnection() throws SQLException {
         try {
