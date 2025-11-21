@@ -28,7 +28,9 @@ public class Login extends HttpServlet {
             if (optUser.isPresent() && optUser.get().getPasswordHash().equals(passwordHash)) {
 
                 HttpSession session = request.getSession();
-                session.setAttribute("user", optUser.get());
+                User user = optUser.get();
+                session.setAttribute("user", user);
+                session.setAttribute("userId", user.getUserId());
 
                 response.sendRedirect(request.getContextPath() + "/IndexServlet");
                 return;

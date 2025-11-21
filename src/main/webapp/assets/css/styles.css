@@ -198,7 +198,18 @@ form input[type="submit"]:hover {
     background-color: darkslategray;
 }
 
+.error {
+    color: red;
+    font-weight: bold;
+}
 
+.success {
+    color: blue;
+    font-weight: bold;
+}
 
-
+.warning {
+    color: red;
+    font-weight: bold;
+}
 

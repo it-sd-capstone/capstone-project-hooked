@@ -8,6 +8,6 @@
   <li><a href="<c:url value='/Login'/>">Login</a></li>
   <li><a href="<c:url value='/logout'/>">Logout</a></li>
   <li><a href="<c:url value='/search'/>">Search</a></li>
-  <li><a href="<c:url value='/add'/>">Add</a></li>
+  <li><a href="<c:url value='/addCatch'/>">Add Catch</a></li>
   <li><a href="<c:url value='/statistics'/>">Statistics</a></li>
 </ul>
