@@ -61,6 +61,15 @@ public final class DbUtil {
             """);
 
             command.executeUpdate("""
+            CREATE TABLE IF NOT EXISTS Location (
+              LocationID   INTEGER PRIMARY KEY AUTOINCREMENT,
+              LocationName VARCHAR(100) NOT NULL,
+              State        VARCHAR(2) NOT NULL
+            );
+            """);
+
+
+            command.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS Catches (
                     CatchID      INTEGER PRIMARY KEY AUTOINCREMENT,
                     UserID       INTEGER NOT NULL,
