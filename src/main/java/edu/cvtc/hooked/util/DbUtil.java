@@ -9,17 +9,28 @@ public final class DbUtil {
     private static final int TIMEOUT_STATEMENT_S = 5;
 
     public static String databasePath() {
-        URL classUrl = DbUtil.class.getProtectionDomain().getCodeSource().getLocation();
-        Path classesPath = Paths.get(classUrl.getPath().substring(1)); // Remove leading /
+        try{
+            URL classUrl = DbUtil.class.getProtectionDomain().getCodeSource().getLocation();
+            Path classesPath = Paths.get(classUrl.toURI());
 
-        Path projectRoot = classesPath.getParent()
-                .getParent()
-                .getParent()
-                .getParent();
+            Path outDir      = classesPath.getParent()   // WEB-INF
+                    .getParent()   // hooked_war_exploded
+                    .getParent()   // artifacts
+                    .getParent();  // out
 
-        Path dataDir = projectRoot.resolve("data");
-        try { Files.createDirectories(dataDir); } catch (Exception ignored) {}
-        return dataDir.resolve("hooked.db").toString();
+            Path projectRoot = outDir.getParent();
+
+            Path dataDir = projectRoot.resolve("data");
+            Files.createDirectories(dataDir);
+
+            String path = dataDir.resolve("hooked.db").toString();
+            System.out.println(">>> DB PATH = " + path);   // <--- add this line
+            return path;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to build DB path", e);
+        }
+
     }
 
     public static Connection getConnection() throws SQLException {
@@ -81,6 +92,14 @@ public final class DbUtil {
                     DateCaught   DATE,
                     Notes        TEXT,
                     FOREIGN KEY (UserID) REFERENCES Users(UserID)
+                );
+            """);
+
+            command.executeUpdate("""
+                CREATE TABLE IF NOT EXISTS Bait (
+                    BaitID   INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name     TEXT NOT NULL,
+                    Notes    TEXT
                 );
             """);
 

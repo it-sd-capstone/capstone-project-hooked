@@ -10,7 +10,7 @@ import java.io.IOException;
 // Map every route you want to support
 @WebServlet(urlPatterns = {
         "/index",
-        "/about", "/locations", "/species", "/bait", "/logout", "/add", "/search", "/statistics"
+        "/about", "/locations", "/species", "/logout", "/add", "/search", "/statistics"
 })
 public class FrontController extends HttpServlet {
 
