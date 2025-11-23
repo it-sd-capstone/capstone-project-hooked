@@ -1,11 +1,13 @@
 package edu.cvtc.hooked.controller;
 
+import edu.cvtc.hooked.util.DbUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.*;
 
 // Map every route you want to support
 @WebServlet(urlPatterns = {
@@ -15,7 +17,7 @@ import java.io.IOException;
 public class FrontController extends HttpServlet {
 
     private String viewFor(String path) {
-        // Normalize “/index/” to “/index”
+        // Normalize "/index/" to "/index"
         if (path == null || path.equals("/")) return "/WEB-INF/views/index.jsp";
 
         return switch (path) {
@@ -36,13 +38,95 @@ public class FrontController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         String path = req.getServletPath();
+
+        // Load statistics data if requesting statistics page
+        if ("/statistics".equals(path)) {
+            loadStatistics(req);
+        }
+
         req.getRequestDispatcher(viewFor(path)).forward(req, resp);
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-        // If any form POST should render a JSP, route here too.
         doGet(req, resp);
+    }
+
+    private void loadStatistics(HttpServletRequest req) {
+        try (Connection conn = DbUtil.getConnection()) {
+
+            // Heaviest fish
+            String heaviestQuery = """
+                SELECT SpeciesName, Weight, LocationName, DateCaught
+                FROM Catches
+                WHERE Weight IS NOT NULL
+                ORDER BY Weight DESC
+                LIMIT 1
+            """;
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(heaviestQuery)) {
+                if (rs.next()) {
+                    req.setAttribute("heaviestFish", rs.getString("SpeciesName"));
+                    req.setAttribute("heaviestWeight", rs.getDouble("Weight"));
+                    req.setAttribute("heaviestLocation", rs.getString("LocationName"));
+                    req.setAttribute("heaviestDate", rs.getString("DateCaught"));
+                }
+            }
+
+            // Longest fish
+            String longestQuery = """
+                SELECT SpeciesName, Length, LocationName, DateCaught
+                FROM Catches
+                WHERE Length IS NOT NULL
+                ORDER BY Length DESC
+                LIMIT 1
+            """;
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(longestQuery)) {
+                if (rs.next()) {
+                    req.setAttribute("longestFish", rs.getString("SpeciesName"));
+                    req.setAttribute("longestLength", rs.getDouble("Length"));
+                    req.setAttribute("longestLocation", rs.getString("LocationName"));
+                    req.setAttribute("longestDate", rs.getString("DateCaught"));
+                }
+            }
+
+            // Most productive location
+            String locationQuery = """
+                SELECT LocationName, COUNT(*) as CatchCount
+                FROM Catches
+                GROUP BY LocationName
+                ORDER BY CatchCount DESC
+                LIMIT 1
+            """;
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(locationQuery)) {
+                if (rs.next()) {
+                    req.setAttribute("topLocation", rs.getString("LocationName"));
+                    req.setAttribute("locationCount", rs.getInt("CatchCount"));
+                }
+            }
+
+            // Most productive bait
+            String baitQuery = """
+                SELECT BaitType, COUNT(*) as CatchCount
+                FROM Catches
+                GROUP BY BaitType
+                ORDER BY CatchCount DESC
+                LIMIT 1
+            """;
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(baitQuery)) {
+                if (rs.next()) {
+                    req.setAttribute("topBait", rs.getString("BaitType"));
+                    req.setAttribute("baitCount", rs.getInt("CatchCount"));
+                }
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            req.setAttribute("error", "Unable to load statistics: " + e.getMessage());
+        }
     }
 }
