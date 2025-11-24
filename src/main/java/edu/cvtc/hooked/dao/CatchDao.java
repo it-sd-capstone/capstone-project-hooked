@@ -177,4 +177,85 @@ public class CatchDao {
             }
         return results;
     }
+
+    // Search across ALL users, with optional filters and sorting
+    public List<Catch> searchAll(String species, String location, String bait,
+                                 String sortField, String sortDir) throws SQLException {
+
+        StringBuilder sb = new StringBuilder("""
+        SELECT CatchID, UserID, SpeciesName, LocationName, BaitType, DateCaught, Notes, Length, Weight
+        FROM Catches
+        WHERE 1=1
+    """);
+
+        List<Object> params = new ArrayList<>();
+
+        if (species != null && !species.isBlank()) {
+            sb.append(" AND LOWER(SpeciesName) LIKE ?");
+            params.add("%" + species.toLowerCase() + "%");
+        }
+
+        if (location != null && !location.isBlank()) {
+            sb.append(" AND LOWER(LocationName) LIKE ?");
+            params.add("%" + location.toLowerCase() + "%");
+        }
+
+        if (bait != null && !bait.isBlank()) {
+            sb.append(" AND LOWER(BaitType) LIKE ?");
+            params.add("%" + bait.toLowerCase() + "%");
+        }
+
+        // Determine sort column
+        String orderCol;
+        if ("species".equalsIgnoreCase(sortField)) {
+            orderCol = "SpeciesName";
+        } else if ("length".equalsIgnoreCase(sortField)) {
+            orderCol = "Length";
+        } else if ("weight".equalsIgnoreCase(sortField)) {
+            orderCol = "Weight";
+        } else if ("location".equalsIgnoreCase(sortField)) {
+            orderCol = "LocationName";
+        } else if ("date".equalsIgnoreCase(sortField)) {
+            orderCol = "DateCaught";
+        } else if ("bait".equalsIgnoreCase(sortField)) {
+            orderCol = "BaitType";
+        } else {
+            // default sort: newest first
+            orderCol = "DateCaught";
+            sortDir = "desc";
+        }
+
+        String direction = "desc".equalsIgnoreCase(sortDir) ? "DESC" : "ASC";
+
+        sb.append(" ORDER BY ").append(orderCol).append(" ").append(direction);
+
+        List<Catch> results = new ArrayList<>();
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sb.toString())) {
+
+            for (int i = 0; i < params.size(); i++) {
+                ps.setObject(i + 1, params.get(i));
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Catch c = new Catch(
+                            rs.getInt("CatchID"),
+                            rs.getInt("UserID"),
+                            rs.getString("SpeciesName"),
+                            rs.getString("LocationName"),
+                            rs.getString("BaitType"),
+                            rs.getString("DateCaught"),
+                            rs.getString("Notes"),
+                            rs.getDouble("Length"),
+                            rs.getDouble("Weight")
+                    );
+                    results.add(c);
+                }
+            }
+        }
+
+        return results;
+    }
 }
