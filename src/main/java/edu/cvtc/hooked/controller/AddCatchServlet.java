@@ -44,12 +44,15 @@ public class AddCatchServlet extends HttpServlet {
         }
 
         // If editId is present, load that catch for editing
+        Boolean isAdmin = (Boolean) req.getSession().getAttribute("isAdmin");
+
         String editIdStr = req.getParameter("editId");
         if (editIdStr != null && !editIdStr.isBlank()) {
             try {
                 int editId = Integer.parseInt(editIdStr);
                 catchDao.findById(editId).ifPresent(c -> {
-                    if (c.getUserId().equals(userId)) {
+                    // Admin can edit any catch; normal user only their own
+                    if ((isAdmin != null && isAdmin) || c.getUserId().equals(userId)) {
                         req.setAttribute("editCatch", c);
                     }
                 });
@@ -74,11 +77,24 @@ public class AddCatchServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        Integer userId = (Integer) req.getSession().getAttribute("userId");
+        Integer sessionUserId = (Integer) req.getSession().getAttribute("userId");
+        Boolean isAdmin       = (Boolean) req.getSession().getAttribute("isAdmin");
 
-        if (userId == null) {
+        if (sessionUserId == null) {
             resp.sendRedirect(req.getContextPath() + "/Login");
             return;
+        }
+
+        //Figure out whose catch this is supposed to belong to
+        String ownerUserIdStr = req.getParameter("ownerUserId");
+        Integer ownerUserId = sessionUserId;
+
+        if (isAdmin != null && isAdmin && ownerUserIdStr != null && !ownerUserIdStr.isBlank()) {
+            try {
+                ownerUserId = Integer.valueOf(ownerUserIdStr);
+            } catch (NumberFormatException ignored) {
+                // fall back to session userId
+            }
         }
 
         String catchIdStr     = req.getParameter("catchId");  // hidden field
@@ -104,7 +120,7 @@ public class AddCatchServlet extends HttpServlet {
             }
         } catch (NumberFormatException e) {
             req.setAttribute("error", "Length and weight must be numeric.");
-            forwardWithCatches(req, resp, userId);
+            forwardWithCatches(req, resp, ownerUserId);
             return;
         }
 
@@ -114,7 +130,7 @@ public class AddCatchServlet extends HttpServlet {
 
         if (restrictions == null) {
             req.setAttribute("error", "Unrecognized species.");
-            forwardWithCatches(req, resp, userId);
+            forwardWithCatches(req, resp, ownerUserId);
             return;
         }
 
@@ -123,12 +139,12 @@ public class AddCatchServlet extends HttpServlet {
                 weight > restrictions.getMaxWeight()) {
 
             req.setAttribute("error", "Invalid length/weight for species.");
-            forwardWithCatches(req, resp, userId);
+            forwardWithCatches(req, resp, ownerUserId);
             return;
         }
 
         Catch c = new Catch(
-                userId,
+                ownerUserId,
                 speciesName,
                 locationName,
                 baitType,
@@ -144,8 +160,13 @@ public class AddCatchServlet extends HttpServlet {
 
         try {
             if (isUpdate) {
-                catchDao.update(c);
-                resp.sendRedirect(req.getContextPath() + "/addCatch?updated=1");
+                if (isAdmin != null && isAdmin) {
+                    catchDao.updateAsAdmin(c);
+                    resp.sendRedirect(req.getContextPath() + "/addCatch?updated=1");
+                } else {
+                    catchDao.update(c);
+                    resp.sendRedirect(req.getContextPath() + "/addCatch?updated=1");
+                }
             } else {
                 catchDao.insert(c);
                 resp.sendRedirect(req.getContextPath() + "/addCatch?added=1");
@@ -153,8 +174,9 @@ public class AddCatchServlet extends HttpServlet {
         } catch (Exception ex) {
             ex.printStackTrace();
             req.setAttribute("error", "Failed to save catch: " + ex.getMessage());
-            forwardWithCatches(req, resp, userId);
+            forwardWithCatches(req, resp, sessionUserId);
         }
+
     }
 
     private void forwardWithCatches(HttpServletRequest req, HttpServletResponse resp, Integer userId)

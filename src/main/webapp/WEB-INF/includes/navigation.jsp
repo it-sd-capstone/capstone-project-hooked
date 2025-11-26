@@ -9,4 +9,7 @@
   <li><a href="<c:url value='/searchCatches'/>">Search</a></li>
   <li><a href="<c:url value='/addCatch'/>">Add Catch</a></li>
   <li><a href="<c:url value='/statistics'/>">Statistics</a></li>
+  <c:if test="${sessionScope.isAdmin}">
+    <li><a href="${pageContext.request.contextPath}/admin/catches">Admin Catches</a></li>
+  </c:if>
 </ul>

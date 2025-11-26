@@ -32,6 +32,10 @@ public class Login extends HttpServlet {
                 session.setAttribute("user", user);
                 session.setAttribute("userId", user.getUserId());
 
+                // Mark admin if username is "admin"
+                boolean isAdmin = "admin".equalsIgnoreCase(optUser.get().getUserName());
+                session.setAttribute("isAdmin", isAdmin);
+
                 response.sendRedirect(request.getContextPath() + "/IndexServlet");
                 return;
             } else {

@@ -307,4 +307,93 @@ public class CatchDao {
         }
     }
 
+    // All catches in the system (for admin view)
+    public List<Catch> findAll() throws SQLException {
+        String sql = """
+        SELECT CatchID, UserID, SpeciesName, LocationName, BaitType,
+               DateCaught, Notes, Length, Weight
+        FROM Catches
+        ORDER BY DateCaught DESC, CatchID DESC
+        """;
+
+        List<Catch> results = new ArrayList<>();
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Catch c = new Catch(
+                        rs.getInt("CatchID"),
+                        rs.getInt("UserID"),
+                        rs.getString("SpeciesName"),
+                        rs.getString("LocationName"),
+                        rs.getString("BaitType"),
+                        rs.getString("DateCaught"),
+                        rs.getString("Notes"),
+                        rs.getDouble("Length"),
+                        rs.getDouble("Weight")
+                );
+                results.add(c);
+            }
+        }
+
+        return results;
+    }
+
+    // Admin: delete a single catch by ID (no user restriction)
+    public void deleteById(int catchId) throws SQLException {
+        String sql = "DELETE FROM Catches WHERE CatchID = ?";
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, catchId);
+            ps.executeUpdate();
+        }
+    }
+
+    // Admin: clear the whole Catches table
+    public void deleteAll() throws SQLException {
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement("DELETE FROM Catches")) {
+            ps.executeUpdate();
+        }
+    }
+
+    // Admin-only: update by CatchID only
+    public void updateAsAdmin(Catch c) throws SQLException {
+        if (c.getCatchId() == null) {
+            throw new IllegalArgumentException("Catch ID is required for update");
+        }
+
+        String sql = """
+        UPDATE Catches
+        SET SpeciesName = ?,
+            LocationName = ?,
+            BaitType     = ?,
+            DateCaught   = ?,
+            Notes        = ?,
+            Length       = ?,
+            Weight       = ?,
+            UserID       = ?
+        WHERE CatchID = ?
+        """;
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, c.getSpeciesName());
+            ps.setString(2, c.getLocationName());
+            ps.setString(3, c.getBaitType());
+            ps.setString(4, c.getDateCaught());
+            ps.setString(5, c.getNotes());
+            ps.setDouble(6, c.getLength());
+            ps.setDouble(7, c.getWeight());
+            ps.setInt(8, c.getUserId());      // keep/restore owner
+            ps.setInt(9, c.getCatchId());
+
+            ps.executeUpdate();
+        }
+    }
+
 }

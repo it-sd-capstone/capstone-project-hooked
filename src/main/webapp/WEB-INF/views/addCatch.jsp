@@ -35,6 +35,9 @@
     <input type="hidden" name="catchId"
            value="${editCatch != null ? editCatch.catchId : ''}">
 
+    <input type="hidden" name="ownerUserId"
+           value="${editCatch != null ? editCatch.userId : sessionScope.userId}">
+
     <input type="hidden" name="userId" value="1">
 
     <label for="speciesName">Species:</label>

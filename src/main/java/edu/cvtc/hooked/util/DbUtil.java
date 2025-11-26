@@ -97,6 +97,14 @@ public final class DbUtil {
                 );
             """);
 
+            command.executeUpdate("""
+                INSERT INTO Users(firstName, lastName, userName, passwordHash)
+                SELECT 'Admin', 'User', 'admin', 'admin'
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM Users WHERE userName = 'admin'
+                );
+            """);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
