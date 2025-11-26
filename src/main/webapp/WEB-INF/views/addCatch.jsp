@@ -32,16 +32,23 @@
 
   <form action="${pageContext.request.contextPath}/addCatch" method="post">
 
+    <input type="hidden" name="catchId"
+           value="${editCatch != null ? editCatch.catchId : ''}">
+
+    <input type="hidden" name="userId" value="1">
+
     <label for="speciesName">Species:</label>
     <select id="speciesName" name="speciesName" required>
       <option value="" disabled
-              <c:if test="${empty param.speciesName}">selected</c:if>>
+              <c:if test="${editCatch == null && empty param.speciesName}">selected</c:if>>
         Select a species
       </option>
 
       <c:forEach var="s" items="${speciesList}">
-        <option value="${s}"
-                <c:if test="${param.speciesName == s}">selected</c:if>>
+        <c:set var="selected"
+               value="${(editCatch != null and editCatch.speciesName == s) or
+                     (editCatch == null and param.speciesName == s)}" />
+        <option value="${s}" <c:if test="${selected}">selected</c:if>>
             ${s}
         </option>
       </c:forEach>
@@ -49,24 +56,24 @@
     <br><br>
 
     <label for="length">Length (inches):</label>
-    <input type="number" step=".01" min="0" id="length" name="length" placeholder="ex. 11.00" value="${param.length}" required><br><br>
+    <input type="number" step=".01" min="0" id="length" name="length" placeholder="ex. 11.00" value="${editCatch != null ? editCatch.length : param.length}" required><br><br>
 
     <label for="weight">Weight (pounds):</label>
-    <input type="number" step=".01" min="0" id="weight" name="weight" placeholder="ex. 1.00" value="${param.weight}" required><br><br>
+    <input type="number" step=".01" min="0" id="weight" name="weight" placeholder="ex. 1.00" value="${editCatch != null ? editCatch.weight : param.weight}" required><br><br>
 
     <label for="locationName">Location:</label>
-    <input type="text" id="locationName" name="locationName" placeholder="ex. Mississippi River" value="${param.locationName}" required><br><br>
+    <input type="text" id="locationName" name="locationName" placeholder="ex. Mississippi River" value="${editCatch != null ? editCatch.locationName : param.locationName}" required><br><br>
 
     <label for="baitType">Bait:</label>
-    <input type="text" id="baitType" name="baitType" placeholder="ex. Gulp! Minnow" value="${param.baitType}" required><br><br>
+    <input type="text" id="baitType" name="baitType" placeholder="ex. Gulp! Minnow" value="${editCatch != null ? editCatch.baitType : param.baitType}" required><br><br>
 
     <label for="dateCaught">Date Caught (YYYY-MM-DD):</label>
-    <input type="date" id="dateCaught" name="dateCaught" placeholder="ex. 2025-09-15" value="${param.dateCaught}"><br><br>
+    <input type="date" id="dateCaught" name="dateCaught" placeholder="ex. 2025-09-15" value="${editCatch != null ? editCatch.dateCaught : param.dateCaught}"><br><br>
 
     <label for="notes">Notes:</label>
-    <input type="text" id="notes" name="notes" placeholder="ex. Slip Bobber" value="${param.notes}"><br><br>
+    <input type="text" id="notes" name="notes" placeholder="ex. Slip Bobber" value="${editCatch != null ? editCatch.notes : param.notes}"><br><br>
 
-    <input type="submit" value="Add Catch">
+    <input type="submit" value="${editCatch != null ? 'Update Catch' : 'Add Catch'}">
 
   </form>
 
@@ -85,6 +92,7 @@
         <th>Date</th>
         <th>Bait</th>
         <th>Notes</th>
+        <th>Actions</th>
       </tr>
       </thead>
       <tbody>
@@ -97,6 +105,26 @@
           <td>${c.dateCaught}</td>
           <td>${c.baitType}</td>
           <td>${c.notes}</td>
+          <td class="actions-cell">
+            <div class="actions-wrapper">
+              <!-- Edit button -->
+              <a href="${pageContext.request.contextPath}/addCatch?editId=${c.catchId}"
+                 class="btn-action btn-edit">
+                Edit
+              </a>
+
+              <!-- Delete button -->
+              <form action="${pageContext.request.contextPath}/deleteCatch"
+                    method="post"
+                    class="inline-form"
+                    onsubmit="return confirm('Are you sure you want to delete this catch?');">
+                <input type="hidden" name="catchId" value="${c.catchId}">
+                <button type="submit" class="btn-action btn-delete">
+                  Delete
+                </button>
+              </form>
+            </div>
+          </td>
         </tr>
       </c:forEach>
       </tbody>

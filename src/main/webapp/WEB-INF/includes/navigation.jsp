@@ -6,7 +6,6 @@
   <li><a href="<c:url value='/bait'/>">Bait</a></li>
   <li><a href="<c:url value='/about'/>">About</a></li>
   <li><a href="<c:url value='/Login'/>">Login</a></li>
-  <li><a href="<c:url value='/logout'/>">Logout</a></li>
   <li><a href="<c:url value='/searchCatches'/>">Search</a></li>
   <li><a href="<c:url value='/addCatch'/>">Add Catch</a></li>
   <li><a href="<c:url value='/statistics'/>">Statistics</a></li>

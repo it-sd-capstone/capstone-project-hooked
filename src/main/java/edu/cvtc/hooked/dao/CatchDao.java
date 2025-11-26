@@ -258,4 +258,53 @@ public class CatchDao {
 
         return results;
     }
+
+    // UPDATE an existing catch
+    public void update(Catch c) throws SQLException {
+        if (c.getCatchId() == null) {
+            throw new IllegalArgumentException("Catch ID is required for update");
+        }
+
+        String sql = """
+        UPDATE Catches
+        SET SpeciesName = ?,
+            LocationName = ?,
+            BaitType     = ?,
+            DateCaught   = ?,
+            Notes        = ?,
+            Length       = ?,
+            Weight       = ?
+        WHERE CatchID = ? AND UserID = ?
+        """;
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, c.getSpeciesName());
+            ps.setString(2, c.getLocationName());
+            ps.setString(3, c.getBaitType());
+            ps.setString(4, c.getDateCaught());
+            ps.setString(5, c.getNotes());
+            ps.setDouble(6, c.getLength());
+            ps.setDouble(7, c.getWeight());
+            ps.setInt(8, c.getCatchId());
+            ps.setInt(9, c.getUserId());
+
+            ps.executeUpdate();
+        }
+    }
+
+    // DELETE a catch, ensuring it belongs to the user
+    public void deleteForUser(int catchId, int userId) throws SQLException {
+        String sql = "DELETE FROM Catches WHERE CatchID = ? AND UserID = ?";
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, catchId);
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
+    }
+
 }

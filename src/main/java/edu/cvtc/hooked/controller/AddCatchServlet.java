@@ -32,10 +32,30 @@ public class AddCatchServlet extends HttpServlet {
             return;
         }
 
-        // If redirected here with ?added=1, show success message
-        String addedFlag = req.getParameter("added");
-        if ("1".equals(addedFlag)) {
+        // Success messages
+        if ("1".equals(req.getParameter("added"))) {
             req.setAttribute("success", "Your catch has been added!");
+        }
+        if ("1".equals(req.getParameter("updated"))) {
+            req.setAttribute("success", "Your catch has been updated!");
+        }
+        if ("1".equals(req.getParameter("deleted"))) {
+            req.setAttribute("success", "Your catch has been deleted.");
+        }
+
+        // If editId is present, load that catch for editing
+        String editIdStr = req.getParameter("editId");
+        if (editIdStr != null && !editIdStr.isBlank()) {
+            try {
+                int editId = Integer.parseInt(editIdStr);
+                catchDao.findById(editId).ifPresent(c -> {
+                    if (c.getUserId().equals(userId)) {
+                        req.setAttribute("editCatch", c);
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         try {
@@ -57,10 +77,12 @@ public class AddCatchServlet extends HttpServlet {
         Integer userId = (Integer) req.getSession().getAttribute("userId");
 
         if (userId == null) {
-            req.setAttribute("error", "You must be logged in to add a catch.");
-            forwardWithCatches(req, resp, null);
+            resp.sendRedirect(req.getContextPath() + "/Login");
             return;
         }
+
+        String catchIdStr     = req.getParameter("catchId");  // hidden field
+        boolean isUpdate      = catchIdStr != null && !catchIdStr.isBlank();
 
         String speciesName      = req.getParameter("speciesName"); // from dropdown
         String locationName     = req.getParameter("locationName");
@@ -116,17 +138,23 @@ public class AddCatchServlet extends HttpServlet {
                 weight
         );
 
+        if (isUpdate) {
+            c.setCatchId(Integer.parseInt(catchIdStr));
+        }
+
         try {
-            catchDao.insert(c);
+            if (isUpdate) {
+                catchDao.update(c);
+                resp.sendRedirect(req.getContextPath() + "/addCatch?updated=1");
+            } else {
+                catchDao.insert(c);
+                resp.sendRedirect(req.getContextPath() + "/addCatch?added=1");
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
             req.setAttribute("error", "Failed to save catch: " + ex.getMessage());
             forwardWithCatches(req, resp, userId);
-            return;
         }
-
-        // ✅ SUCCESS PATH: redirect and STOP.
-        resp.sendRedirect(req.getContextPath() + "/addCatch?added=1");
     }
 
     private void forwardWithCatches(HttpServletRequest req, HttpServletResponse resp, Integer userId)
@@ -139,14 +167,13 @@ public class AddCatchServlet extends HttpServlet {
                 e.printStackTrace();
             }
         }
-
         addSpeciesList(req);
         req.getRequestDispatcher("/WEB-INF/views/addCatch.jsp").forward(req, resp);
     }
 
     private void addSpeciesList(HttpServletRequest req) {
         List<String> species = new ArrayList<>(SpeciesRestrictions.ALL.keySet());
-        Collections.sort(species); // alphabetical
+        Collections.sort(species);
         req.setAttribute("speciesList", species);
     }
 }
