@@ -16,7 +16,7 @@
 
   <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
-  <img src="<c:url value='/assets/img/temporaryBait.jpg' />" alt="tackle box"><br><br>
+  <img src="<c:url value='/assets/img/temporaryBait.jpg' />" alt="tackle box" class="page-image"><br><br>
 
   <form action="${pageContext.request.contextPath}/bait" method="post">
     <label for="addBait">Bait:</label>

@@ -14,7 +14,7 @@
 
   <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
-  <img src="<c:url value='/assets/img/temporaryLocation.jpg' />" alt="Lake Superior"><br><br>
+  <img src="<c:url value='/assets/img/temporaryLocation.jpg' />" alt="Lake Superior" class="page-image"><br><br>
 
   <form action="<%= request.getContextPath() %>/AddData" method="post">
     <label for="addLocation">Location:</label>

@@ -1,260 +1,320 @@
+/* Base + Layout  */
+
+:root {
+    --bg-main: #064e3b;          /* deep sea green */
+    --bg-main-alt: #03624b;
+    --bg-card: rgba(0, 0, 0, 0.35);
+    --border-soft: #4b5563;
+    --accent: #fbbf24;           /* warm yellow */
+    --accent-hover: #f97316;     /* orange */
+    --accent-active: #e11d48;    /* pink/red */
+    --text-main: #f9fafb;
+    --text-muted: #d1d5db;
+}
+
+* {
+    box-sizing: border-box;
+}
+
 html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
     overflow-x: hidden;
 }
 
 body {
-    background-color: seagreen;
+    background-color: #064e3b;    /* deeper sea green */
     text-align: center;
     color: white;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
     margin: 0;
-
-    /* unvisited link */
-    a:link {
-        color: yellow;
-    }
-
-    /* visited link Possibly overshadowed by FrontController
-    currently sets all links to visited after clicking any
-    link. Will need to be fixed or remove visited altogether
-    a:visited {
-        color: lightblue;
-    }
-     */
-
-    /* mouse over link */
-    a:hover {
-        color: red;
-    }
-
-    /* selected link */
-    a:active {
-        color: purple;
-    }
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-ul li {
+/* Links  */
+
+a:link {
+    color: #fbbf24;   /* warm yellow */
+}
+
+a:hover {
+    color: #fb923c;   /* orange */
+}
+
+a:active {
+    color: #e11d48;   /* reddish accent */
+}
+
+
+/*  Container / Content  */
+
+.container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.content {
+    width: 100%;
+    max-width: 100%;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+}
+
+/* Keep main content flexible so footer stays at bottom */
+main {
+    flex: 1;
+}
+
+/*  Navigation  */
+
+.nav {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0 30px 0;
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* space between links */
+}
+
+.nav li {
     display: inline-block;
-    margin-right: 10px;
-    padding: 5px;
 }
+
+.nav a {
+    text-decoration: none;
+    font-weight: 600;
+    color: #E8F8F5; /* soft light text */
+    padding: 6px 8px;
+    border-radius: 4px;
+    transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+/* nav hover/active override the global link colors */
+.nav a:hover {
+    color: #FFD700;        /* gold highlight */
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+.nav a:active {
+    color: #FFA500;
+}
+
+/* Footer  */
 
 .footer {
-    position: relative;
-    bottom: 0;
+    margin-top: auto;
     width: 100%;
-    height: 25px;
-    margin-bottom: 25px;
-    margin-top: 25px;
+    padding: 0.5rem 1rem 1rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    opacity: 0.85;
 }
 
+/*  Buttons  */
+
+.btn,
+#loginButton,
+#logoutButton,
+#returnHome {
+    background-color: #374151;
+    color: var(--text-main);
+    padding: 0.5rem 1.25rem;
+    border: none;
+    border-radius: 999px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    margin: 0.75rem 0;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn:hover,
+#loginButton:hover,
+#logoutButton:hover,
+#returnHome:hover {
+    background-color: #111827;
+    transform: translateY(-1px);
+}
+
+/*  Form Layout  */
+
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+    max-width: 360px;
+    margin: 1.75rem auto;
+    padding: 1rem 1.25rem;
+    background-color: var(--bg-card);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+    text-align: left;
+}
+
+form label {
+    font-size: 0.9rem;
+    margin-bottom: 0.1rem;
+    color: var(--text-muted);
+}
+
+input,
+select,
+textarea {
+    background-color: #111827;
+    color: var(--text-main);
+    border: 1px solid var(--border-soft);
+    border-radius: 6px;
+    padding: 0.35rem 0.5rem;
+    width: 100%;
+}
+
+form input[type="text"],
+form input[type="password"],
+form input[type="number"],
+form select {
+    margin-bottom: 0.35rem;
+}
+
+form input[type="submit"] {
+    margin-top: 0.25rem;
+    align-self: center;
+    width: auto;
+}
+
+/*  Special Login / Links  */
+
 #passwordReset {
-    margin-left: -25px;
-    margin-right: 45px;
+    margin-left: 0;
+    margin-right: 0;
+    font-size: 0.85rem;
 }
 
 #createAccount {
-    margin-right: 45px;
+    margin-right: 0;
+    font-size: 0.85rem;
 }
 
 #password {
-    margin-left: 20px;
-    margin-right: 30px;
+    margin-left: 0;
+    margin-right: 0;
 }
 
-#loginButton {
-    background-color: dimgray;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 20px 0px 20px 0px;
-}
-
-#logoutButton {
-    background-color: dimgray;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 20px 0px 20px 0px;
-}
-
-#returnHome {
-    background-color: dimgray;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    margin: 20px 0px 20px 0px;
-}
+/*  Tables  */
 
 table {
-    margin-left: auto;
-    margin-right: auto;
-    border-spacing: 60px 20px;
+    margin: 1.5rem auto;
     border-collapse: collapse;
-    text-align: left;
-    background-color: dimgray;
-    border: 5px solid darkgray;
+    width: 100%;
+    max-width: 900px;
+    background-color: var(--bg-card);
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 th, td {
-    border: 2px solid darkgray;
-    padding: 10px 20px;
+    border-bottom: 1px solid rgba(156,163,175,0.6);
+    padding: 0.6rem 0.9rem;
+    text-align: left;
+    font-size: 0.95rem;
 }
 
-/* Actions column layout */
-td.actions-cell {
-    text-align: center;
-    white-space: nowrap;
+th {
+    background-color: rgba(15,23,42,0.85);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.8rem;
 }
 
-.actions-wrapper {
-    display: inline-flex;
-    gap: 8px;              /* space between Edit and Delete */
-    align-items: center;
+tr:nth-child(even) td {
+    background-color: rgba(15,23,42,0.6);
 }
 
-/* Buttons/links look consistent and smaller */
-.btn-action {
-    display: inline-block;
-    padding: 4px 10px;
-    font-size: 0.85rem;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-/* Edit: blue background, yellow text */
-.btn-edit {
-    background-color: #1e88e5;
-    color: #ffffff;
-}
-
-/* Delete: blue background, red text */
-.btn-delete {
-    background-color: #1e88e5;
-    color: #ff4444;
-    box-shadow: none;
-}
-
-/* Keep delete form from forcing a new line */
-.inline-form {
-    display: inline;
-    margin: 0;
-    padding: 0;
-    background: transparent;
-}
-
-input, select {
-    background-color: dimgray;
-    color: white;
-}
+/* Images  */
 
 img {
     max-width: 100%;
     height: auto;
     display: block;
+    margin: 20px auto;
 }
 
-#loginPic {
-    max-width: 100%;
-    height: auto;
-}
-
-/* Home page image */
+/* home page hero image */
 .home-image {
-    max-width: 75%;
-    height: auto;
+    max-width: 600px;
+    width: 80%;
+}
+
+/* normal page images (locations, species, etc.) */
+.page-image {
+    max-width: 200px;
+    width: 60%;
+    margin: 20px auto;
     display: block;
-    margin: 0 auto;
-}
-
-/* Container */
-.container {
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-    box-sizing: border-box;
-}
-
-/* Content */
-.content {
-    width: 100%;
-    max-width: 100%;
-    margin: 0 auto;
-    padding: 0 10px;
-    box-sizing: border-box;
-}
-
-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    max-width: 300px;
-    margin: 30px auto;
-    padding: 15px;
-    background-color: green;
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-    color: white;
 }
 
-form label {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 2px;
+/* Login-specific image */
+#loginPic {
+    max-width: 360px;
+    width: 80%;
+    height: auto;
+    margin: 1rem auto;
+    border-radius: 10px;
 }
 
-form input[type="text"] {
-    width: 100%;
-    padding: 5px;
-    box-sizing: border-box;
-    background-color: dimgray;
-    color: white;
-    border: 1px solid darkgray;
-    border-radius: 4px;
-}
-
-form input[type="submit"] {
-    padding: 6px 12px;
-    background-color: dimgray;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    width: auto;
-}
-
-form input[type="submit"]:hover {
-    background-color: darkslategray;
-}
+/* Messages */
 
 .error {
-    color: red;
+    color: #fecaca;
     font-weight: bold;
+    margin-top: 0.5rem;
 }
 
 .success {
-    color: blue;
+    color: #bfdbfe;
     font-weight: bold;
+    margin-top: 0.5rem;
 }
 
 .warning {
-    color: red;
+    color: #fed7aa;
     font-weight: bold;
+    margin-top: 0.5rem;
 }
 
+/* Responsiveness */
+
+@media (max-width: 768px) {
+    table {
+        font-size: 0.85rem;
+    }
+
+    th, td {
+        padding: 0.45rem 0.6rem;
+    }
+
+    ul li {
+        margin-right: 4px;
+        padding: 3px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .home-image,
+    .page-image,
+    #loginPic {
+        width: 90%;
+        max-width: 340px;
+    }
+
+    form {
+        margin: 1.25rem auto;
+        padding: 0.85rem 1rem;
+    }
+}

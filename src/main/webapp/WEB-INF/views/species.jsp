@@ -14,7 +14,7 @@
 
     <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
-    <img src="<c:url value='/assets/img/temporarySpecies.jpg' />" alt="sturgeon image"><br><br>
+    <img src="<c:url value='/assets/img/temporarySpecies.jpg' />" alt="sturgeon image" class="page-image"><br><br>
 
     <form action="<%= request.getContextPath() %>/AddData" method="post">
         <label for="addSpecies">Species:</label>
