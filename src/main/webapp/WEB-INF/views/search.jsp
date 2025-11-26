@@ -54,6 +54,8 @@
 
     <h2>Search Results</h2>
 
+    <a id="results"></a>   <%-- anchor for scrolling back here --%>
+
     <table>
         <thead>
         <tr>
@@ -67,7 +69,7 @@
                 <c:param name="sort" value="species" />
                 <c:param name="dir" value="${speciesDir}" />
             </c:url>
-            <th><a href="${speciesUrl}">Species</a></th>
+            <th><a href="${speciesUrl}#results">Species</a></th>
 
             <%-- Length sort toggle --%>
             <c:set var="lengthDir"
@@ -79,7 +81,7 @@
                 <c:param name="sort" value="length" />
                 <c:param name="dir" value="${lengthDir}" />
             </c:url>
-            <th><a href="${lengthUrl}">Length (in)</a></th>
+            <th><a href="${lengthUrl}#results">Length (in)</a></th>
 
             <%-- Weight sort toggle --%>
             <c:set var="weightDir"
@@ -91,7 +93,7 @@
                 <c:param name="sort" value="weight" />
                 <c:param name="dir" value="${weightDir}" />
             </c:url>
-            <th><a href="${weightUrl}">Weight (lb)</a></th>
+            <th><a href="${weightUrl}#results">Weight (lb)</a></th>
 
             <%-- Location sort toggle --%>
             <c:set var="locationDir"
@@ -103,7 +105,7 @@
                 <c:param name="sort" value="location" />
                 <c:param name="dir" value="${locationDir}" />
             </c:url>
-            <th><a href="${locationUrl}">Location</a></th>
+            <th><a href="${locationUrl}#results">Location</a></th>
 
             <%-- Date sort toggle --%>
             <c:set var="dateDir"
@@ -115,7 +117,7 @@
                 <c:param name="sort" value="date" />
                 <c:param name="dir" value="${dateDir}" />
             </c:url>
-            <th><a href="${dateUrl}">Date</a></th>
+            <th><a href="${dateUrl}#results">Date</a></th>
 
             <%-- Bait sort toggle --%>
             <c:set var="baitDir"
@@ -127,7 +129,7 @@
                 <c:param name="sort" value="bait" />
                 <c:param name="dir" value="${baitDir}" />
             </c:url>
-            <th><a href="${baitUrl}">Bait</a></th>
+            <th><a href="${baitUrl}#results">Bait</a></th>
 
             <th>Notes</th>
         </tr>
