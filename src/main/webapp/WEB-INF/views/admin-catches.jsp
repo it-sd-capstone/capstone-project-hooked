@@ -15,7 +15,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>Admin – All Catches</h1>
+        <h1>Admin – All Data</h1>
     </div>
 
     <%@include file="/WEB-INF/includes/navigation.jsp"%>
@@ -24,71 +24,129 @@
         <p class="error">${error}</p>
     </c:if>
 
-    <!-- Clear-all button -->
-    <form action="${pageContext.request.contextPath}/admin/catches"
-          method="post"
-          onsubmit="return confirm('This will delete ALL catches in the database. Are you sure?');">
-        <input type="hidden" name="action" value="clearAll">
-        <input type="submit" value="Clear ALL Catches">
-    </form>
-
-    <br>
-
-    <table>
-        <thead>
-        <tr>
-            <th>CatchID</th>
-            <th>UserID</th>
-            <th>Species</th>
-            <th>Length</th>
-            <th>Weight</th>
-            <th>Location</th>
-            <th>Date</th>
-            <th>Bait</th>
-            <th>Notes</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
+    <!-- Toggle button: switches between catches view and users view -->
+    <form action="${pageContext.request.contextPath}/admin/catches" method="get">
         <c:choose>
-            <c:when test="${empty catches}">
-                <tr><td colspan="10">No catches found.</td></tr>
+            <c:when test="${view == 'users'}">
+                <input type="hidden" name="view" value="catches">
+                <input type="submit" value="Catches">
             </c:when>
             <c:otherwise>
-                <c:forEach var="c" items="${catches}">
-                    <tr>
-                        <td>${c.catchId}</td>
-                        <td>${c.userId}</td>
-                        <td>${c.speciesName}</td>
-                        <td>${c.length}</td>
-                        <td>${c.weight}</td>
-                        <td>${c.locationName}</td>
-                        <td>${c.dateCaught}</td>
-                        <td>${c.baitType}</td>
-                        <td>${c.notes}</td>
-                        <td>
-                            <!-- Delete single catch -->
-                            <form action="${pageContext.request.contextPath}/admin/catches"
-                                  method="post"
-                                  style="display:inline"
-                                  onsubmit="return confirm('Delete this catch?');">
-                                <input type="hidden" name="action" value="deleteOne">
-                                <input type="hidden" name="catchId" value="${c.catchId}">
-                                <input type="submit" value="Delete">
-                            </form>
-
-                            <!-- Optional: link to edit via AddCatch page -->
-                            <a href="${pageContext.request.contextPath}/addCatch?editId=${c.catchId}">
-                                Edit as that user
-                            </a>
-
-                        </td>
-                    </tr>
-                </c:forEach>
+                <input type="hidden" name="view" value="users">
+                <input type="submit" value="Users">
             </c:otherwise>
         </c:choose>
-        </tbody>
-    </table>
+    </form>
+    <br>
+
+    <c:choose>
+        <c:when test="${view == 'users'}">
+            <!-- USERS TABLE -->
+            <h2>Registered Users</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>UserID</th>
+                    <th>Username</th>
+                    <!-- optional:
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    -->
+                </tr>
+                </thead>
+                <tbody>
+                <c:choose>
+                    <c:when test="${empty users}">
+                        <tr><td colspan="2">No users found.</td></tr>
+                    </c:when>
+                    <c:otherwise>
+                        <c:forEach var="u" items="${users}">
+                            <tr>
+                                <td>${u.userId}</td>
+                                <td>${u.userName}</td>
+                                    <%-- optional:
+                                    <td>${u.firstName}</td>
+                                    <td>${u.lastName}</td>
+                                    --%>
+                            </tr>
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
+                </tbody>
+            </table>
+        </c:when>
+
+        <c:otherwise>
+            <!-- CATCHES TABLE (current behavior) -->
+            <h2>All Catches</h2>
+
+            <!-- Clear-all button -->
+            <form action="${pageContext.request.contextPath}/admin/catches"
+                  method="post"
+                  onsubmit="return confirm('This will delete ALL catches in the database. Are you sure?');">
+                <input type="hidden" name="action" value="clearAll">
+                <input type="submit" value="Clear ALL Catches">
+            </form>
+
+            <br>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>CatchID</th>
+                    <th>UserID</th>
+                    <th>Species</th>
+                    <th>Length</th>
+                    <th>Weight</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                    <th>Bait</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <c:choose>
+                    <c:when test="${empty catches}">
+                        <tr><td colspan="10">No catches found.</td></tr>
+                    </c:when>
+                    <c:otherwise>
+                        <c:forEach var="c" items="${catches}">
+                            <tr>
+                                <td>${c.catchId}</td>
+                                <td>${c.userId}</td>
+                                <td>${c.speciesName}</td>
+                                <td>${c.length}</td>
+                                <td>${c.weight}</td>
+                                <td>${c.locationName}</td>
+                                <td>${c.dateCaught}</td>
+                                <td>${c.baitType}</td>
+                                <td>${c.notes}</td>
+                                <td>
+                                    <!-- delete single catch -->
+                                    <form action="${pageContext.request.contextPath}/admin/catches"
+                                          method="post"
+                                          style="display:inline"
+                                          onsubmit="return confirm('Delete this catch?');">
+                                        <input type="hidden" name="action" value="deleteOne">
+                                        <input type="hidden" name="catchId" value="${c.catchId}">
+                                        <input type="submit" value="Delete">
+                                    </form>
+
+                                    <!-- edit as admin (your existing link) -->
+                                    <a href="${pageContext.request.contextPath}/addCatch?editId=${c.catchId}">
+                                        Edit
+                                    </a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                    </c:otherwise>
+                </c:choose>
+                </tbody>
+            </table>
+        </c:otherwise>
+    </c:choose>
+
 
     <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>

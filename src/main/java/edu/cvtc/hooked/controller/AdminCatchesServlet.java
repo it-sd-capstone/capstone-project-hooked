@@ -1,7 +1,9 @@
 package edu.cvtc.hooked.controller;
 
 import edu.cvtc.hooked.dao.CatchDao;
+import edu.cvtc.hooked.dao.UserDao;
 import edu.cvtc.hooked.model.Catch;
+import edu.cvtc.hooked.model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -16,6 +18,7 @@ import java.util.List;
 public class AdminCatchesServlet extends HttpServlet {
 
     private final CatchDao catchDao = new CatchDao();
+    private final UserDao userDao   = new UserDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -27,12 +30,23 @@ public class AdminCatchesServlet extends HttpServlet {
             return;
         }
 
+        String view = req.getParameter("view");
+        if (!"users".equals(view)) {
+            view = "catches"; // default
+        }
+        req.setAttribute("view", view);
+
         try {
-            List<Catch> all = catchDao.findAll();
-            req.setAttribute("catches", all);
+            if ("users".equals(view)) {
+                List<User> users = userDao.findAll();
+                req.setAttribute("users", users);
+            } else {
+                List<Catch> all = catchDao.findAll();
+                req.setAttribute("catches", all);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
-            req.setAttribute("error", "Unable to load catches: " + e.getMessage());
+            req.setAttribute("error", "Unable to load data: " + e.getMessage());
         }
 
         req.getRequestDispatcher("/WEB-INF/views/admin-catches.jsp").forward(req, resp);
@@ -63,7 +77,7 @@ public class AdminCatchesServlet extends HttpServlet {
             req.setAttribute("error", "Operation failed: " + e.getMessage());
         }
 
-        // Always redirect back to GET so the table refreshes
-        resp.sendRedirect(req.getContextPath() + "/admin/catches");
+        // After POST always go back to catches view (safe default)
+        resp.sendRedirect(req.getContextPath() + "/admin/catches?view=catches");
     }
 }

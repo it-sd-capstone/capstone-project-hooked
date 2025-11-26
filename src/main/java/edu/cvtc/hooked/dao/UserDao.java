@@ -3,6 +3,8 @@ package edu.cvtc.hooked.dao;
 import edu.cvtc.hooked.model.User;
 import edu.cvtc.hooked.util.DbUtil;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class UserDao {
@@ -43,5 +45,33 @@ public class UserDao {
             }
         }
     }
+
+    public List<User> findAll() throws SQLException {
+        String sql = """
+        SELECT UserID, firstName, lastName, userName, passwordHash
+        FROM Users
+        ORDER BY UserID
+        """;
+
+        List<User> users = new ArrayList<>();
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                User u = new User();
+                u.setUserId(rs.getInt("UserID"));
+                u.setFirstName(rs.getString("firstName"));
+                u.setLastName(rs.getString("lastName"));
+                u.setUserName(rs.getString("userName"));
+                u.setPasswordHash(rs.getString("passwordHash"));
+                users.add(u);
+            }
+        }
+
+        return users;
+    }
+
 }
 
