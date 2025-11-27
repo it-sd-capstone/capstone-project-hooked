@@ -22,17 +22,11 @@
         <label for="addSpecies">Species Name:</label>
         <input type="text" id="addSpecies" name="addSpecies" required>
 
-        <label for="minLength">Min Length (inches):</label>
-        <input type="number" step="0.1" id="minLength" name="minLength">
+        <label for="addLength">Length (inches):</label>
+        <input type="number" step="0.1" id="addLength" name="addLength">
 
-        <label for="maxLength">Max Length (inches):</label>
-        <input type="number" step="0.1" id="maxLength" name="maxLength">
-
-        <label for="minWeight">Min Weight (lbs):</label>
-        <input type="number" step="0.1" id="minWeight" name="minWeight">
-
-        <label for="maxWeight">Max Weight (lbs):</label>
-        <input type="number" step="0.1" id="maxWeight" name="maxWeight">
+        <label for="addWeight">Weight (lbs):</label>
+        <input type="number" step="0.1" id="addWeight" name="addWeight">
 
         <input type="submit" value="Add Species">
 
@@ -84,8 +78,8 @@
 
                 <td>
                     <c:choose>
-                        <c:when test="${s.minLength != null || s.maxLength != null}">
-                            ${s.minLength} - ${s.maxLength}
+                        <c:when test="${s.length != null}">
+                            ${s.length}
                         </c:when>
                         <c:otherwise>-</c:otherwise>
                     </c:choose>
@@ -93,8 +87,8 @@
 
                 <td>
                     <c:choose>
-                        <c:when test="${s.minWeight != null || s.maxWeight != null}">
-                            ${s.minWeight} - ${s.maxWeight}
+                        <c:when test="${s.weight != null}">
+                            ${s.weight}
                         </c:when>
                         <c:otherwise>-</c:otherwise>
                     </c:choose>
