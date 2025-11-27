@@ -15,6 +15,7 @@ class UserDaoTest {
     @BeforeAll
     static void setupDatabase() {
         // Make sure all the tables exist before any of these tests run.
+        System.setProperty("hooked.test.db", "true");
         DbUtil.ensureSchema();
     }
 

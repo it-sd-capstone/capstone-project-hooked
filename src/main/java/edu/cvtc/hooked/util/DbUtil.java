@@ -14,6 +14,17 @@ public final class DbUtil {
             // local dev and AWS Elastic Beanstalk.
             String userHome = System.getProperty("user.home");
 
+            // Check if we are in test mode
+            if ("true".equals(System.getProperty("hooked.test.db"))) {
+                Path testDir = Paths.get(userHome, "hooked-data");
+                Files.createDirectories(testDir);
+
+                String testPath = testDir.resolve("hooked-test.db").toString();
+                System.out.println(">>> TEST DB PATH = " + testPath);
+                return testPath;
+            }
+
+            // Normal DB
             Path dataDir = Paths.get(userHome, "hooked-data");
             Files.createDirectories(dataDir);
 

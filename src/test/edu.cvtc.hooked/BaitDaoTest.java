@@ -16,6 +16,7 @@ public class BaitDaoTest {
 
     @BeforeAll
     static void setup() throws Exception {
+        System.setProperty("hooked.test.db", "true");
         DbUtil.ensureSchema();
 
         try (Connection conn = DbUtil.getConnection();

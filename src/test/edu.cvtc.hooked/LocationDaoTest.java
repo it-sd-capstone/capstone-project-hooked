@@ -18,6 +18,7 @@ class LocationDaoTest {
 
     @BeforeAll
     static void setup() {
+        System.setProperty("hooked.test.db", "true");
         DbUtil.ensureSchema();
         dao = new LocationDao();
     }

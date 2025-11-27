@@ -18,6 +18,7 @@ public class CatchDaoTest {
     @BeforeAll
     static void setupDatabase() {
         // Make sure all tables exist so we can insert users and catches.
+        System.setProperty("hooked.test.db", "true");
         DbUtil.ensureSchema();
     }
 
