@@ -40,7 +40,8 @@
         <label for="addSpecies">Species Name:</label>
 
         <input type="text" id="addSpecies" name="addSpecies"
-               value="${param.formatted}" required>
+               value="${param.formatted}"
+               placeholder="ex. Smallmouth Bass" required>
 
         <input type="submit" value="Add Species">
 
