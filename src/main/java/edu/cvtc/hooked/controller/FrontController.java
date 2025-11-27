@@ -70,20 +70,17 @@ public class FrontController extends HttpServlet {
     throws IOException {
 
         String species = req.getParameter("addSpecies");
-        String minLength = req.getParameter("minLength");
-        String maxLength = req.getParameter("maxLength");
-        String minWeight = req.getParameter("minWeight");
-        String maxWeight = req.getParameter("maxWeight");
+        String length = req.getParameter("addLength");
+        String weight = req.getParameter("addWeight");
 
         try {
             SpeciesDao dao = new SpeciesDao();
 
             Species s = new Species(
                     species.trim(),
-                    parseDoubleOrNull(minLength),
-                    parseDoubleOrNull(maxLength),
-                    parseDoubleOrNull(minWeight),
-                    parseDoubleOrNull(maxWeight)
+                    parseDoubleOrNull(length),
+                    parseDoubleOrNull(weight)
+
             );
 
             dao.insert(s);
