@@ -38,21 +38,12 @@
         <label for="speciesSearch">Choose a Species:</label>
         <select name="speciesSearch" id="speciesSearch" required>
             <option value="" disabled selected>Select a Species</option>
-            <option value="Bluegill">Bluegill</option>
-            <option value="Brooke Trout">Brooke Trout</option>
-            <option value="Brown Trout">Brown Trout</option>
-            <option value="Carp">Carp</option>
-            <option value="Catfish">Catfish</option>
-            <option value="Crappie">Crappie</option>
-            <option value="Largemouth Bass">Largemouth Bass</option>
-            <option value="Lake Sturgeon">Lake Sturgeon</option>
-            <option value="Muskellunge">Muskellunge</option>
-            <option value="Northern Pike">Northern Pike</option>
-            <option value="Rainbow Trout">Rainbow Trout</option>
-            <option value="Shovelnose Sturgeon">Shovelnose Sturgeon</option>
-            <option value="SmallMouth Bass">Smallmouth Bass</option>
-            <option value="Sucker">Sucker</option>
-            <option value="Yellow Perch">Yellow Perch</option>
+
+            <c:forEach var="s" items="${speciesList}">
+                <option value="${s.speciesName}">
+                        ${s.speciesName}
+                </option>
+            </c:forEach>
         </select>
         <input type="submit" value="Search Species">
     </form> <br><br>

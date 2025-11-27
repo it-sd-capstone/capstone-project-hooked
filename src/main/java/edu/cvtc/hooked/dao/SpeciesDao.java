@@ -98,4 +98,33 @@ public class SpeciesDao {
             ps.setDouble(index, value);
         }
     }
+
+    public List<Species> searchByTerm(String name) {
+        List<Species> list = new ArrayList<>();
+
+        String sql = "SELECT SpeciesID, SpeciesName, Length, Weight FROM Species WHERE SpeciesName = ?";
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Species s = new Species(
+                            rs.getInt("SpeciesID"),
+                            rs.getString("SpeciesName"),
+                            (Double) rs.getObject("Length"),
+                            (Double) rs.getObject("Weight")
+                    );
+                    list.add(s);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }

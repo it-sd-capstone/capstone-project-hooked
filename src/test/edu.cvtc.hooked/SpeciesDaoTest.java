@@ -129,6 +129,43 @@ class SpeciesDaoTest {
 
         assertTrue(found, "findAll should include the species we just inserted");
     }
+
+    @Test
+    void searchByTerm_findsExactMatch() throws Exception {
+        SpeciesDao dao = new SpeciesDao();
+
+        // Unique species so nothing else matches
+        String uniqueName = "JUnitSearch_" + System.currentTimeMillis();
+
+        Species s = new Species(
+                uniqueName,
+                7.5,
+                2.2
+        );
+
+        dao.insert(s);
+
+        // Now search for it using the new method
+        List<Species> result = dao.searchByTerm(uniqueName);
+
+        assertFalse(result.isEmpty(), "searchByTerm should return the inserted species");
+
+        Species found = result.get(0);
+
+        assertEquals(uniqueName, found.getSpeciesName());
+        assertEquals(7.5, found.getLength());
+        assertEquals(2.2, found.getWeight());
+    }
+
+    @Test
+    void searchByTerm_returnsEmptyListWhenNotFound() {
+        SpeciesDao dao = new SpeciesDao();
+
+        List<Species> result = dao.searchByTerm("NameDoesNotExist_" + System.currentTimeMillis());
+
+        assertTrue(result.isEmpty(), "Expected empty list for unknown species name");
+    }
+
 }
 
 
