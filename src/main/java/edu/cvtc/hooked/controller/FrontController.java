@@ -50,7 +50,17 @@ public class FrontController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
+
+        String path = req.getServletPath();
+
+        if ("/species".equals(path)) {
+            handleSpeciesPost(req);
+        }
         doGet(req, resp);
+    }
+
+    private void handleSpeciesPost(HttpServletRequest req) {
+        // TODO: implement species from processing
     }
 
     private void loadStatistics(HttpServletRequest req) {
