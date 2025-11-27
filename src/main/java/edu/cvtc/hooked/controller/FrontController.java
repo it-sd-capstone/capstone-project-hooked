@@ -1,5 +1,7 @@
 package edu.cvtc.hooked.controller;
 
+import edu.cvtc.hooked.dao.SpeciesDao;
+import edu.cvtc.hooked.model.Species;
 import edu.cvtc.hooked.util.DbUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -44,6 +46,10 @@ public class FrontController extends HttpServlet {
             loadStatistics(req);
         }
 
+        if ("/species".equals(path)) {
+            loadSpecies(req);
+        }
+
         req.getRequestDispatcher(viewFor(path)).forward(req, resp);
     }
 
@@ -54,13 +60,41 @@ public class FrontController extends HttpServlet {
         String path = req.getServletPath();
 
         if ("/species".equals(path)) {
-            handleSpeciesPost(req);
+            handleSpeciesPost(req, resp);
+            return;
         }
         doGet(req, resp);
     }
 
-    private void handleSpeciesPost(HttpServletRequest req) {
-        // TODO: implement species from processing
+    private void handleSpeciesPost(HttpServletRequest req, HttpServletResponse resp)
+    throws IOException {
+
+        String species = req.getParameter("addSpecies");
+        String minLength = req.getParameter("minLength");
+        String maxLength = req.getParameter("maxLength");
+        String minWeight = req.getParameter("minWeight");
+        String maxWeight = req.getParameter("maxWeight");
+
+        try {
+            SpeciesDao dao = new SpeciesDao();
+
+            Species s = new Species(
+                    species.trim(),
+                    parseDoubleOrNull(minLength),
+                    parseDoubleOrNull(maxLength),
+                    parseDoubleOrNull(minWeight),
+                    parseDoubleOrNull(maxWeight)
+            );
+
+            dao.insert(s);
+
+            resp.sendRedirect("species?success=1");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.sendRedirect("species?error=1");
+        }
+
     }
 
     private void loadStatistics(HttpServletRequest req) {
@@ -137,6 +171,23 @@ public class FrontController extends HttpServlet {
         } catch (SQLException e) {
             e.printStackTrace();
             req.setAttribute("error", "Unable to load statistics: " + e.getMessage());
+        }
+    }
+
+    private Double parseDoubleOrNull(String val) {
+        if (val == null || val.isBlank()) {
+            return null;
+        }
+        return Double.parseDouble(val);
+    }
+
+    private void loadSpecies(HttpServletRequest req) {
+        try {
+            SpeciesDao dao = new SpeciesDao();
+            req.setAttribute("speciesList", dao.findAll());
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("speciesError", "Unable to load species.");
         }
     }
 }
