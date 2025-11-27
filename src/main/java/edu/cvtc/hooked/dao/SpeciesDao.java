@@ -11,22 +11,19 @@ import java.util.Optional;
 public class SpeciesDao {
 
     public void insert(Species s) throws SQLException {
-        String sql = "INSERT INTO Species(SpeciesName, Length, Weight) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO Species(SpeciesName) VALUES (?)";
 
         try (Connection c = DbUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, s.getSpeciesName());
 
-            setNullableDouble(ps, 2, s.getLength());
-            setNullableDouble(ps, 3, s.getWeight());
-
             ps.executeUpdate();
         }
     }
 
     public Optional<Species> findBySpeciesName(String speciesName) throws SQLException {
-        String sql = "SELECT SpeciesID, SpeciesName, Length, Weight " +
+        String sql = "SELECT SpeciesID, SpeciesName " +
                 "FROM Species WHERE SpeciesName = ?";
 
         try (Connection c = DbUtil.getConnection();
@@ -45,7 +42,7 @@ public class SpeciesDao {
     }
 
     public Optional<Species> findById(int speciesId) throws SQLException {
-        String sql = "SELECT SpeciesID, SpeciesName, Length, Weight " +
+        String sql = "SELECT SpeciesID, SpeciesName " +
                 "FROM Species WHERE SpeciesID = ?";
 
         try (Connection c = DbUtil.getConnection();
@@ -64,7 +61,7 @@ public class SpeciesDao {
     }
 
     public List<Species> findAll() throws SQLException {
-        String sql = "SELECT SpeciesID, SpeciesName, Length, Weight " +
+        String sql = "SELECT SpeciesID, SpeciesName " +
                 "FROM Species ORDER BY SpeciesName";
 
         List<Species> result = new ArrayList<>();
@@ -84,25 +81,14 @@ public class SpeciesDao {
     private Species mapRow(ResultSet rs) throws SQLException {
         return new Species(
                 rs.getInt("SpeciesID"),
-                rs.getString("SpeciesName"),
-                (Double) rs.getObject("Length"),
-                (Double) rs.getObject("Weight")
-
+                rs.getString("SpeciesName")
         );
-    }
-
-    private void setNullableDouble(PreparedStatement ps, int index, Double value) throws SQLException {
-        if (value == null) {
-            ps.setNull(index, Types.REAL);
-        }  else {
-            ps.setDouble(index, value);
-        }
     }
 
     public List<Species> searchByTerm(String name) {
         List<Species> list = new ArrayList<>();
 
-        String sql = "SELECT SpeciesID, SpeciesName, Length, Weight FROM Species WHERE SpeciesName = ?";
+        String sql = "SELECT SpeciesID, SpeciesName FROM Species WHERE SpeciesName = ?";
 
         try (Connection conn = DbUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -113,9 +99,7 @@ public class SpeciesDao {
                 while (rs.next()) {
                     Species s = new Species(
                             rs.getInt("SpeciesID"),
-                            rs.getString("SpeciesName"),
-                            (Double) rs.getObject("Length"),
-                            (Double) rs.getObject("Weight")
+                            rs.getString("SpeciesName")
                     );
                     list.add(s);
                 }
@@ -127,4 +111,23 @@ public class SpeciesDao {
 
         return list;
     }
+
+    public boolean exists(String speciesName) {
+        String sql = "SELECT 1 FROM Species WHERE SpeciesName = ? LIMIT 1";
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, speciesName);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next(); // true if species exists
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

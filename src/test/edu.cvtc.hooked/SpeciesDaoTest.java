@@ -28,11 +28,7 @@ class SpeciesDaoTest {
         SpeciesDao dao = new SpeciesDao();
 
         // Build a species the same way the app would.
-        Species toInsert = new Species(
-                uniqueName,
-                10.0,
-                20.0
-        );
+        Species toInsert = new Species(uniqueName);
 
         // Try inserting the species into the database.
         dao.insert(toInsert);
@@ -48,8 +44,6 @@ class SpeciesDaoTest {
 
         // Confirm the rest of the fields match what I put in.
         assertEquals(uniqueName, found.getSpeciesName());
-        assertEquals(10.0, found.getLength());
-        assertEquals(20.0, found.getWeight());
     }
 
     @Test
@@ -59,11 +53,7 @@ class SpeciesDaoTest {
 
         SpeciesDao dao = new SpeciesDao();
 
-        Species toInsert = new Species(
-                uniqueName,
-                8.0,
-                18.0
-        );
+        Species toInsert = new Species(uniqueName);
 
         dao.insert(toInsert);
 
@@ -79,8 +69,6 @@ class SpeciesDaoTest {
 
         assertEquals(id, found.getSpeciesId());
         assertEquals(uniqueName, found.getSpeciesName());
-        assertEquals(8.0, found.getLength());
-        assertEquals(18.0, found.getWeight());
     }
 
     @Test
@@ -113,11 +101,7 @@ class SpeciesDaoTest {
         // Insert a species with a unique name.
         String uniqueName = "JUnitSpeciesFindAll_" + System.currentTimeMillis();
 
-        Species toInsert = new Species(
-                uniqueName,
-                4.0,
-                9.0
-        );
+        Species toInsert = new Species(uniqueName);
 
         dao.insert(toInsert);
 
@@ -137,11 +121,7 @@ class SpeciesDaoTest {
         // Unique species so nothing else matches
         String uniqueName = "JUnitSearch_" + System.currentTimeMillis();
 
-        Species s = new Species(
-                uniqueName,
-                7.5,
-                2.2
-        );
+        Species s = new Species(uniqueName);
 
         dao.insert(s);
 
@@ -153,8 +133,6 @@ class SpeciesDaoTest {
         Species found = result.get(0);
 
         assertEquals(uniqueName, found.getSpeciesName());
-        assertEquals(7.5, found.getLength());
-        assertEquals(2.2, found.getWeight());
     }
 
     @Test

@@ -1,8 +1,8 @@
 package edu.cvtc.hooked.controller;
 
 import edu.cvtc.hooked.dao.CatchDao;
+import edu.cvtc.hooked.dao.SpeciesDao;
 import edu.cvtc.hooked.model.Catch;
-import edu.cvtc.hooked.model.SpeciesRestrictions;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -108,6 +108,14 @@ public class AddCatchServlet extends HttpServlet {
         String lengthStr        = req.getParameter("length");
         String weightStr        = req.getParameter("weight");
 
+        SpeciesDao speciesDao = new SpeciesDao();
+
+        if (speciesName == null || !speciesDao.exists(speciesName)) {
+            req.setAttribute("error", "Invalid species. Please select a valid species.");
+            forwardWithCatches(req, resp, ownerUserId);
+            return;
+        }
+
         double length = 0;
         double weight = 0;
 
@@ -120,25 +128,6 @@ public class AddCatchServlet extends HttpServlet {
             }
         } catch (NumberFormatException e) {
             req.setAttribute("error", "Length and weight must be numeric.");
-            forwardWithCatches(req, resp, ownerUserId);
-            return;
-        }
-
-        SpeciesRestrictions restrictions = (speciesName == null)
-                ? null
-                : SpeciesRestrictions.ALL.get(speciesName);
-
-        if (restrictions == null) {
-            req.setAttribute("error", "Unrecognized species.");
-            forwardWithCatches(req, resp, ownerUserId);
-            return;
-        }
-
-        if (length <= 0 || weight <= 0 ||
-                length > restrictions.getMaxLength() ||
-                weight > restrictions.getMaxWeight()) {
-
-            req.setAttribute("error", "Invalid length/weight for species.");
             forwardWithCatches(req, resp, ownerUserId);
             return;
         }
@@ -194,8 +183,12 @@ public class AddCatchServlet extends HttpServlet {
     }
 
     private void addSpeciesList(HttpServletRequest req) {
-        List<String> species = new ArrayList<>(SpeciesRestrictions.ALL.keySet());
-        Collections.sort(species);
-        req.setAttribute("speciesList", species);
+        try {
+            SpeciesDao dao = new SpeciesDao();
+            req.setAttribute("speciesList", dao.findAll());
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("speciesList", Collections.emptyList());
+        }
     }
 }

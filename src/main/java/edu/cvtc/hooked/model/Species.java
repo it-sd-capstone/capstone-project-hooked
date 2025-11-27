@@ -6,9 +6,6 @@ public class Species {
 
     private Integer speciesId;
     private String speciesName;
-    private Double length;
-    private Double weight;
-
 
     public Species() {
         // default ctor
@@ -16,20 +13,14 @@ public class Species {
 
     // full ctor (used when loading from DB)
     public Species(Integer speciesId,
-                   String speciesName,
-                   Double length,
-                   Double weight) {
+                   String speciesName) {
         this.speciesId = speciesId;
         this.speciesName = speciesName;
-        this.length = length;
-        this.weight = weight;
     }
 
     // convenience ctor for new species (id assigned by DB)
-    public Species(String speciesName,
-                   Double length,
-                   Double weight) {
-        this(null, speciesName, length, weight);
+    public Species(String speciesName) {
+        this(null, speciesName);
     }
 
     public Integer getSpeciesId() {
@@ -46,20 +37,6 @@ public class Species {
 
     public void setSpeciesName(String speciesName) {
         this.speciesName = speciesName;
-    }
-
-    public Double getLength() {
-        return length;
-    }
-
-    public void setLength(Double length) {
-        this.length = length;
-    }
-
-    public Double getWeight() {return weight;}
-
-    public void setWeight(Double weight) {
-        this.weight = weight;
     }
 
     // treat speciesName as the unique key

@@ -70,17 +70,12 @@ public class FrontController extends HttpServlet {
     throws IOException {
 
         String species = req.getParameter("addSpecies");
-        String length = req.getParameter("addLength");
-        String weight = req.getParameter("addWeight");
 
         try {
             SpeciesDao dao = new SpeciesDao();
 
             Species s = new Species(
-                    species.trim(),
-                    parseDoubleOrNull(length),
-                    parseDoubleOrNull(weight)
-
+                    species.trim()
             );
 
             dao.insert(s);
@@ -169,13 +164,6 @@ public class FrontController extends HttpServlet {
             e.printStackTrace();
             req.setAttribute("error", "Unable to load statistics: " + e.getMessage());
         }
-    }
-
-    private Double parseDoubleOrNull(String val) {
-        if (val == null || val.isBlank()) {
-            return null;
-        }
-        return Double.parseDouble(val);
     }
 
     private void loadSpecies(HttpServletRequest req) {

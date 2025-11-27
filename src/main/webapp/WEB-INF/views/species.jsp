@@ -22,12 +22,6 @@
         <label for="addSpecies">Species Name:</label>
         <input type="text" id="addSpecies" name="addSpecies" required>
 
-        <label for="addLength">Length (inches):</label>
-        <input type="number" step="0.1" id="addLength" name="addLength">
-
-        <label for="addWeight">Weight (lbs):</label>
-        <input type="number" step="0.1" id="addWeight" name="addWeight">
-
         <input type="submit" value="Add Species">
 
     </form>
@@ -40,7 +34,8 @@
             <option value="" disabled selected>Select a Species</option>
 
             <c:forEach var="s" items="${speciesList}">
-                <option value="${s.speciesName}">
+                <option value="${s.speciesName}"
+                        <c:if test="${param.speciesSearch == s.speciesName}">selected</c:if>>
                         ${s.speciesName}
                 </option>
             </c:forEach>
@@ -55,11 +50,6 @@
         <thead>
         <tr>
             <th>Species</th>
-            <th>Length</th>
-            <th>Weight(lbs)</th>
-            <th>Location</th>
-            <th>Bait Used</th>
-            <th>Notes</th>
         </tr>
         </thead>
         <tbody>
@@ -67,33 +57,40 @@
             <tr>
                 <td>${s.speciesName}</td>
 
-                <td>
-                    <c:choose>
-                        <c:when test="${s.length != null}">
-                            ${s.length}
-                        </c:when>
-                        <c:otherwise>-</c:otherwise>
-                    </c:choose>
-                </td>
-
-                <td>
-                    <c:choose>
-                        <c:when test="${s.weight != null}">
-                            ${s.weight}
-                        </c:when>
-                        <c:otherwise>-</c:otherwise>
-                    </c:choose>
-                </td>
-
-                <!-- empty placeholder cells to match header -->
-                <td>-</td>
-                <td>-</td>
-                <td>-</td>
             </tr>
         </c:forEach>
         </tbody>
     </table>
 
+    <c:if test="${not empty catchesForSpecies}">
+        <h2>Catches for this Species</h2>
+
+        <table>
+            <thead>
+            <tr>
+                <th>Length (in)</th>
+                <th>Weight (lbs)</th>
+                <th>Location</th>
+                <th>Date</th>
+                <th>Bait</th>
+                <th>Notes</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <c:forEach var="c" items="${catchesForSpecies}">
+                <tr>
+                    <td>${c.length}</td>
+                    <td>${c.weight}</td>
+                    <td>${c.locationName}</td>
+                    <td>${c.dateCaught}</td>
+                    <td>${c.baitType}</td>
+                    <td>${c.notes}</td>
+                </tr>
+            </c:forEach>
+            </tbody>
+        </table>
+    </c:if>
 
     <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>

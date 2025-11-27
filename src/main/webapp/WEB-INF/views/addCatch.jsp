@@ -47,14 +47,15 @@
         Select a species
       </option>
 
-      <c:forEach var="s" items="${speciesList}">
-        <c:set var="selected"
-               value="${(editCatch != null and editCatch.speciesName == s) or
-                     (editCatch == null and param.speciesName == s)}" />
-        <option value="${s}" <c:if test="${selected}">selected</c:if>>
-            ${s}
-        </option>
-      </c:forEach>
+        <c:forEach var="s" items="${speciesList}">
+            <c:set var="selected"
+                   value="${(editCatch != null and editCatch.speciesName == s.speciesName) or
+                   (editCatch == null and param.speciesName == s.speciesName)}" />
+
+            <option value="${s.speciesName}" <c:if test="${selected}">selected</c:if>>
+                    ${s.speciesName}
+            </option>
+        </c:forEach>
     </select>
     <br><br>
 
