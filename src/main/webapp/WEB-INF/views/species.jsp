@@ -16,10 +16,25 @@
 
     <img src="<c:url value='/assets/img/temporarySpecies.jpg' />" alt="sturgeon image" class="page-image"><br><br>
 
-    <form action="<%= request.getContextPath() %>/AddData" method="post">
-        <label for="addSpecies">Species:</label>
-        <input type="text" id="addSpecies" name="addSpecies">
+    <form action="${pageContext.request.contextPath}/species" method="post">
+
+        <label for="addSpecies">Species Name:</label>
+        <input type="text" id="addSpecies" name="addSpecies" required>
+
+        <label for="minLength">Min Length (inches):</label>
+        <input type="number" step="0.1" id="minLength" name="minLength">
+
+        <label for="maxLength">Max Length (inches):</label>
+        <input type="number" step="0.1" id="maxLength" name="maxLength">
+
+        <label for="minWeight">Min Weight (lbs):</label>
+        <input type="number" step="0.1" id="minWeight" name="minWeight">
+
+        <label for="maxWeight">Max Weight (lbs):</label>
+        <input type="number" step="0.1" id="maxWeight" name="maxWeight">
+
         <input type="submit" value="Add Species">
+
     </form>
 
     <br>
