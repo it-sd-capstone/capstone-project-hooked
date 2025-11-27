@@ -17,10 +17,30 @@
 
     <img src="<c:url value='/assets/img/temporarySpecies.jpg' />" alt="sturgeon image" class="page-image"><br><br>
 
+    <c:if test="${not empty param.error}">
+        <div class="error-message" style="color:red; font-weight:bold;">
+                ${param.error}
+        </div>
+    </c:if>
+
+    <c:if test="${not empty param.success}">
+        <div class="success-message" style="color:green; font-weight:bold;">
+            Species added successfully!
+        </div>
+    </c:if>
+
+    <c:if test="${not empty param.formatted}">
+        <div class="info-message" style="color:#0066cc; font-weight:bold;">
+            Auto-formatted to: <strong>${param.formatted}</strong>
+        </div>
+    </c:if>
+
     <form action="${pageContext.request.contextPath}/species" method="post">
 
         <label for="addSpecies">Species Name:</label>
-        <input type="text" id="addSpecies" name="addSpecies" required>
+
+        <input type="text" id="addSpecies" name="addSpecies"
+               value="${param.formatted}" required>
 
         <input type="submit" value="Add Species">
 

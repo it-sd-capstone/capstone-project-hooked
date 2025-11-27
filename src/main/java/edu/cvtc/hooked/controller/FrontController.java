@@ -71,9 +71,34 @@ public class FrontController extends HttpServlet {
 
         String species = req.getParameter("addSpecies");
 
-        try {
-            SpeciesDao dao = new SpeciesDao();
+        if (species == null || species.trim().isEmpty()) {
+            resp.sendRedirect("species?error=Empty species name");
+            return;
+        }
 
+        species = species.trim().replaceAll("\\s+", " ");
+
+        String formatted = capitalizeWords(species);
+
+        if (!formatted.equals(species)) {
+            resp.sendRedirect("species?formatted="
+                    + java.net.URLEncoder.encode(formatted, "UTF-8"));
+            return;
+        }
+
+
+        if (!species.matches("^[A-Za-z][A-Za-z\\s-]*[A-Za-z]$")) {
+            resp.sendRedirect("species?error=Invalid species name");
+            return;
+        }
+
+        SpeciesDao dao = new SpeciesDao();
+        if (dao.exists(species)) {
+            resp.sendRedirect("species?error=Species already exists");
+            return;
+        }
+
+        try {
             Species s = new Species(
                     species.trim()
             );
@@ -175,4 +200,20 @@ public class FrontController extends HttpServlet {
             req.setAttribute("speciesError", "Unable to load species.");
         }
     }
+
+    private String capitalizeWords(String input) {
+        String[] parts = input.split(" ");
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < parts.length; i++) {
+            String w = parts[i];
+            if (!w.isEmpty()) {
+                sb.append(Character.toUpperCase(w.charAt(0)))
+                        .append(w.substring(1).toLowerCase());
+            }
+            if (i < parts.length - 1) sb.append(" ");
+        }
+        return sb.toString();
+    }
+
 }
