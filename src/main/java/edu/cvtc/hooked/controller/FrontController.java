@@ -69,6 +69,11 @@ public class FrontController extends HttpServlet {
     private void handleSpeciesPost(HttpServletRequest req, HttpServletResponse resp)
     throws IOException {
 
+        if (req.getSession(false) == null || req.getSession(false).getAttribute("userId") == null) {
+            resp.sendRedirect("species?error=You must be logged in to add species.");
+            return;
+        }
+
         String species = req.getParameter("addSpecies");
 
         if (species == null || species.trim().isEmpty()) {
