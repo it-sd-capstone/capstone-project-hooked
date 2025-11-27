@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -77,22 +78,34 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td>Bluegill</td>
-            <td>11 inches</td>
-            <td>1 lb</td>
-            <td>Mississippi River</td>
-            <td>Gulp! Minnow</td>
-            <td>Slip Bobber</td>
-        </tr>
-        <tr>
-            <td>ShovelNose Sturgeon</td>
-            <td>27 inches</td>
-            <td>5 lbs</td>
-            <td>Chippewa River</td>
-            <td>Nightcrawler</td>
-            <td>Fishing the edge of an eddy</td>
-        </tr>
+        <c:forEach var="s" items="${speciesList}">
+            <tr>
+                <td>${s.speciesName}</td>
+
+                <td>
+                    <c:choose>
+                        <c:when test="${s.minLength != null || s.maxLength != null}">
+                            ${s.minLength} - ${s.maxLength}
+                        </c:when>
+                        <c:otherwise>-</c:otherwise>
+                    </c:choose>
+                </td>
+
+                <td>
+                    <c:choose>
+                        <c:when test="${s.minWeight != null || s.maxWeight != null}">
+                            ${s.minWeight} - ${s.maxWeight}
+                        </c:when>
+                        <c:otherwise>-</c:otherwise>
+                    </c:choose>
+                </td>
+
+                <!-- empty placeholder cells to match header -->
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+            </tr>
+        </c:forEach>
         </tbody>
     </table>
 
