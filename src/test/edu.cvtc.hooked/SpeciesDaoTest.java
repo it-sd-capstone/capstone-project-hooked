@@ -30,9 +30,7 @@ class SpeciesDaoTest {
         Species toInsert = new Species(
                 uniqueName,
                 10.0,
-                20.0,
-                1.0,
-                5.0
+                20.0
         );
 
         // Try inserting the species into the database.
@@ -49,10 +47,8 @@ class SpeciesDaoTest {
 
         // Confirm the rest of the fields match what I put in.
         assertEquals(uniqueName, found.getSpeciesName());
-        assertEquals(10.0, found.getMinLength());
-        assertEquals(20.0, found.getMaxLength());
-        assertEquals(1.0, found.getMinWeight());
-        assertEquals(5.0, found.getMaxWeight());
+        assertEquals(10.0, found.getLength());
+        assertEquals(20.0, found.getWeight());
     }
 
     @Test
@@ -65,9 +61,7 @@ class SpeciesDaoTest {
         Species toInsert = new Species(
                 uniqueName,
                 8.0,
-                18.0,
-                0.5,
-                3.0
+                18.0
         );
 
         dao.insert(toInsert);
@@ -84,10 +78,8 @@ class SpeciesDaoTest {
 
         assertEquals(id, found.getSpeciesId());
         assertEquals(uniqueName, found.getSpeciesName());
-        assertEquals(8.0, found.getMinLength());
-        assertEquals(18.0, found.getMaxLength());
-        assertEquals(0.5, found.getMinWeight());
-        assertEquals(3.0, found.getMaxWeight());
+        assertEquals(8.0, found.getLength());
+        assertEquals(18.0, found.getWeight());
     }
 
     @Test
@@ -123,9 +115,7 @@ class SpeciesDaoTest {
         Species toInsert = new Species(
                 uniqueName,
                 4.0,
-                9.0,
-                0.3,
-                1.0
+                9.0
         );
 
         dao.insert(toInsert);
