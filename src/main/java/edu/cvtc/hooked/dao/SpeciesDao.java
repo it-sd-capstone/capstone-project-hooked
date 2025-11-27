@@ -11,24 +11,22 @@ import java.util.Optional;
 public class SpeciesDao {
 
     public void insert(Species s) throws SQLException {
-        String sql = "INSERT INTO Species(SpeciesName, minLength, maxLength, minWeight, maxWeight) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Species(SpeciesName, Length, Weight) VALUES (?, ?, ?)";
 
         try (Connection c = DbUtil.getConnection();
              PreparedStatement ps = c.prepareStatement(sql)) {
 
             ps.setString(1, s.getSpeciesName());
 
-            setNullableDouble(ps, 2, s.getMinLength());
-            setNullableDouble(ps, 3, s.getMaxLength());
-            setNullableDouble(ps, 4, s.getMinWeight());
-            setNullableDouble(ps,5, s.getMaxWeight());
+            setNullableDouble(ps, 2, s.getLength());
+            setNullableDouble(ps, 3, s.getWeight());
 
             ps.executeUpdate();
         }
     }
 
     public Optional<Species> findBySpeciesName(String speciesName) throws SQLException {
-        String sql = "SELECT SpeciesID, SpeciesName, minLength, maxLength, minWeight, maxWeight " +
+        String sql = "SELECT SpeciesID, SpeciesName, Length, Weight " +
                 "FROM Species WHERE SpeciesName = ?";
 
         try (Connection c = DbUtil.getConnection();
@@ -47,7 +45,7 @@ public class SpeciesDao {
     }
 
     public Optional<Species> findById(int speciesId) throws SQLException {
-        String sql = "SELECT SpeciesID, SpeciesName, minLength, maxLength, minWeight, maxWeight " +
+        String sql = "SELECT SpeciesID, SpeciesName, Length, Weight " +
                 "FROM Species WHERE SpeciesID = ?";
 
         try (Connection c = DbUtil.getConnection();
@@ -66,7 +64,7 @@ public class SpeciesDao {
     }
 
     public List<Species> findAll() throws SQLException {
-        String sql = "SELECT SpeciesID, SpeciesName, minLength, maxLength, minWeight, maxWeight " +
+        String sql = "SELECT SpeciesID, SpeciesName, Length, Weight " +
                 "FROM Species ORDER BY SpeciesName";
 
         List<Species> result = new ArrayList<>();
@@ -87,10 +85,9 @@ public class SpeciesDao {
         return new Species(
                 rs.getInt("SpeciesID"),
                 rs.getString("SpeciesName"),
-                (Double) rs.getObject("minLength"),
-                (Double) rs.getObject("maxLength"),
-                (Double)  rs.getObject("minWeight"),
-                (Double) rs.getObject("maxWeight")
+                (Double) rs.getObject("Length"),
+                (Double) rs.getObject("Weight")
+
         );
     }
 
