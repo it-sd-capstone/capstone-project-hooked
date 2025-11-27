@@ -60,10 +60,8 @@ public final class DbUtil {
             CREATE TABLE IF NOT EXISTS Species (
               SpeciesID    INTEGER PRIMARY KEY AUTOINCREMENT,
               SpeciesName  VARCHAR(50) NOT NULL UNIQUE,
-              MinLength       REAL,
-              MaxLength       REAL,
-              MinWeight       REAL,
-              MaxWeight       REAL
+              Length       REAL,
+              Weight       REAL
             );
             """);
 
@@ -107,21 +105,8 @@ public final class DbUtil {
                 );
             """);
 
-            addColumnIfMissing(c, "Species", "MinLength", "REAL");
-            addColumnIfMissing(c, "Species", "MaxLength", "REAL");
-            addColumnIfMissing(c, "Species", "MinWeight", "REAL");
-            addColumnIfMissing(c, "Species", "MaxWeight", "REAL");
-
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    private static void addColumnIfMissing(Connection conn, String table, String column, String type) {
-        try (Statement st = conn.createStatement()) {
-            st.executeUpdate("ALTER TABLE " + table + " ADD COLUMN " + column + " " + type);
-        } catch (SQLException ignore) {
-            // Column already exists; ignore
         }
     }
 
