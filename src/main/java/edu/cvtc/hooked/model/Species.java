@@ -6,8 +6,10 @@ public class Species {
 
     private Integer speciesId;
     private String speciesName;
-    private Double length;
-    private Double weight;
+    private Double minLength;
+    private Double maxLength;
+    private Double minWeight;
+    private Double maxWeight;
 
     public Species() {
         // default ctor
@@ -16,19 +18,25 @@ public class Species {
     // full ctor (used when loading from DB)
     public Species(Integer speciesId,
                    String speciesName,
-                   Double length,
-                   Double weight) {
+                   Double minLength,
+                   Double maxLength,
+                   Double minWeight,
+                   Double maxWeight) {
         this.speciesId = speciesId;
         this.speciesName = speciesName;
-        this.length = length;
-        this.weight = weight;
+        this.minLength = minLength;
+        this.maxLength = maxLength;
+        this.minWeight = minWeight;
+        this.maxWeight = maxWeight;
     }
 
     // convenience ctor for new species (id assigned by DB)
     public Species(String speciesName,
-                   Double length,
-                   Double weight) {
-        this(null, speciesName, length, weight);
+                   Double minLength,
+                   Double maxLength,
+                   Double minWeight,
+                   Double maxWeight) {
+        this(null, speciesName, minLength, maxLength, minWeight, maxWeight);
     }
 
     public Integer getSpeciesId() {
@@ -47,20 +55,31 @@ public class Species {
         this.speciesName = speciesName;
     }
 
-    public Double getLength() {
-        return length;
+    public Double getMinLength() {
+        return minLength;
     }
 
-    public void setLength(Double length) {
-        this.length = length;
+    public void setMinLength(Double minLength) {
+        this.minLength = minLength;
     }
 
-    public Double getWeight() {
-        return weight;
+    public Double getMaxLength() {return maxLength;}
+
+    public void setMaxLength(Double maxLength) {
+        this.maxLength = maxLength;}
+
+    public Double getMinWeight() {
+        return minWeight;
     }
 
-    public void setWeight(Double weight) {
-        this.weight = weight;
+    public void setMinWeight(Double minWeight) {
+        this.minWeight = minWeight;
+    }
+
+    public Double getMaxWeight() {return maxWeight;}
+
+    public void setMaxWeight(Double maxWeight) {
+        this.maxWeight = maxWeight;
     }
 
     // treat speciesName as the unique key
