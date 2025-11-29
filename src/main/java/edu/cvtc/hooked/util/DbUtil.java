@@ -70,6 +70,13 @@ public final class DbUtil {
                 )
             """);
 
+            try {command.executeUpdate("ALTER TABLE Users ADD COLUMN email TEXT");}
+            catch (SQLException e) { e.printStackTrace(); }
+            try {command.executeUpdate("ALTER TABLE Users ADD COLUMN resetHash TEXT");}
+            catch (SQLException e) { e.printStackTrace(); }
+            try {command.executeUpdate("ALTER TABLE Users ADD COLUMN resetTime TIMESTAMP");}
+            catch (SQLException e) { e.printStackTrace(); }
+
             command.executeUpdate("""
             CREATE TABLE IF NOT EXISTS Species (
               SpeciesID    INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -110,7 +117,7 @@ public final class DbUtil {
             """);
 
             command.executeUpdate("""
-                INSERT INTO Users(firstName, lastName, userName, passwordHash)
+                INSERT INTO Users(firstName, lastName, userName, email, passwordHash)
                 SELECT 'Admin', 'User', 'admin', 'hookedAdmin1@gmail.com', 'admin'
                 WHERE NOT EXISTS (
                     SELECT 1 FROM Users WHERE userName = 'admin'

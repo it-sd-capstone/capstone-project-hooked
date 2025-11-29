@@ -20,14 +20,14 @@
 
     <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
+    <h3><%= message != null ? message : "" %></h3>
+
     <% if (!isFormSet) { %>
-    <!-- Email form -->
     <form action="<%= request.getContextPath() %>/resetPassword" method="post">
         <input type="email" name="email" placeholder="User@gmail.com" required>
         <input type="submit" value="Send Reset Link">
     </form>
     <% } else { %>
-    <!-- Password reset form -->
     <form action="<%= request.getContextPath() %>/resetPassword" method="post">
         <input type="hidden" name="hash" value="<%= hash %>">
         <input type="password" name="newPassword" placeholder="Enter new password" required>

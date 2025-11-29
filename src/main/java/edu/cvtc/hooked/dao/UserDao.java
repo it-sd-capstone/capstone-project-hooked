@@ -58,7 +58,7 @@ public class UserDao {
 
     public List<User> findAll() throws SQLException {
         String sql = """
-        SELECT UserID, firstName, lastName, userName, email, resethash, passwordHash, passwordHash
+        SELECT UserID, firstName, lastName, userName, email, resetHash, resetTime, passwordHash
         FROM Users
         ORDER BY UserID
         """;
@@ -68,10 +68,11 @@ public class UserDao {
         try (Connection conn = DbUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            Timestamp timeStamp = rs.getTimestamp("resetTime");
-            LocalDateTime resetTime = timeStamp != null ? timeStamp.toLocalDateTime(): null;
 
             while (rs.next()) {
+                Timestamp timeStamp = rs.getTimestamp("resetTime");
+                LocalDateTime resetTime = timeStamp != null ? timeStamp.toLocalDateTime(): null;
+
                 User u = new User();
                 u.setUserId(rs.getInt("UserID"));
                 u.setFirstName(rs.getString("firstName"));

@@ -4,9 +4,9 @@ import javax.mail.*;
 import javax.mail.internet.*;
 
 public class EmailUtil {
-    // need to create an email to send reset from
-    private static final String from = "capstone-hooked@gmail.com";
-    private static final String password = "CapstoneHooked!";
+    // email and then the app password to access it
+    private static final String from = "capstonehooked@gmail.com";
+    private static final String password = "gqnk krld egzi oukt ";
 
     public static void sendEmail(String to, String subject, String body) {
         Properties props = new Properties();
@@ -34,7 +34,7 @@ public class EmailUtil {
 
         } catch (MessagingException e) {
             e.printStackTrace();
-            System.out.println("Failed to send email.");
+            System.out.println("Failed to send email: " + e.getMessage());
         }
     }
 }
