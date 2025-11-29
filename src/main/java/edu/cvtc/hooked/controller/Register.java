@@ -22,14 +22,31 @@ public class Register extends HttpServlet {
         String email = request.getParameter("email");
         String passwordHash = request.getParameter("passwordHash");
 
+        // Validate inputs - check for null or empty after trimming
+        if (firstName == null || firstName.trim().isEmpty() ||
+                lastName == null || lastName.trim().isEmpty() ||
+                userName == null || userName.trim().isEmpty() ||
+                email == null || email.trim().isEmpty() ||
+                passwordHash == null || passwordHash.trim().isEmpty()) {
+
+            request.setAttribute("Error", "All fields are required. Please fill in all information.");
+            request.getRequestDispatcher("/WEB-INF/views/createAccount.jsp").forward(request, response);
+            return;
+        }
+
+        // Trim the values to remove whitespace
+        firstName = firstName.trim();
+        lastName = lastName.trim();
+        userName = userName.trim();
+        email = email.trim();
+        passwordHash = passwordHash.trim();
+
         User user = new User(firstName, lastName, userName, email, null, null, passwordHash);
         UserDao dao = new UserDao();
 
         try {
-            // Get the database path
             String dbPath = edu.cvtc.hooked.util.DbUtil.databasePath();
             System.out.println("Database file being used: " + dbPath);
-
 
             if (dao.findByUserName(userName).isPresent()) {
                 request.setAttribute("Error", "Username already taken. Please choose another.");
@@ -37,17 +54,9 @@ public class Register extends HttpServlet {
                 return;
             }
 
-            // Insert the user
             dao.insert(user);
-
-            // Print info after insert
             System.out.println("Inserted user: " + userName + " into DB at " + dbPath);
-
-            // Crash to show console
-            //throw new RuntimeException("Crash after inserting user '" + userName + "' into DB at " + dbPath);
-
-            // Redirects to login.
-             response.sendRedirect(request.getContextPath() + "/Login");
+            response.sendRedirect(request.getContextPath() + "/Login");
 
         } catch (SQLException e) {
             e.printStackTrace();
