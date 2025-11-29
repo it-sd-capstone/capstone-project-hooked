@@ -28,6 +28,9 @@ public class UserTest {
                 "John",
                 "Smith",
                 "jsmith",
+                "jsmith@gmail.com",
+                null,
+                null,
                 "hashed123"
         );
 
@@ -45,6 +48,9 @@ public class UserTest {
                 "Jane",
                 "Doe",
                 "jdoe",
+                "jdoe@gmail.com",
+                null,
+                null,
                 "hash456"
         );
 
@@ -91,6 +97,9 @@ public class UserTest {
                 "FName",
                 "LName",
                 "coolUser",
+                "cooluser@gmail.com",
+                null,
+                null,
                 "superSecretHash"
         );
 
@@ -109,6 +118,9 @@ public class UserTest {
                 "A",
                 "B",
                 "sameUser",
+                "sameuser@gmail.com",
+                null,
+                null,
                 "h1"
         );
         User b = new User(
@@ -116,6 +128,9 @@ public class UserTest {
                 "X",
                 "Y",
                 "sameUser",
+                "sameuser@gmail.com",
+                null,
+                null,
                 "h2"
         );
 
@@ -131,6 +146,9 @@ public class UserTest {
                 "A",
                 "B",
                 "userOne",
+                "Userone@gmail.com",
+                null,
+                null,
                 "h1"
         );
         User b = new User(
@@ -138,6 +156,9 @@ public class UserTest {
                 "X",
                 "Y",
                 "userTwo",
+                "Usertwo@gmail.com",
+                null,
+                null,
                 "h2"
         );
 

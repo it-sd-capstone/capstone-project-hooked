@@ -19,9 +19,10 @@ public class Register extends HttpServlet {
         String firstName = request.getParameter("firstName");
         String lastName = request.getParameter("lastName");
         String userName = request.getParameter("userName");
+        String email = request.getParameter("email");
         String passwordHash = request.getParameter("passwordHash");
 
-        User user = new User(firstName, lastName, userName, passwordHash);
+        User user = new User(firstName, lastName, userName, email, null, null, passwordHash);
         UserDao dao = new UserDao();
 
         try {

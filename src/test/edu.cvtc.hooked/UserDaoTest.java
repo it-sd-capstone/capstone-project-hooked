@@ -23,6 +23,7 @@ class UserDaoTest {
     void insertAndFindByUserName_roundTrip() throws Exception {
         // Using a unique username so it never conflicts with anything already in the DB
         String uniqueUserName = "junitUser_" + System.currentTimeMillis();
+        String email = "test" + System.currentTimeMillis() + "@example.com";
 
         UserDao dao = new UserDao();
 
@@ -31,6 +32,9 @@ class UserDaoTest {
                 "JUnit",
                 "Tester",
                 uniqueUserName,
+                email,
+                null,
+                null,
                 "fakeHash123"
         );
 

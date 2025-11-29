@@ -26,7 +26,8 @@ public class CatchDaoTest {
     private int createTestUser() throws Exception {
         UserDao userDao = new UserDao();
         String uniqueName = "user_" + System.currentTimeMillis();
-        User u = new User("Test", "User", uniqueName, "hash123");
+        String email = "test" + System.currentTimeMillis() + "@example.com";
+        User u = new User("Test", "User", uniqueName, email, null, null, "hash123");
         userDao.insert(u);
         return u.getUserId();
     }
