@@ -63,6 +63,9 @@ public final class DbUtil {
                   firstName    TEXT NOT NULL,
                   lastName     TEXT NOT NULL,
                   userName     TEXT NOT NULL UNIQUE,
+                  email    TEXT NOT NULL UNIQUE,
+                  resetHash TEXT,
+                  resetTime TIMESTAMP,
                   passwordHash TEXT NOT NULL
                 )
             """);
@@ -108,7 +111,7 @@ public final class DbUtil {
 
             command.executeUpdate("""
                 INSERT INTO Users(firstName, lastName, userName, passwordHash)
-                SELECT 'Admin', 'User', 'admin', 'admin'
+                SELECT 'Admin', 'User', 'admin', 'hookedAdmin1@gmail.com', 'admin'
                 WHERE NOT EXISTS (
                     SELECT 1 FROM Users WHERE userName = 'admin'
                 );

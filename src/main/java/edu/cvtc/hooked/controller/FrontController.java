@@ -14,7 +14,7 @@ import java.sql.*;
 // Map every route you want to support
 @WebServlet(urlPatterns = {
         "/index",
-        "/about", "/locations", "/species", "/logout", "/add", "/search", "/statistics"
+        "/about", "/locations", "/species", "/logout", "/add", "/search", "/statistics", "/passwordReset"
 })
 public class FrontController extends HttpServlet {
 
@@ -32,6 +32,7 @@ public class FrontController extends HttpServlet {
             case "/add"   -> "/WEB-INF/views/addCatch.jsp";
             case "/statistics"      -> "/WEB-INF/views/statistics.jsp";
             case "/logout"    -> "/WEB-INF/views/logout.jsp"; // or do logout logic first
+            case "/passwordReset" -> "/WEB-INF/views/passwordReset.jsp";
             default           -> "/WEB-INF/views/error.jsp";  // optional fallback page
         };
     }

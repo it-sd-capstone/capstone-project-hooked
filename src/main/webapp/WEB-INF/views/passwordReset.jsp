@@ -1,4 +1,10 @@
+<%@ page import="java.sql.*" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%
+    String message = (String) request.getAttribute("message");
+    String hash = request.getParameter("hash");
+    boolean isFormSet = hash != null && !hash.isEmpty();
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -14,11 +20,20 @@
 
     <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
-    <h6>Email to send reset form too:</h6>
-    <form action="<%= request.getContextPath() %>/Login" method="post">
-        <input type="text" id="email" name="email" placeholder="User@gmail.com">
-        <input type="submit" value="login">
+    <% if (!isFormSet) { %>
+    <!-- Email form -->
+    <form action="<%= request.getContextPath() %>/resetPassword" method="post">
+        <input type="email" name="email" placeholder="User@gmail.com" required>
+        <input type="submit" value="Send Reset Link">
     </form>
+    <% } else { %>
+    <!-- Password reset form -->
+    <form action="<%= request.getContextPath() %>/resetPassword" method="post">
+        <input type="hidden" name="hash" value="<%= hash %>">
+        <input type="password" name="newPassword" placeholder="Enter new password" required>
+        <input type="submit" value="Reset Password">
+    </form>
+    <% } %>
 
     <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>
