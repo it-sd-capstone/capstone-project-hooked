@@ -2,6 +2,8 @@ package edu.cvtc.hooked.controller;
 
 import edu.cvtc.hooked.dao.CatchDao;
 import edu.cvtc.hooked.dao.UserDao;
+import edu.cvtc.hooked.dao.SpeciesRequestDao;
+import edu.cvtc.hooked.model.SpeciesRequest;
 import edu.cvtc.hooked.model.Catch;
 import edu.cvtc.hooked.model.User;
 import jakarta.servlet.ServletException;
@@ -19,6 +21,7 @@ public class AdminCatchesServlet extends HttpServlet {
 
     private final CatchDao catchDao = new CatchDao();
     private final UserDao userDao   = new UserDao();
+    private final SpeciesRequestDao speciesRequestDao = new SpeciesRequestDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -49,6 +52,14 @@ public class AdminCatchesServlet extends HttpServlet {
             req.setAttribute("error", "Unable to load data: " + e.getMessage());
         }
 
+        try {
+            List<SpeciesRequest> requests = speciesRequestDao.findAll();
+            req.setAttribute("speciesRequests", requests);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            // don't kill the page if this fails, just log it
+        }
+
         req.getRequestDispatcher("/WEB-INF/views/admin-catches.jsp").forward(req, resp);
     }
 
@@ -62,15 +73,25 @@ public class AdminCatchesServlet extends HttpServlet {
             return;
         }
 
-        String action   = req.getParameter("action");
+        String action = req.getParameter("action");
         String catchIdStr = req.getParameter("catchId");
+        String requestIdStr = req.getParameter("requestId");
+        String view = req.getParameter("view");
+        if (!"users".equals(view)) {
+            view = "catches";  // default if missing
+        }
 
         try {
             if ("deleteOne".equals(action) && catchIdStr != null) {
                 int catchId = Integer.parseInt(catchIdStr);
                 catchDao.deleteById(catchId);
+
             } else if ("clearAll".equals(action)) {
                 catchDao.deleteAll();
+
+            } else if ("deleteSpeciesRequest".equals(action) && requestIdStr != null) {
+                int requestId = Integer.parseInt(requestIdStr);
+                speciesRequestDao.deleteById(requestId);
             }
         } catch (Exception e) {
             e.printStackTrace();

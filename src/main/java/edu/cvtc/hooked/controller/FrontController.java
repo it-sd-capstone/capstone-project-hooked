@@ -14,7 +14,7 @@ import java.sql.*;
 // Map every route you want to support
 @WebServlet(urlPatterns = {
         "/index",
-        "/about", "/locations", "/species", "/logout", "/add", "/search", "/statistics", "/passwordReset"
+        "/about", "/locations", "/logout", "/add", "/search", "/statistics", "/passwordReset"
 })
 public class FrontController extends HttpServlet {
 

@@ -25,7 +25,7 @@
 
     <c:if test="${not empty param.success}">
         <div class="success-message" style="color:green; font-weight:bold;">
-            Species added successfully!
+            Species Request added successfully!
         </div>
     </c:if>
 
@@ -40,78 +40,72 @@
         <label for="addSpecies">Species Name:</label>
 
         <input type="text" id="addSpecies" name="addSpecies"
-               value="${param.formatted}"
                placeholder="ex. Smallmouth Bass" required>
 
-        <input type="submit" value="Add Species">
+        <input type="submit" value="Request New Species">
 
     </form>
 
     <br>
 
-    <form action="${pageContext.request.contextPath}/SearchData" method="get">
-        <label for="speciesSearch">Choose a Species:</label>
-        <select name="speciesSearch" id="speciesSearch" required>
-            <option value="" disabled selected>Select a Species</option>
-
-            <c:forEach var="s" items="${speciesList}">
-                <option value="${s.speciesName}"
-                        <c:if test="${param.speciesSearch == s.speciesName}">selected</c:if>>
-                        ${s.speciesName}
+    <form action="${pageContext.request.contextPath}/species#speciesTable"" method="get">
+    <c:choose>
+        <c:when test="${empty currentSpeciesSearch}">
+            <!-- No active search: show dropdown -->
+            <label for="speciesSearch">Choose a Species:</label>
+            <select name="speciesSearch" id="speciesSearch" required>
+                <option value="" disabled selected>
+                    Select a Species
                 </option>
-            </c:forEach>
-        </select>
-        <input type="submit" value="Search Species">
+
+                <c:forEach var="name" items="${speciesNames}">
+                    <option value="${name}">${name}</option>
+                </c:forEach>
+            </select>
+        </c:when>
+
+        <c:otherwise>
+            <!-- Search active: hide dropdown, show current filter text -->
+            <p><strong>Currently viewing:</strong> ${currentSpeciesSearch}</p>
+        </c:otherwise>
+    </c:choose>
+
+
+    <c:choose>
+            <c:when test="${not empty currentSpeciesSearch}">
+                <!-- We are currently filtered: show a Clear button -->
+                <button type="submit" name="clear" value="1">
+                    Clear Search
+                </button>
+            </c:when>
+            <c:otherwise>
+                <!-- No active search: show Search button -->
+                <input type="submit" value="Search Species">
+            </c:otherwise>
+        </c:choose>
     </form> <br><br>
 
+    <a id="speciesTable"></a>
+    <h2>Supported Species & Maximum Recorded Size</h2>
 
-    <%--table will need to be update to use dyanmic info from the db--%>
-    <%--table could also be removed entirely in opt of a different way--%>
     <table>
         <thead>
         <tr>
             <th>Species</th>
+            <th>Max Length (in)</th>
+            <th>Max Weight (lb)</th>
         </tr>
         </thead>
         <tbody>
-        <c:forEach var="s" items="${speciesList}">
+        <c:forEach var="entry" items="${restrictionList}">
             <tr>
-                <td>${s.speciesName}</td>
-
+                <td>${entry.key}</td>
+                <td>${entry.value.maxLength}</td>
+                <td>${entry.value.maxWeight}</td>
             </tr>
         </c:forEach>
         </tbody>
     </table>
-
-    <c:if test="${not empty catchesForSpecies}">
-        <h2>Catches for this Species</h2>
-
-        <table>
-            <thead>
-            <tr>
-                <th>Length (in)</th>
-                <th>Weight (lbs)</th>
-                <th>Location</th>
-                <th>Date</th>
-                <th>Bait</th>
-                <th>Notes</th>
-            </tr>
-            </thead>
-
-            <tbody>
-            <c:forEach var="c" items="${catchesForSpecies}">
-                <tr>
-                    <td>${c.length}</td>
-                    <td>${c.weight}</td>
-                    <td>${c.locationName}</td>
-                    <td>${c.dateCaught}</td>
-                    <td>${c.baitType}</td>
-                    <td>${c.notes}</td>
-                </tr>
-            </c:forEach>
-            </tbody>
-        </table>
-    </c:if>
 
     <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>

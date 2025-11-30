@@ -124,6 +124,16 @@ public final class DbUtil {
                 );
             """);
 
+            command.executeUpdate("""
+                CREATE TABLE IF NOT EXISTS SpeciesRequests (
+                  RequestID   INTEGER PRIMARY KEY AUTOINCREMENT,
+                  SpeciesName TEXT NOT NULL,
+                  UserID      INTEGER,
+                  RequestedAt TEXT DEFAULT (datetime('now')),
+                  FOREIGN KEY (UserID) REFERENCES Users(UserID)
+                )
+            """);
+
         } catch (Exception e) {
             e.printStackTrace();
         }
