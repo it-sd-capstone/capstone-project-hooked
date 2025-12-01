@@ -5,7 +5,6 @@ import edu.cvtc.hooked.util.EmailUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 import java.sql.*;
@@ -53,11 +52,9 @@ public class PasswordReset extends HttpServlet {
                         message = "Please enter a new password.";
                     } else {
 
-                        String hashedPw = BCrypt.hashpw(newPassword, BCrypt.gensalt());
-
                         PreparedStatement ps2 = c.prepareStatement(
                                 "UPDATE Users SET passwordHash = ?, resetHash = NULL, resetTime = NULL WHERE resetHash = ?");
-                        ps2.setString(1, hashedPw);
+                        ps2.setString(1, newPassword);
                         ps2.setString(2, hash);
                         ps2.executeUpdate();
 
