@@ -13,6 +13,24 @@
 </head>
 <body>
 <div class="container">
+    <script>
+        window.onload = function () {
+            const passwordShow = document.getElementById("passwordView")
+            const passwordViewButton = document.getElementById("passwordViewButton")
+
+            passwordViewButton.addEventListener('mousedown', () => {
+                passwordShow.type = 'text';
+            });
+
+            passwordViewButton.addEventListener('mouseup', () => {
+                passwordShow.type = 'password';
+            });
+
+            passwordViewButton.addEventListener('mouseleave', () => {
+                passwordShow.type = 'password';
+            })
+        }
+    </script>
 
     <div class="header">
         <h1>Reset Password</h1>
@@ -30,7 +48,9 @@
     <% } else { %>
     <form action="<%= request.getContextPath() %>/resetPassword" method="post">
         <input type="hidden" name="hash" value="<%= hash %>">
-        <input type="password" name="newPassword" placeholder="Enter new password" required>
+        <input type="password" id="passwordView" name="newPassword" placeholder="Enter new password" required>
+        <input type="button" id="passwordViewButton" value="View Password" style="width: 120px; margin: 0 auto; text-align: center;">
+        <input type="password" name="newPasswordConfirmed" placeholder="Confirm new password" required>
         <input type="submit" value="Reset Password">
     </form>
     <% } %>
