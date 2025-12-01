@@ -16,6 +16,12 @@
             <c:if test="${sessionScope.isAdmin}">
                 <li><a href="${pageContext.request.contextPath}/admin/catches">Admin Catches</a></li>
             </c:if>
+
+            <!-- User info and logout on the right side -->
+            <li style="float: right;"><a href="<c:url value='/Logout'/>">Logout</a></li>
+            <li style="float: right; padding: 10px 15px; color: white;">
+                Logged in as: <strong>${sessionScope.user.userName}</strong>
+            </li>
         </c:when>
         <c:otherwise>
             <!-- only when logged out -->
