@@ -317,4 +317,94 @@ img {
         margin: 1.25rem auto;
         padding: 0.85rem 1rem;
     }
+
+    /* Statistics Page */
+
+    .stats-container {
+        max-width: 900px;
+        margin: 20px auto;
+    }
+
+    .stats-section {
+        margin-bottom: 30px;
+        background-color: var(--bg-card);
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+    }
+
+    .stats-section h2 {
+        color: var(--accent);
+        margin-top: 0;
+        border-bottom: 2px solid var(--border-soft);
+        padding-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 1.1rem;
+    }
+
+    .stats-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        background-color: var(--bg-card);
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .stats-table th {
+        background-color: rgba(15,23,42,0.85);
+        color: var(--text-main);
+        padding: 0.6rem 0.9rem;
+        text-align: left;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.8rem;
+        border-bottom: 1px solid var(--border-soft);
+    }
+
+    .stats-table td {
+        padding: 0.6rem 0.9rem;
+        border-bottom: 1px solid rgba(156,163,175,0.6);
+        color: var(--text-main);
+        font-size: 0.95rem;
+    }
+
+    .stats-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .stats-table tr:nth-child(even) td {
+        background-color: rgba(15,23,42,0.6);
+    }
+
+    .no-data {
+        text-align: center;
+        color: var(--text-muted);
+        font-style: italic;
+        padding: 20px;
+    }
+
+    .stat-label {
+        font-weight: bold;
+        width: 40%;
+        color: var(--accent);
+    }
+
+    .stat-value {
+        font-weight: bold;
+        color: var(--accent);
+    }
+
+    @media (max-width: 768px) {
+        .stats-table {
+            font-size: 0.85rem;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 0.45rem 0.6rem;
+        }
+    }
 }

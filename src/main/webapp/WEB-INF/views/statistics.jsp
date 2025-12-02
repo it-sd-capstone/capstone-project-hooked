@@ -4,59 +4,102 @@
 <head>
     <title>Hooked - Statistics</title>
     <%@include file="/WEB-INF/includes/header.jsp"%>
+
 </head>
 <body>
 <div class="container">
 
     <div class="header">
-        <h1>Statistics</h1>
+        <h1>Fishing Statistics</h1>
     </div>
 
     <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
     <% if (request.getAttribute("error") != null) { %>
-    <p style="color: red;"><%= request.getAttribute("error") %></p>
+    <div style="color: #fecaca; padding: 10px; margin: 10px 0; border: 1px solid var(--border-soft); background-color: var(--bg-card); border-radius: 10px;">
+        <strong>Error:</strong> <%= request.getAttribute("error") %>
+    </div>
     <% } else { %>
 
-    <h3>The heaviest fish caught recently was:
-        <% if (request.getAttribute("heaviestFish") != null) { %>
-        <%= request.getAttribute("heaviestFish") %>
-        at <%= request.getAttribute("heaviestWeight") %> lbs
-        (caught at <%= request.getAttribute("heaviestLocation") %>
-        on <%= request.getAttribute("heaviestDate") %>)
-        <% } else { %>
-        No data available yet
-        <% } %>
-    </h3>
+    <div class="stats-container">
 
-    <h3>The longest fish caught recently was:
-        <% if (request.getAttribute("longestFish") != null) { %>
-        <%= request.getAttribute("longestFish") %>
-        at <%= request.getAttribute("longestLength") %> inches
-        (caught at <%= request.getAttribute("longestLocation") %>
-        on <%= request.getAttribute("longestDate") %>)
-        <% } else { %>
-        No data available yet
-        <% } %>
-    </h3>
+        <!-- top catches by weight and length -->
+        <div class="stats-section">
+            <h2>Record Catches</h2>
 
-    <h3>The most productive location recently has been:
-        <% if (request.getAttribute("topLocation") != null) { %>
-        <%= request.getAttribute("topLocation") %>
-        with <%= request.getAttribute("locationCount") %> catches
-        <% } else { %>
-        No data available yet
-        <% } %>
-    </h3>
+            <table class="stats-table">
+                <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Species</th>
+                    <th>Measurement</th>
+                    <th>Location</th>
+                    <th>Date</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="stat-label">Heaviest Fish</td>
+                    <% if (request.getAttribute("heaviestFish") != null) { %>
+                    <td><%= request.getAttribute("heaviestFish") %></td>
+                    <td class="stat-value"><%= request.getAttribute("heaviestWeight") %> lbs</td>
+                    <td><%= request.getAttribute("heaviestLocation") %></td>
+                    <td><%= request.getAttribute("heaviestDate") %></td>
+                    <% } else { %>
+                    <td colspan="4" class="no-data">No data available yet</td>
+                    <% } %>
+                </tr>
+                <tr>
+                    <td class="stat-label">Longest Fish</td>
+                    <% if (request.getAttribute("longestFish") != null) { %>
+                    <td><%= request.getAttribute("longestFish") %></td>
+                    <td class="stat-value"><%= request.getAttribute("longestLength") %> inches</td>
+                    <td><%= request.getAttribute("longestLocation") %></td>
+                    <td><%= request.getAttribute("longestDate") %></td>
+                    <% } else { %>
+                    <td colspan="4" class="no-data">No data available yet</td>
+                    <% } %>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-    <h3>The most productive bait recently has been:
-        <% if (request.getAttribute("topBait") != null) { %>
-        <%= request.getAttribute("topBait") %>
-        with <%= request.getAttribute("baitCount") %> catches
-        <% } else { %>
-        No data available yet
-        <% } %>
-    </h3>
+        <!-- top bait and location -->
+        <div class="stats-section">
+            <h2>Top Performers</h2>
+
+            <table class="stats-table">
+                <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Name</th>
+                    <th>Total Catches</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="stat-label">Most Productive Location</td>
+                    <% if (request.getAttribute("topLocation") != null) { %>
+                    <td><%= request.getAttribute("topLocation") %></td>
+                    <td class="stat-value"><%= request.getAttribute("locationCount") %> catches</td>
+                    <% } else { %>
+                    <td colspan="2" class="no-data">No data available yet</td>
+                    <% } %>
+                </tr>
+                <tr>
+                    <td class="stat-label">Most Productive Bait</td>
+                    <% if (request.getAttribute("topBait") != null) { %>
+                    <td><%= request.getAttribute("topBait") %></td>
+                    <td class="stat-value"><%= request.getAttribute("baitCount") %> catches</td>
+                    <% } else { %>
+                    <td colspan="2" class="no-data">No data available yet</td>
+                    <% } %>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
 
     <% } %>
 
