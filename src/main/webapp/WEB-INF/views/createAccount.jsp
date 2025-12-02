@@ -14,31 +14,31 @@
 
     <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
-    <!-- Error message display -->
+    <!-- Error message display. -->
     <% if (request.getAttribute("Error") != null) { %>
     <div style="color: red; padding: 10px; margin: 10px 0; border: 1px solid red; background-color: #ffe6e6;">
         <strong>Error:</strong> <%= request.getAttribute("Error") %>
     </div>
     <% } %>
 
-    <h6></h6>
-
     <form action="<%= request.getContextPath() %>/Register" method="post">
-        <h6>First Name:</h6>
+        <label for="firstName">First Name:</label>
         <input type="text" id="firstName" name="firstName" placeholder="First Name" required>
 
-        <h6>Last Name:</h6>
+        <label for="lastName">Last Name:</label>
         <input type="text" id="lastName" name="lastName" placeholder="Last Name" required>
 
-        <h6>Username:</h6>
+        <label for="userName">Username:</label>
         <input type="text" id="userName" name="userName" placeholder="Username" required>
 
-        <h6>Email:</h6>
+        <label for="email">Email:</label>
         <input type="email" id="email" name="email" placeholder="Email" required>
 
-        <h6>Password:</h6>
-        <input type="password" id="passwordHash" name="passwordHash" placeholder="Password" required minlength="6"> <br><br>
+        <label for="passwordHash">Password:</label>
+        <input type="password" id="passwordHash" name="passwordHash" placeholder="Password (minimum 6 characters)" required minlength="6" title="Password must be at least 6 characters long">
+        <small style="display: block; color: #666; margin-top: 5px;">Minimum 6 characters</small>
 
+        <br>
         <input type="submit" value="Create Account">
     </form>
 
