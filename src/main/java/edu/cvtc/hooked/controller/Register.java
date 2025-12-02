@@ -56,6 +56,10 @@ public class Register extends HttpServlet {
 
             dao.insert(user);
             System.out.println("Inserted user: " + userName + " into DB at " + dbPath);
+
+            // success message after creating account
+            HttpSession session = request.getSession();
+            session.setAttribute("SuccessMessage", "Account created successfully! Please log in with your credentials.");
             response.sendRedirect(request.getContextPath() + "/Login");
 
         } catch (SQLException e) {
