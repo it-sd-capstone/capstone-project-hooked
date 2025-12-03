@@ -118,7 +118,7 @@ public class CatchDaoTest {
         Catch c = new Catch(userId, "Perch", "Dock", "Jig", "2024-09-09", "test", 11.0, 0.9);
         dao.insert(c);
 
-        List<Catch> results = dao.searchOutput(userId, null, null, null);
+        List<Catch> results = dao.searchOutput(userId, (String) null, null, null);
 
         assertFalse(results.isEmpty(), "Search by userId should find catch.");
         assertEquals("Perch", results.get(0).getSpeciesName());

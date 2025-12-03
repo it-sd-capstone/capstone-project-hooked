@@ -121,78 +121,53 @@ public class CatchDao {
         return results;
     }
 
-    // Find by userID, or specified field
-    public List<Catch> searchOutput(Integer userId, String species, String location, String bait) throws SQLException {
-        List<Catch> results;
+    public List<Catch> searchOutput(
+            Integer userId,
+            List<String> speciesList,
+            String location,
+            String bait) throws SQLException {
 
-            StringBuilder sb = new StringBuilder("SELECT * FROM CATCHES WHERE 1=1");
-            List<Object> parameters = new ArrayList<>();
-
-            if (userId != null) {
-                sb.append(" AND UserID = ?");
-                parameters.add(userId);
-            }
-            if (species != null && !species.isBlank()) {
-                sb.append(" AND SpeciesName = ?");
-                parameters.add(species);
-            }
-            if (location != null && !location.isBlank()) {
-                sb.append(" AND LocationName = ?");
-                parameters.add(location);
-            }
-            if (bait != null && !bait.isBlank()) {
-                sb.append(" AND BaitType = ?");
-                parameters.add(bait);
-            }
-
-            sb.append(" ORDER BY DateCaught DESC");
-
-            results = new ArrayList<>();
-
-            try (Connection conn = DbUtil.getConnection();
-                    PreparedStatement ps = conn.prepareStatement(sb.toString())) {
-
-                for (int i = 0; i < parameters.size(); i++) {
-                    ps.setObject(i + 1, parameters.get(i));
-                }
-                try (ResultSet rs = ps.executeQuery()) {
-
-                    while (rs.next()) {
-                        Catch catchObj = new Catch(
-                                rs.getInt("CatchID"),
-                                rs.getInt("UserID"),
-                                rs.getString("SpeciesName"),
-                                rs.getString("LocationName"),
-                                rs.getString("BaitType"),
-                                rs.getString("DateCaught"),
-                                rs.getString("Notes"),
-                                rs.getDouble("Length"),
-                                rs.getDouble("Weight")
-                        );
-                        results.add(catchObj);
-                    }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-            }
-        return results;
+        // default: newest first
+        return searchOutput(userId, speciesList, location, bait, null, null);
     }
 
-    // Search across ALL users, with optional filters and sorting
-    public List<Catch> searchAll(String species, String location, String bait,
-                                 String sortField, String sortDir) throws SQLException {
+    public List<Catch> searchOutput(
+            Integer userId,
+            List<String> speciesList,
+            String location,
+            String bait,
+            String sortField,
+            String sortDir) throws SQLException {
 
-        StringBuilder sb = new StringBuilder("""
-        SELECT CatchID, UserID, SpeciesName, LocationName, BaitType, DateCaught, Notes, Length, Weight
-        FROM Catches
-        WHERE 1=1
-    """);
+        StringBuilder sb = new StringBuilder(
+                "SELECT CatchID, UserID, SpeciesName, LocationName, BaitType, DateCaught, Notes, Length, Weight " +
+                        "FROM Catches WHERE 1=1"
+        );
 
         List<Object> params = new ArrayList<>();
 
-        if (species != null && !species.isBlank()) {
-            sb.append(" AND LOWER(SpeciesName) LIKE ?");
-            params.add("%" + species.toLowerCase() + "%");
+        if (userId != null) {
+            sb.append(" AND UserID = ?");
+            params.add(userId);
+        }
+
+        // 🔍 fuzzy + multi-species ("trout", "bluegills", "walleye, bluegill")
+        if (speciesList != null && !speciesList.isEmpty()) {
+            sb.append(" AND (");
+            for (int i = 0; i < speciesList.size(); i++) {
+                if (i > 0) sb.append(" OR ");
+
+                String term = speciesList.get(i).toLowerCase();
+
+                sb.append("(");
+                sb.append("LOWER(SpeciesName) LIKE ?");                  // e.g. 'lake trout' LIKE '%trout%'
+                sb.append(" OR ? LIKE '%' || LOWER(SpeciesName) || '%'"); // e.g. 'bluegills' LIKE '%bluegill%'
+                sb.append(")");
+
+                params.add("%" + term + "%");
+                params.add(term);
+            }
+            sb.append(")");
         }
 
         if (location != null && !location.isBlank()) {
@@ -205,7 +180,7 @@ public class CatchDao {
             params.add("%" + bait.toLowerCase() + "%");
         }
 
-        // Determine sort column
+        // 🧮 Choose ORDER BY column (same logic you had in searchAll)
         String orderCol;
         if ("species".equalsIgnoreCase(sortField)) {
             orderCol = "SpeciesName";
@@ -258,6 +233,23 @@ public class CatchDao {
 
         return results;
     }
+
+    // Convenience overload for a single species
+    public List<Catch> searchOutput(
+            Integer userId,
+            String species,
+            String location,
+            String bait
+    ) throws SQLException {
+
+        List<String> speciesList = null;
+        if (species != null && !species.isBlank()) {
+            speciesList = java.util.Collections.singletonList(species);
+        }
+
+        return searchOutput(userId, speciesList, location, bait);
+    }
+
 
     // UPDATE an existing catch
     public void update(Catch c) throws SQLException {
