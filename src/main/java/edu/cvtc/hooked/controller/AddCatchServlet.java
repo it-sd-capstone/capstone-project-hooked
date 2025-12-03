@@ -3,6 +3,7 @@ package edu.cvtc.hooked.controller;
 import edu.cvtc.hooked.dao.CatchDao;
 import edu.cvtc.hooked.dao.SpeciesDao;
 import edu.cvtc.hooked.model.Catch;
+import edu.cvtc.hooked.model.SpeciesRestrictions;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -108,9 +109,14 @@ public class AddCatchServlet extends HttpServlet {
         String lengthStr        = req.getParameter("length");
         String weightStr        = req.getParameter("weight");
 
-        SpeciesDao speciesDao = new SpeciesDao();
+        if (speciesName == null || speciesName.isBlank()) {
+            req.setAttribute("error", "Please select a species.");
+            forwardWithCatches(req, resp, ownerUserId);
+            return;
+        }
 
-        if (speciesName == null || !speciesDao.exists(speciesName)) {
+        String speciesKey = speciesName.toLowerCase();
+        if (!edu.cvtc.hooked.model.SpeciesRestrictions.ALL.containsKey(speciesKey)) {
             req.setAttribute("error", "Invalid species. Please select a valid species.");
             forwardWithCatches(req, resp, ownerUserId);
             return;
@@ -165,7 +171,6 @@ public class AddCatchServlet extends HttpServlet {
             req.setAttribute("error", "Failed to save catch: " + ex.getMessage());
             forwardWithCatches(req, resp, sessionUserId);
         }
-
     }
 
     private void forwardWithCatches(HttpServletRequest req, HttpServletResponse resp, Integer userId)
@@ -183,12 +188,8 @@ public class AddCatchServlet extends HttpServlet {
     }
 
     private void addSpeciesList(HttpServletRequest req) {
-        try {
-            SpeciesDao dao = new SpeciesDao();
-            req.setAttribute("speciesList", dao.findAll());
-        } catch (Exception e) {
-            e.printStackTrace();
-            req.setAttribute("speciesList", Collections.emptyList());
-        }
+        List<String> species = new ArrayList<>(SpeciesRestrictions.ALL.keySet());
+        Collections.sort(species);
+        req.setAttribute("speciesList", species);
     }
 }
