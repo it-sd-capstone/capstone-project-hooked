@@ -1,5 +1,6 @@
 package edu.cvtc.hooked.controller;
 
+import edu.cvtc.hooked.dao.BaitDao;
 import edu.cvtc.hooked.dao.CatchDao;
 import edu.cvtc.hooked.dao.SpeciesDao;
 import edu.cvtc.hooked.model.Catch;
@@ -71,6 +72,7 @@ public class AddCatchServlet extends HttpServlet {
         }
 
         addSpeciesList(req);
+        addBaitList(req);
         req.getRequestDispatcher("/WEB-INF/views/addCatch.jsp").forward(req, resp);
     }
 
@@ -213,6 +215,7 @@ public class AddCatchServlet extends HttpServlet {
             }
         }
         addSpeciesList(req);
+        addBaitList(req);
         req.getRequestDispatcher("/WEB-INF/views/addCatch.jsp").forward(req, resp);
     }
 
@@ -223,6 +226,16 @@ public class AddCatchServlet extends HttpServlet {
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("speciesList", java.util.Collections.emptyList());
+        }
+    }
+
+    private void addBaitList(HttpServletRequest req) {
+        try {
+            BaitDao dao = new BaitDao();
+            req.setAttribute("baitList", dao.findAll());
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("baitList", java.util.Collections.emptyList());
         }
     }
 

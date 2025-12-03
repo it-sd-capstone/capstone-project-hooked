@@ -1,6 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,72 +15,106 @@
 
   <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
-  <img src="<c:url value='/assets/img/temporaryBait.jpg' />" alt="tackle box" class="page-image"><br><br>
+  <img src="<c:url value='/assets/img/temporaryBait.jpg' />"
+       alt="tackle box"
+       class="page-image"><br><br>
 
+  <a id="baitForm"></a>
+
+  <!-- Add / Update form (same pattern as species) -->
   <form action="${pageContext.request.contextPath}/bait" method="post">
-    <label for="addBait">Bait:</label>
-    <input type="text" id="addBait" name="addBait" required>
+    <c:choose>
+      <c:when test="${not empty baitToEdit}">
+        <input type="hidden" name="action" value="update" />
+        <input type="hidden" name="baitId" value="${baitToEdit.id}" />
+      </c:when>
+      <c:otherwise>
+        <input type="hidden" name="action" value="create" />
+      </c:otherwise>
+    </c:choose>
+
+    <label for="name">Bait:</label>
+    <input type="text"
+           id="name"
+           name="name"
+           value="${not empty baitToEdit ? baitToEdit.name : ''}"
+           required />
 
     <label for="notes">Notes:</label>
-    <input type="text" id="notes" name="notes">
+    <input type="text"
+           id="notes"
+           name="notes"
+           value="${not empty baitToEdit ? baitToEdit.notes : ''}" />
 
-    <input type="submit" value="Add Bait">
+    <input type="submit"
+           value="${not empty baitToEdit ? 'Update Bait' : 'Add Bait'}" />
   </form>
 
-  <br>
+  <br/>
 
-  <%-- <form action="${pageContext.request.contextPath}/SearchData" method="get">
-    <label for="baitSearch">Choose a Bait:</label>
-    <select name="baitSearch" id="baitSearch" required>
-      <option value="" disabled selected>Select a Bait</option>
-      <option value="Crankbait">Crankbait</option>
-      <option value="Cut fish">Cut fish</option>
-      <option value="Inline Spinner">Inline Spinner</option>
-      <option value="Leeches">Leeches</option>
-      <option value="Live fish">Live fish</option>
-      <option value="Minnows">Minnows</option>
-      <option value="Nightcrawler">Nightcrawler</option>
-      <option value="Soft plastic crawfish">Soft plastic crawfish</option>
-      <option value="Soft plastic creature">Soft plastic creature</option>
-      <option value="Soft plastic minnow">Soft plastic minnow</option>
-      <option value="Soft plastic panfish">Soft plastic panfish</option>
-      <option value="Soft plastic worm">Soft plastic worm</option>
-      <option value="Spoon">Spoon</option>
-      <option value="Swimbait">Swimbait</option>
-      <option value="Topwater">Topwater</option>
-    </select>
-    <input type="submit" value="Search Baits">
-  </form> <br><br> --%>
-
-  <!-- Search form using dynamic bait list -->
-  <form action="${pageContext.request.contextPath}/bait" method="get">
-    <label for="searchTerm">Search Baits:</label>
-    <input type="text" id="searchTerm" name="searchTerm"
-           value="${param.searchTerm}" placeholder="e.g. worm, crawler, minnow">
-
-    <input type="submit" value="Search Baits">
-
-    <!-- Clear search: just go back to /bait with no query -->
-    <a href="${pageContext.request.contextPath}/bait">Clear Search</a>
-  </form> <br><br>
-
-  <c:if test="${searchActive}">
-    <p>Showing results matching: "<strong>${fn:escapeXml(param.searchTerm)}</strong>"</p>
+  <c:if test="${not empty error}">
+    <div class="error-message">${error}</div>
   </c:if>
-  <%--table will need to be updated to use dyanmic info from the db--%>
-  <%--table could also be removed entirely in opt of a different way--%>
+  <c:if test="${not empty success}">
+    <div class="success-message">${success}</div>
+  </c:if>
+
+  <a id="baitTable"></a>
+  <h2>Bait List</h2>
+
   <table>
     <thead>
-      <tr>
-        <th>Bait</th>
-        <th>Notes</th>
-      </tr>
+    <tr>
+      <th>
+        <a href="${pageContext.request.contextPath}/bait?sort=${sortOrder == 'asc' ? 'desc' : 'asc'}#baitTable">
+          Bait Name
+          <c:choose>
+            <c:when test="${sortOrder == 'asc'}">▲</c:when>
+            <c:otherwise>▼</c:otherwise>
+          </c:choose>
+        </a>
+      </th>
+      <th>Notes</th>
+      <th>Added By</th>
+      <c:if test="${sessionScope.isAdmin}">
+        <th>Actions</th>
+      </c:if>
+    </tr>
     </thead>
     <tbody>
-    <c:forEach var="b" items="${baits}">
+    <c:forEach var="b" items="${baitList}">
       <tr>
         <td>${b.name}</td>
         <td>${b.notes}</td>
+        <td>
+          <c:choose>
+            <c:when test="${not empty b.createdByUserId}">
+              User ID ${b.createdByUserId}
+            </c:when>
+            <c:otherwise>(preloaded)</c:otherwise>
+          </c:choose>
+        </td>
+
+        <c:if test="${sessionScope.isAdmin}">
+          <td>
+            <!-- Edit: reloads page with baitToEdit -->
+            <a href="${pageContext.request.contextPath}/bait?editId=${b.id}#baitForm">
+              Edit
+            </a>
+            |
+            <!-- Delete: POST with action=delete -->
+            <form action="${pageContext.request.contextPath}/bait#baitTable"
+                  method="post"
+                  style="display:inline">
+              <input type="hidden" name="action" value="delete" />
+              <input type="hidden" name="baitId" value="${b.id}" />
+              <button type="submit"
+                      onclick="return confirm('Are you sure you want to delete this bait?');">
+                Delete
+              </button>
+            </form>
+          </td>
+        </c:if>
       </tr>
     </c:forEach>
     </tbody>

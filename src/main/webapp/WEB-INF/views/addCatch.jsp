@@ -89,7 +89,27 @@
     <input type="text" id="locationName" name="locationName" placeholder="ex. Mississippi River" value="${editCatch != null ? editCatch.locationName : param.locationName}" required><br>
 
     <label for="baitType">Bait:</label>
-    <input type="text" id="baitType" name="baitType" placeholder="ex. Gulp! Minnow" value="${editCatch != null ? editCatch.baitType : param.baitType}" required><br>
+    <select id="baitType" name="baitType" required>
+      <option value="" disabled
+              <c:if test="${editCatch == null && empty param.baitType}">selected</c:if>>
+        Select bait
+      </option>
+
+      <c:forEach var="b" items="${baitList}">
+        <c:set var="selected"
+               value="${(editCatch != null and editCatch.baitType == b.name)
+                        or (editCatch == null and param.baitType == b.name)}" />
+        <option value="${b.name}" <c:if test="${selected}">selected</c:if>>
+            ${b.name}
+        </option>
+      </c:forEach>
+    </select>
+
+    <a href="${pageContext.request.contextPath}/bait#baitTableOne"
+       class="btn">
+      Add Bait
+    </a>
+    <br>
 
     <label for="dateCaught">Date Caught (YYYY-MM-DD):</label>
     <input type="date" id="dateCaught" name="dateCaught" placeholder="ex. 2025-09-15" value="${editCatch != null ? editCatch.dateCaught : param.dateCaught}"><br>

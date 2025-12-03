@@ -2,36 +2,47 @@ package edu.cvtc.hooked.model;
 
 public class Bait {
 
-    private int id;
+    private Integer id;
     private String name;
     private String notes;
+    private Integer createdByUserId;
 
     public Bait() {
     }
 
-    public Bait(int id, String name, String notes) {
+    // Full constructor with id + createdByUserId
+    public Bait(Integer id, String name, String notes, Integer createdByUserId) {
         this.id = id;
         this.name = name;
         this.notes = notes;
+        this.createdByUserId = createdByUserId;
     }
 
+    // Convenience: id + no creator
+    public Bait(Integer id, String name, String notes) {
+        this(id, name, notes, null);
+    }
+
+    // Convenience: no id (for inserts) + no creator
     public Bait(String name, String notes) {
-        this.name = name;
-        this.notes = notes;
+        this(null, name, notes, null);
     }
 
-    public int getId() {
+    // Convenience: no id (for inserts) + creator
+    public Bait(String name, String notes, Integer createdByUserId) {
+        this(null, name, notes, createdByUserId);
+    }
+
+    public Integer getId() {
         return id;
     }
-
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
     public String getName() {
         return name;
     }
-
     public void setName(String name) {
         this.name = name;
     }
@@ -39,8 +50,14 @@ public class Bait {
     public String getNotes() {
         return notes;
     }
-
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public Integer getCreatedByUserId() {
+        return createdByUserId;
+    }
+    public void setCreatedByUserId(Integer createdByUserId) {
+        this.createdByUserId = createdByUserId;
     }
 }

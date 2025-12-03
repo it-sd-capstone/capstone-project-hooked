@@ -70,7 +70,6 @@ public final class DbUtil {
                 )
             """);
 
-
             command.executeUpdate("""
             CREATE TABLE IF NOT EXISTS Location (
               LocationID   INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -78,7 +77,6 @@ public final class DbUtil {
               State        VARCHAR(2) NOT NULL
             );
             """);
-
 
             command.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS Catches (
@@ -97,11 +95,23 @@ public final class DbUtil {
 
             command.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS Bait (
-                    BaitID   INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Name     TEXT NOT NULL,
-                    Notes    TEXT
+                    BaitID          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name            TEXT NOT NULL,
+                    Notes           TEXT,
+                    CreatedByUserID INTEGER,
+                    FOREIGN KEY (CreatedByUserID) REFERENCES Users(UserID)
                 );
             """);
+
+            try (Statement s = c.createStatement()) {
+                s.executeUpdate("ALTER TABLE Bait ADD COLUMN CreatedByUserID INTEGER");
+            } catch (SQLException ex) {
+                // If the column already exists, you’ll get "duplicate column name"
+                // Ignore that — it just means we're up to date.
+                if (!ex.getMessage().toLowerCase().contains("duplicate column name")) {
+                    throw ex;
+                }
+            }
 
             command.executeUpdate("""
                 INSERT INTO Users(firstName, lastName, userName, email, passwordHash)
@@ -109,16 +119,6 @@ public final class DbUtil {
                 WHERE NOT EXISTS (
                     SELECT 1 FROM Users WHERE userName = 'admin'
                 );
-            """);
-
-            command.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS SpeciesRequests (
-                  RequestID   INTEGER PRIMARY KEY AUTOINCREMENT,
-                  SpeciesName TEXT NOT NULL,
-                  UserID      INTEGER,
-                  RequestedAt TEXT DEFAULT (datetime('now')),
-                  FOREIGN KEY (UserID) REFERENCES Users(UserID)
-                )
             """);
 
             command.executeUpdate("""
@@ -133,6 +133,7 @@ public final class DbUtil {
             """);
 
             seedSpeciesIfEmpty(c);
+            seedBaitIfEmpty(c);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to ensure schema", e);
@@ -200,6 +201,45 @@ public final class DbUtil {
         ps.addBatch();
     }
 
+    private static void seedBaitIfEmpty(Connection conn) throws SQLException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Bait")) {
+            if (rs.next() && rs.getInt(1) > 0) {
+                // already has rows
+                return;
+            }
+        }
+
+        String sql = "INSERT INTO Bait (Name, Notes) VALUES (?, ?)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            insertBait(ps, "nightcrawler",       "Live bait");
+            insertBait(ps, "leeches",            "Live bait");
+            insertBait(ps, "fathead minnows",    "Live bait");
+            insertBait(ps, "shiners",            "Live bait");
+            insertBait(ps, "gulp! minnow",       "Soft plastic");
+            insertBait(ps, "plastic worm",       "Soft plastic");
+            insertBait(ps, "tube jig",           "Soft plastic");
+            insertBait(ps, "swimbait",           "Soft plastic");
+            insertBait(ps, "spinnerbait",        "Lure");
+            insertBait(ps, "crankbait",          "Lure");
+            insertBait(ps, "jerkbait",           "Lure");
+            insertBait(ps, "topwater frog",      "Lure");
+            insertBait(ps, "inline spinner",     "Lure");
+            insertBait(ps, "jig & minnow",       "Combo");
+            insertBait(ps, "slip bobber rig",    "Rig");
+
+            ps.executeBatch();
+        }
+    }
+
+    private static void insertBait(PreparedStatement ps,
+                                   String name,
+                                   String notes) throws SQLException {
+        ps.setString(1, name);
+        ps.setString(2, notes);
+        ps.addBatch();
+    }
 
 
     public static ResultSet queryRaw(Connection db, String sql) throws SQLException {
