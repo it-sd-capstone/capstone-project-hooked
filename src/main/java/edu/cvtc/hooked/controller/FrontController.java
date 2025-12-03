@@ -29,7 +29,7 @@ public class FrontController extends HttpServlet {
         return switch (path) {
             case "/index"     -> "/WEB-INF/views/index.jsp";
             case "/about"     -> "/WEB-INF/views/about.jsp";
-            case "/locations" -> "/WEB-INF/views/locations.jsp";
+            case "/locations" -> "/WEB-INF/views/location.jsp";
             case "/species"   -> "/WEB-INF/views/species.jsp";
             case "/bait"      -> "/WEB-INF/views/bait.jsp";
             case "/search" -> "/WEB-INF/views/search.jsp";

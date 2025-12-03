@@ -86,7 +86,27 @@
     <br>
 
     <label for="locationName">Location:</label>
-    <input type="text" id="locationName" name="locationName" placeholder="ex. Mississippi River" value="${editCatch != null ? editCatch.locationName : param.locationName}" required><br>
+
+    <select id="locationName" name="locationName" required>
+      <option value="" disabled
+              <c:if test="${editCatch == null && empty param.locationName}">selected</c:if>>
+        Select location
+      </option>
+
+      <c:forEach var="loc" items="${locationList}">
+        <c:set var="selected"
+               value="${(editCatch != null and editCatch.locationName == loc.locationName)
+                    or (editCatch == null and param.locationName == loc.locationName)}" />
+        <option value="${loc.locationName}" <c:if test="${selected}">selected</c:if>>
+            ${loc.locationName} (${loc.state})
+        </option>
+      </c:forEach>
+    </select>
+
+    <a href="${pageContext.request.contextPath}/location#locationFormOne"
+       class="btn">
+      Add Location
+    </a>
 
     <label for="baitType">Bait:</label>
     <select id="baitType" name="baitType" required>

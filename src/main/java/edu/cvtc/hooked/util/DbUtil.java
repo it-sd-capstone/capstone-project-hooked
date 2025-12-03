@@ -71,12 +71,15 @@ public final class DbUtil {
             """);
 
             command.executeUpdate("""
-            CREATE TABLE IF NOT EXISTS Location (
-              LocationID   INTEGER PRIMARY KEY AUTOINCREMENT,
-              LocationName VARCHAR(100) NOT NULL,
-              State        VARCHAR(2) NOT NULL
-            );
+                CREATE TABLE IF NOT EXISTS Location (
+                  LocationID      INTEGER PRIMARY KEY AUTOINCREMENT,
+                  LocationName    TEXT NOT NULL,
+                  State           TEXT NOT NULL,
+                  CreatedByUserID INTEGER,
+                  FOREIGN KEY (CreatedByUserID) REFERENCES Users(UserID)
+                );
             """);
+
 
             command.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS Catches (
@@ -113,6 +116,14 @@ public final class DbUtil {
                 }
             }
 
+            try (Statement s = c.createStatement()) {
+                s.executeUpdate("ALTER TABLE Location ADD COLUMN CreatedByUserID INTEGER");
+            } catch (SQLException ex) {
+                if (!ex.getMessage().toLowerCase().contains("duplicate column name")) {
+                    throw ex;
+                }
+            }
+
             command.executeUpdate("""
                 INSERT INTO Users(firstName, lastName, userName, email, passwordHash)
                 SELECT 'Admin', 'User', 'admin', 'hookedAdmin1@gmail.com', 'admin'
@@ -134,6 +145,7 @@ public final class DbUtil {
 
             seedSpeciesIfEmpty(c);
             seedBaitIfEmpty(c);
+            seedLocationIfEmpty(c);
 
         } catch (Exception e) {
             throw new RuntimeException("Failed to ensure schema", e);
@@ -240,6 +252,42 @@ public final class DbUtil {
         ps.setString(2, notes);
         ps.addBatch();
     }
+
+    private static void seedLocationIfEmpty(Connection conn) throws SQLException {
+        // Check if Location already has data
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Location")) {
+            if (rs.next() && rs.getInt(1) > 0) {
+                // Already seeded – do nothing
+                return;
+            }
+        }
+
+        String sql = "INSERT INTO Location (LocationName, State) VALUES (?, ?)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            insertLocation(ps, "Lake Wissota",     "WI");
+            insertLocation(ps, "Lake Hallie",      "WI");
+            insertLocation(ps, "Chippewa River",   "WI");
+            insertLocation(ps, "Lake Altoona",     "WI");
+            insertLocation(ps, "Lake Eau Claire",  "WI");
+            insertLocation(ps, "Mississippi River","WI");
+            insertLocation(ps, "Lake Superior",    "WI");
+            insertLocation(ps, "Lake Menomin",     "WI");
+            insertLocation(ps, "Lake Chetek",      "WI");
+
+            ps.executeBatch();
+        }
+    }
+
+    private static void insertLocation(PreparedStatement ps,
+                                       String locationName,
+                                       String state) throws SQLException {
+        ps.setString(1, locationName);
+        ps.setString(2, state);
+        ps.addBatch();
+    }
+
 
 
     public static ResultSet queryRaw(Connection db, String sql) throws SQLException {

@@ -3,6 +3,7 @@ package edu.cvtc.hooked.controller;
 import edu.cvtc.hooked.dao.BaitDao;
 import edu.cvtc.hooked.dao.CatchDao;
 import edu.cvtc.hooked.dao.SpeciesDao;
+import edu.cvtc.hooked.dao.LocationDao;   // <-- NEW
 import edu.cvtc.hooked.model.Catch;
 import edu.cvtc.hooked.model.SpeciesRestrictions;
 
@@ -14,8 +15,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @WebServlet("/addCatch")
@@ -73,6 +72,7 @@ public class AddCatchServlet extends HttpServlet {
 
         addSpeciesList(req);
         addBaitList(req);
+        addLocationList(req);  // <-- NEW
         req.getRequestDispatcher("/WEB-INF/views/addCatch.jsp").forward(req, resp);
     }
 
@@ -104,7 +104,7 @@ public class AddCatchServlet extends HttpServlet {
         boolean isUpdate      = catchIdStr != null && !catchIdStr.isBlank();
 
         String speciesName      = req.getParameter("speciesName"); // from dropdown
-        String locationName     = req.getParameter("locationName");
+        String locationName     = req.getParameter("locationName"); // from dropdown now
         String baitType         = req.getParameter("baitType");
         String dateCaught       = req.getParameter("dateCaught");
         String notes            = req.getParameter("notes");
@@ -118,7 +118,7 @@ public class AddCatchServlet extends HttpServlet {
         }
 
         String speciesKey = speciesName.toLowerCase();
-        if (!edu.cvtc.hooked.model.SpeciesRestrictions.ALL.containsKey(speciesKey)) {
+        if (!SpeciesRestrictions.ALL.containsKey(speciesKey)) {
             req.setAttribute("error", "Invalid species. Please select a valid species.");
             forwardWithCatches(req, resp, ownerUserId);
             return;
@@ -168,7 +168,6 @@ public class AddCatchServlet extends HttpServlet {
             return;
         }
 
-
         Catch c = new Catch(
                 ownerUserId,
                 speciesName,
@@ -216,6 +215,7 @@ public class AddCatchServlet extends HttpServlet {
         }
         addSpeciesList(req);
         addBaitList(req);
+        addLocationList(req);  // <-- NEW, so dropdown still works on validation error
         req.getRequestDispatcher("/WEB-INF/views/addCatch.jsp").forward(req, resp);
     }
 
@@ -239,4 +239,15 @@ public class AddCatchServlet extends HttpServlet {
         }
     }
 
+    // --- NEW: location list for dropdown ---
+    private void addLocationList(HttpServletRequest req) {
+        try {
+            LocationDao dao = new LocationDao();
+            // sorted by name ascending; or dao.findAll() if you prefer
+            req.setAttribute("locationList", dao.findAllSorted("locationName", "asc"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("locationList", java.util.Collections.emptyList());
+        }
+    }
 }

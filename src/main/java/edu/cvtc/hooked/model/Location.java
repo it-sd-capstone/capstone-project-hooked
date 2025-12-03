@@ -7,6 +7,7 @@ public class Location {
     private Integer locationId;      // null until saved
     private String locationName;
     private String state;           // 2 letter code, for example "WI"
+    private Integer createdByUserId; // nullable, same idea as Bait
 
     public Location() {
         // default ctor
@@ -15,16 +16,18 @@ public class Location {
     // Full constructor (used when loading from DB)
     public Location(Integer locationId,
                     String locationName,
-                    String state) {
+                    String state,
+                    Integer createdByUserId) {
         this.locationId = locationId;
         this.locationName = locationName;
         this.state = state;
+        this.createdByUserId = createdByUserId;
     }
 
     // Convenience constructor for new locations (id assigned by DB)
     public Location(String locationName,
                     String state) {
-        this(null, locationName, state);
+        this(null, locationName, state, null);
     }
 
     public Integer getLocationId() {
@@ -51,6 +54,14 @@ public class Location {
         this.state = state;
     }
 
+    public Integer getCreatedByUserId() {
+        return createdByUserId;
+    }
+
+    public void setCreatedByUserId(Integer createdByUserId) {
+        this.createdByUserId = createdByUserId;
+    }
+
     // Treat (locationName, state) as the logical key
     @Override
     public boolean equals(Object o) {
@@ -70,11 +81,8 @@ public class Location {
     public String toString() {
         return "Location{locationId=" + locationId
                 + ", locationName='" + locationName + '\''
-                + ", state='" + state + '\'' + '}';
+                + ", state='" + state + '\''
+                + ", createdByUserId=" + createdByUserId
+                + '}';
     }
 }
-
-
-
-
-

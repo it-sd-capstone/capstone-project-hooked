@@ -8,10 +8,10 @@
     <c:choose>
         <c:when test="${not empty sessionScope.user}">
             <!-- only when logged in -->
-            <li><a href="<c:url value='/locations'/>">Locations</a></li>
+<%--            <li><a href="<c:url value='/location'/>">Locations</a></li>--%>
 <%--            <li><a href="<c:url value='/species'/>">Species</a></li>--%>
 <%--            <li><a href="<c:url value='/bait'/>">Bait</a></li>--%>
-            <li><a href="<c:url value='/searchCatches'/>">Search</a></li>
+<%--            <li><a href="<c:url value='/searchCatches'/>">Search</a></li>--%>
             <li><a href="<c:url value='/addCatch'/>">Add Catch</a></li>
 
             <c:if test="${sessionScope.isAdmin}">
