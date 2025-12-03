@@ -8,13 +8,17 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 
 // Map every route you want to support
 @WebServlet(urlPatterns = {
         "/index",
-        "/about", "/locations", "/logout", "/add", "/search", "/statistics", "/passwordReset"
+        "/about", "/locations", "/logout", "/add", "/search", "/statistics", "/passwordReset", "/species"
 })
 public class FrontController extends HttpServlet {
 
@@ -48,6 +52,7 @@ public class FrontController extends HttpServlet {
         }
 
         if ("/species".equals(path)) {
+            handleSpeciesAdminActions(req);
             loadSpecies(req);
         }
 
@@ -68,57 +73,89 @@ public class FrontController extends HttpServlet {
     }
 
     private void handleSpeciesPost(HttpServletRequest req, HttpServletResponse resp)
-    throws IOException {
+            throws IOException {
 
-        if (req.getSession(false) == null || req.getSession(false).getAttribute("userId") == null) {
-            resp.sendRedirect("species?error=You must be logged in to add species.");
+        HttpSession session = req.getSession(false);
+        Integer userId = (session != null) ? (Integer) session.getAttribute("userId") : null;
+        Boolean isAdmin = (session != null) ? (Boolean) session.getAttribute("isAdmin") : null;
+
+        if (userId == null) {
+            resp.sendRedirect(req.getContextPath() + "/Login");
             return;
         }
 
-        String species = req.getParameter("addSpecies");
+        String idStr      = req.getParameter("speciesId");  // hidden when editing
+        boolean isUpdate  = idStr != null && !idStr.isBlank();
 
-        if (species == null || species.trim().isEmpty()) {
-            resp.sendRedirect("species?error=Empty species name");
+        // Only admins can update existing species
+        if (isUpdate && (isAdmin == null || !isAdmin)) {
+            resp.sendRedirect(req.getContextPath() + "/species?error=" +
+                    url("Only admins can edit species.") + "#speciesTable");
             return;
         }
 
-        species = species.trim().replaceAll("\\s+", " ");
+        String species   = req.getParameter("addSpecies");
+        String maxLenStr = req.getParameter("maxLength");
+        String maxWtStr  = req.getParameter("maxWeight");
 
-        String formatted = capitalizeWords(species);
+        if (species == null || species.isBlank()
+                || maxLenStr == null || maxLenStr.isBlank()
+                || maxWtStr == null || maxWtStr.isBlank()) {
 
-        if (!formatted.equals(species)) {
-            resp.sendRedirect("species?formatted="
-                    + java.net.URLEncoder.encode(formatted, "UTF-8"));
+            resp.sendRedirect(req.getContextPath() + "/species?error=" +
+                    url("Species name, max length, and max weight are required.") +
+                    "#speciesTable");
             return;
         }
 
+        // Normalize whitespace and convert to lower case for storage
+        String normalized = species.trim().replaceAll("\\s+", " ");
+        String formatted  = normalized.toLowerCase();
 
-        if (!species.matches("^[A-Za-z][A-Za-z\\s-]*[A-Za-z]$")) {
-            resp.sendRedirect("species?error=Invalid species name");
+        double maxLen;
+        double maxWt;
+        try {
+            maxLen = Double.parseDouble(maxLenStr);
+            maxWt  = Double.parseDouble(maxWtStr);
+        } catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/species?error=" +
+                    url("Max length and max weight must be numeric.") +
+                    "#speciesTable");
             return;
         }
 
         SpeciesDao dao = new SpeciesDao();
-        if (dao.exists(species)) {
-            resp.sendRedirect("species?error=Species already exists");
-            return;
-        }
 
         try {
-            Species s = new Species(
-                    species.trim()
-            );
+            if (isUpdate) {
+                // EDIT existing
+                int id = Integer.parseInt(idStr);
+                Species s = new Species(id, formatted, maxLen, maxWt, null);
+                dao.update(s);
+                resp.sendRedirect(req.getContextPath() + "/species?success=" +
+                        url("Species updated successfully.") + "#speciesTable");
 
-            dao.insert(s);
+            } else {
+                // ADD new
+                if (dao.exists(formatted)) {
+                    resp.sendRedirect(req.getContextPath() + "/species?error=" +
+                            url("That species already exists.") + "#speciesTable");
+                    return;
+                }
 
-            resp.sendRedirect("species?success=1");
+                Species s = new Species(formatted, maxLen, maxWt, userId);
+                dao.insert(s);
+                resp.sendRedirect(req.getContextPath() + "/species?success=" +
+                        url("Species added successfully.") + "#speciesTable");
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            resp.sendRedirect("species?error=1");
+            resp.sendRedirect(req.getContextPath() + "/species?error=" +
+                    url("Failed to save species.") + "#speciesTable");
         }
-
     }
+
 
     private void loadStatistics(HttpServletRequest req) {
         try (Connection conn = DbUtil.getConnection()) {
@@ -199,13 +236,29 @@ public class FrontController extends HttpServlet {
 
     private void loadSpecies(HttpServletRequest req) {
         try {
+            String sort = req.getParameter("sort");
+            String dir  = req.getParameter("dir");
+
+            if (sort == null || sort.isBlank()) {
+                sort = "species";   // default: alphabetical
+            }
+            if (dir == null || dir.isBlank()) {
+                dir = "asc";
+            }
+
             SpeciesDao dao = new SpeciesDao();
-            req.setAttribute("speciesList", dao.findAll());
+            req.setAttribute("speciesList", dao.findAllSorted(sort, dir));
+
+            // so JSP can know current sort if needed
+            req.setAttribute("currentSort", sort);
+            req.setAttribute("currentDir", dir);
+
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("speciesError", "Unable to load species.");
         }
     }
+
 
     private String capitalizeWords(String input) {
         String[] parts = input.split(" ");
@@ -221,5 +274,45 @@ public class FrontController extends HttpServlet {
         }
         return sb.toString();
     }
+
+    private String url(String s) {
+        return URLEncoder.encode(s, StandardCharsets.UTF_8);
+    }
+
+    private void handleSpeciesAdminActions(HttpServletRequest req) {
+        Boolean isAdmin = (Boolean) req.getSession().getAttribute("isAdmin");
+        if (isAdmin == null || !isAdmin) {
+            return; // non-admins can't edit/delete
+        }
+
+        String deleteId = req.getParameter("deleteId");
+        String editId   = req.getParameter("editId");
+
+        SpeciesDao dao = new SpeciesDao();
+
+        // DELETE
+        if (deleteId != null && !deleteId.isBlank()) {
+            try {
+                int id = Integer.parseInt(deleteId);
+                dao.deleteById(id);
+                req.setAttribute("success", "Species deleted.");
+            } catch (Exception e) {
+                e.printStackTrace();
+                req.setAttribute("error", "Unable to delete species.");
+            }
+        }
+
+        // EDIT (load species into request so JSP can prefill form)
+        if (editId != null && !editId.isBlank()) {
+            try {
+                int id = Integer.parseInt(editId);
+                dao.findById(id).ifPresent(s -> req.setAttribute("editSpecies", s));
+            } catch (Exception e) {
+                e.printStackTrace();
+                req.setAttribute("error", "Unable to load species for editing.");
+            }
+        }
+    }
+
 
 }

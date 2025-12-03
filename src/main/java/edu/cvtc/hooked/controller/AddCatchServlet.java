@@ -138,6 +138,35 @@ public class AddCatchServlet extends HttpServlet {
             return;
         }
 
+        // Lookup species in DB and enforce size limits
+        SpeciesDao speciesDao = new SpeciesDao();
+        try {
+            var optSpecies = speciesDao.findByName(speciesName);
+            if (optSpecies.isEmpty()) {
+                req.setAttribute("error", "Invalid species. Please select a valid species.");
+                forwardWithCatches(req, resp, ownerUserId);
+                return;
+            }
+
+            var sp = optSpecies.get();
+            if (length <= 0 || weight <= 0 ||
+                    length > sp.getMaxLength() ||
+                    weight > sp.getMaxWeight()) {
+
+                req.setAttribute("error", "Length/weight exceed allowed max for " + sp.getSpeciesName() +
+                        " (Max length: " + sp.getMaxLength() +
+                        ", Max weight: " + sp.getMaxWeight() + ").");
+                forwardWithCatches(req, resp, ownerUserId);
+                return;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            req.setAttribute("error", "Could not validate species limits. Please try again.");
+            forwardWithCatches(req, resp, ownerUserId);
+            return;
+        }
+
+
         Catch c = new Catch(
                 ownerUserId,
                 speciesName,
@@ -188,8 +217,13 @@ public class AddCatchServlet extends HttpServlet {
     }
 
     private void addSpeciesList(HttpServletRequest req) {
-        List<String> species = new ArrayList<>(SpeciesRestrictions.ALL.keySet());
-        Collections.sort(species);
-        req.setAttribute("speciesList", species);
+        try {
+            SpeciesDao dao = new SpeciesDao();
+            req.setAttribute("speciesList", dao.findAll());
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("speciesList", java.util.Collections.emptyList());
+        }
     }
+
 }

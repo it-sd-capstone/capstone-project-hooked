@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -47,35 +49,53 @@
         Select a species
       </option>
 
-      <c:forEach var="name" items="${speciesList}">
+      <c:forEach var="s" items="${speciesList}">
         <c:set var="selected"
-               value="${(editCatch != null and editCatch.speciesName == name) or
-                     (editCatch == null and param.speciesName == name)}" />
+               value="${(editCatch != null and editCatch.speciesName == s.speciesName) or
+                     (editCatch == null and param.speciesName == s.speciesName)}" />
 
-        <option value="${name}" <c:if test="${selected}">selected</c:if>>
-            ${name}
+        <option value="${s.speciesName}"
+                data-max-length="${s.maxLength}"
+                data-max-weight="${s.maxWeight}"
+                <c:if test="${selected}">selected</c:if>>
+            ${s.speciesName}
         </option>
       </c:forEach>
     </select>
-    <br><br>
+    <a href="${pageContext.request.contextPath}/species#speciesTableOne"
+       class="btn">
+      Add Species
+    </a>
 
-    <label for="length">Length (inches):</label>
-    <input type="number" step=".01" min="0" id="length" name="length" placeholder="ex. 11.00" value="${editCatch != null ? editCatch.length : param.length}" required><br><br>
+    <label for="length" id="lengthLabel">
+      Length (inches):
+    </label>
+    <input type="number" step=".01" min="0" id="length" name="length"
+           placeholder="ex. 11.00"
+           value="${editCatch != null ? editCatch.length : param.length}"
+           required>
+    <br>
 
-    <label for="weight">Weight (pounds):</label>
-    <input type="number" step=".01" min="0" id="weight" name="weight" placeholder="ex. 1.00" value="${editCatch != null ? editCatch.weight : param.weight}" required><br><br>
+    <label for="weight" id="weightLabel">
+      Weight (pounds):
+    </label>
+    <input type="number" step=".01" min="0" id="weight" name="weight"
+           placeholder="ex. 1.00"
+           value="${editCatch != null ? editCatch.weight : param.weight}"
+           required>
+    <br>
 
     <label for="locationName">Location:</label>
-    <input type="text" id="locationName" name="locationName" placeholder="ex. Mississippi River" value="${editCatch != null ? editCatch.locationName : param.locationName}" required><br><br>
+    <input type="text" id="locationName" name="locationName" placeholder="ex. Mississippi River" value="${editCatch != null ? editCatch.locationName : param.locationName}" required><br>
 
     <label for="baitType">Bait:</label>
-    <input type="text" id="baitType" name="baitType" placeholder="ex. Gulp! Minnow" value="${editCatch != null ? editCatch.baitType : param.baitType}" required><br><br>
+    <input type="text" id="baitType" name="baitType" placeholder="ex. Gulp! Minnow" value="${editCatch != null ? editCatch.baitType : param.baitType}" required><br>
 
     <label for="dateCaught">Date Caught (YYYY-MM-DD):</label>
-    <input type="date" id="dateCaught" name="dateCaught" placeholder="ex. 2025-09-15" value="${editCatch != null ? editCatch.dateCaught : param.dateCaught}"><br><br>
+    <input type="date" id="dateCaught" name="dateCaught" placeholder="ex. 2025-09-15" value="${editCatch != null ? editCatch.dateCaught : param.dateCaught}"><br>
 
     <label for="notes">Notes:</label>
-    <input type="text" id="notes" name="notes" placeholder="ex. Slip Bobber" value="${editCatch != null ? editCatch.notes : param.notes}"><br><br>
+    <input type="text" id="notes" name="notes" placeholder="ex. Slip Bobber" value="${editCatch != null ? editCatch.notes : param.notes}"><br>
 
     <input type="submit" value="${editCatch != null ? 'Update Catch' : 'Add Catch'}">
 
@@ -134,6 +154,59 @@
       </tbody>
     </table>
   </c:if>
+
+  <script>
+    function updateMaxLabels() {
+      var select = document.getElementById('speciesName');
+      if (!select) return;
+
+      var option = select.options[select.selectedIndex];
+      if (!option) return;
+
+      // Read data-* attributes
+      var maxLenRaw = option.getAttribute('data-max-length');
+      var maxWtRaw  = option.getAttribute('data-max-weight');
+
+      var lengthLabel = document.getElementById('lengthLabel');
+      var weightLabel = document.getElementById('weightLabel');
+
+      console.log('Selected species:', option.value,
+              'maxLenRaw:', maxLenRaw, 'maxWtRaw:', maxWtRaw);
+
+      if (lengthLabel) {
+        if (maxLenRaw) {
+          var numLen = parseFloat(maxLenRaw);
+          var formattedLen = isNaN(numLen) ? maxLenRaw : numLen.toFixed(2);
+          lengthLabel.textContent = 'Length (Max. ' + formattedLen + ' inches):';
+        } else {
+          lengthLabel.textContent = 'Length (inches):';
+        }
+      }
+
+      if (weightLabel) {
+        if (maxWtRaw) {
+          var numWt = parseFloat(maxWtRaw);
+          var formattedWt = isNaN(numWt) ? maxWtRaw : numWt.toFixed(2);
+          weightLabel.textContent = 'Weight (Max. ' + formattedWt + ' pounds):';
+        } else {
+          weightLabel.textContent = 'Weight (pounds):';
+        }
+      }
+    }
+
+    // Run when page is fully loaded
+    window.addEventListener('load', function () {
+      var select = document.getElementById('speciesName');
+      if (!select) return;
+
+      // Update once on load (for edit mode / default selection)
+      updateMaxLabels();
+
+      // Update whenever user changes species
+      select.addEventListener('change', updateMaxLabels);
+    });
+  </script>
+
 
   <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>

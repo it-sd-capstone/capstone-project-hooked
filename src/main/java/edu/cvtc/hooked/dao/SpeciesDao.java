@@ -10,124 +10,154 @@ import java.util.Optional;
 
 public class SpeciesDao {
 
-    public void insert(Species s) throws SQLException {
-        String sql = "INSERT INTO Species(SpeciesName) VALUES (?)";
+    public List<Species> findAll() throws SQLException {
+        // Default: alphabetical by species name ASC
+        return findAllSorted("species", "asc");
+    }
 
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
+    public List<Species> findAllSorted(String sortField, String sortDir) throws SQLException {
+        String orderCol;
+
+        if ("length".equalsIgnoreCase(sortField)) {
+            orderCol = "MaxLength";
+        } else if ("weight".equalsIgnoreCase(sortField)) {
+            orderCol = "MaxWeight";
+        } else {
+            // default / "species"
+            orderCol = "SpeciesName";
+        }
+
+        String direction = "desc".equalsIgnoreCase(sortDir) ? "DESC" : "ASC";
+
+        String sql = """
+            SELECT SpeciesID, SpeciesName, MaxLength, MaxWeight, CreatedByUserID
+            FROM Species
+            ORDER BY %s %s
+        """.formatted(orderCol, direction);
+
+        List<Species> list = new ArrayList<>();
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                list.add(mapRow(rs));
+            }
+        }
+        return list;
+    }
+
+    public Optional<Species> findByName(String name) throws SQLException {
+        String sql = """
+            SELECT SpeciesID, SpeciesName, MaxLength, MaxWeight, CreatedByUserID
+            FROM Species
+            WHERE LOWER(SpeciesName) = LOWER(?)
+        """;
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, name);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapRow(rs));
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    public boolean exists(String name) throws SQLException {
+        return findByName(name).isPresent();
+    }
+
+    public void insert(Species s) throws SQLException {
+        String sql = """
+            INSERT INTO Species(SpeciesName, MaxLength, MaxWeight, CreatedByUserID)
+            VALUES(?,?,?,?)
+        """;
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, s.getSpeciesName());
+            ps.setDouble(2, s.getMaxLength());
+            ps.setDouble(3, s.getMaxWeight());
+
+            if (s.getCreatedByUserId() != null) {
+                ps.setInt(4, s.getCreatedByUserId());
+            } else {
+                ps.setNull(4, Types.INTEGER);
+            }
+
+            ps.executeUpdate();
+
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    s.setSpeciesId(rs.getInt(1));
+                }
+            }
+        }
+    }
+
+    public void update(Species s) throws SQLException {
+        String sql = """
+            UPDATE Species
+            SET SpeciesName = ?, MaxLength = ?, MaxWeight = ?
+            WHERE SpeciesID = ?
+        """;
+
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, s.getSpeciesName());
+            ps.setDouble(2, s.getMaxLength());
+            ps.setDouble(3, s.getMaxWeight());
+            ps.setInt(4, s.getSpeciesId());
 
             ps.executeUpdate();
         }
     }
 
-    public Optional<Species> findBySpeciesName(String speciesName) throws SQLException {
-        String sql = "SELECT SpeciesID, SpeciesName " +
-                "FROM Species WHERE SpeciesName = ?";
-
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
-            ps.setString(1, speciesName);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    Species s = mapRow(rs);
-                    return Optional.of(s);
-                }
-                return Optional.empty();
-            }
-        }
-    }
-
-    public Optional<Species> findById(int speciesId) throws SQLException {
-        String sql = "SELECT SpeciesID, SpeciesName " +
-                "FROM Species WHERE SpeciesID = ?";
-
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql)) {
-
+    public void deleteById(int speciesId) throws SQLException {
+        try (Connection conn = DbUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement("DELETE FROM Species WHERE SpeciesID = ?")) {
             ps.setInt(1, speciesId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    Species s = mapRow(rs);
-                    return Optional.of(s);
-                }
-                return Optional.empty();
-            }
+            ps.executeUpdate();
         }
-    }
-
-    public List<Species> findAll() throws SQLException {
-        String sql = "SELECT SpeciesID, SpeciesName " +
-                "FROM Species ORDER BY SpeciesName";
-
-        List<Species> result = new ArrayList<>();
-
-        try (Connection c = DbUtil.getConnection();
-             PreparedStatement ps = c.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
-            while (rs.next()) {
-                result.add(mapRow(rs));
-            }
-        }
-
-        return result;
     }
 
     private Species mapRow(ResultSet rs) throws SQLException {
         return new Species(
                 rs.getInt("SpeciesID"),
-                rs.getString("SpeciesName")
+                rs.getString("SpeciesName"),
+                rs.getDouble("MaxLength"),
+                rs.getDouble("MaxWeight"),
+                (Integer) rs.getObject("CreatedByUserID")
         );
     }
 
-    public List<Species> searchByTerm(String name) {
-        List<Species> list = new ArrayList<>();
-
-        String sql = "SELECT SpeciesID, SpeciesName FROM Species WHERE SpeciesName = ?";
-
-        try (Connection conn = DbUtil.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
-            stmt.setString(1, name);
-
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    Species s = new Species(
-                            rs.getInt("SpeciesID"),
-                            rs.getString("SpeciesName")
-                    );
-                    list.add(s);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return list;
-    }
-
-    public boolean exists(String speciesName) {
-        String sql = "SELECT 1 FROM Species WHERE SpeciesName = ? LIMIT 1";
+    public Optional<Species> findById(int id) throws SQLException {
+        String sql = """
+        SELECT SpeciesID, SpeciesName, MaxLength, MaxWeight, CreatedByUserID
+        FROM Species
+        WHERE SpeciesID = ?
+    """;
 
         try (Connection conn = DbUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, speciesName);
+            ps.setInt(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
-                return rs.next(); // true if species exists
+                if (rs.next()) {
+                    return Optional.of(mapRow(rs));
+                }
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
+        return Optional.empty();
     }
 
 }
