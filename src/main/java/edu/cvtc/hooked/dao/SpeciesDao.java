@@ -74,6 +74,11 @@ public class SpeciesDao {
     }
 
     public void insert(Species s) throws SQLException {
+
+        if (exists(s.getSpeciesName())) {
+            throw new IllegalArgumentException("Species already exists with that name.");
+        }
+
         String sql = """
             INSERT INTO Species(SpeciesName, MaxLength, MaxWeight, CreatedByUserID)
             VALUES(?,?,?,?)
