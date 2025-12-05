@@ -13,7 +13,7 @@ public class Bait {
     // Full constructor with id + createdByUserId
     public Bait(Integer id, String name, String notes, Integer createdByUserId) {
         this.id = id;
-        this.name = name;
+        setName(name);
         this.notes = notes;
         this.createdByUserId = createdByUserId;
     }
@@ -44,14 +44,14 @@ public class Bait {
         return name;
     }
     public void setName(String name) {
-        this.name = name;
+        this.name = formatName(name);
     }
 
     public String getNotes() {
         return notes;
     }
     public void setNotes(String notes) {
-        this.notes = notes;
+        this.notes = formatName(notes);
     }
 
     public Integer getCreatedByUserId() {
@@ -59,5 +59,20 @@ public class Bait {
     }
     public void setCreatedByUserId(Integer createdByUserId) {
         this.createdByUserId = createdByUserId;
+    }
+
+    private String formatName(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        String[] words = input.trim().toLowerCase().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+
+        for (String word : words) {
+            sb.append(Character.toUpperCase(word.charAt(0)))
+                    .append(word.substring(1))
+                    .append(" ");
+        }
+
+        return sb.toString().trim();
     }
 }
