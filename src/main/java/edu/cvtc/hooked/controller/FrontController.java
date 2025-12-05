@@ -18,7 +18,7 @@ import java.sql.*;
 // Map every route you want to support
 @WebServlet(urlPatterns = {
         "/index",
-        "/about", "/locations", "/logout", "/add", "/search", "/statistics", "/passwordReset", "/species"
+        "/locations", "/logout", "/add", "/search", "/statistics", "/passwordReset", "/species"
 })
 public class FrontController extends HttpServlet {
 
@@ -28,7 +28,6 @@ public class FrontController extends HttpServlet {
 
         return switch (path) {
             case "/index"     -> "/WEB-INF/views/index.jsp";
-            case "/about"     -> "/WEB-INF/views/about.jsp";
             case "/locations" -> "/WEB-INF/views/location.jsp";
             case "/species"   -> "/WEB-INF/views/species.jsp";
             case "/bait"      -> "/WEB-INF/views/bait.jsp";
