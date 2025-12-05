@@ -19,8 +19,8 @@ public class Location {
                     String state,
                     Integer createdByUserId) {
         this.locationId = locationId;
-        this.locationName = locationName;
-        this.state = state;
+        setLocationName(locationName);
+        setState(state);
         this.createdByUserId = createdByUserId;
     }
 
@@ -43,7 +43,7 @@ public class Location {
     }
 
     public void setLocationName(String locationName) {
-        this.locationName = locationName;
+        this.locationName = formatTitle(locationName);
     }
 
     public String getState() {
@@ -51,7 +51,7 @@ public class Location {
     }
 
     public void setState(String state) {
-        this.state = state;
+        this.state = formatState(state);
     }
 
     public Integer getCreatedByUserId() {
@@ -60,6 +60,26 @@ public class Location {
 
     public void setCreatedByUserId(Integer createdByUserId) {
         this.createdByUserId = createdByUserId;
+    }
+
+    private String formatTitle(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        String[] words = input.trim().toLowerCase().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+
+        for (String word : words) {
+            sb.append(Character.toUpperCase(word.charAt(0)))
+                    .append(word.substring(1))
+                    .append(" ");
+        }
+
+        return sb.toString().trim();
+    }
+
+    private String formatState(String input) {
+        if (input == null || input.isEmpty()) return input;
+        return input.trim().toUpperCase();
     }
 
     // Treat (locationName, state) as the logical key
