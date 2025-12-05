@@ -1,7 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <ul class="nav nav-tabs">
     <li><a href="<c:url value='/IndexServlet'/>">Home</a></li>
-    <li><a href="<c:url value='/about'/>">About</a></li>
     <li><a href="<c:url value='/statistics'/>">Statistics</a></li>
     <li><a href="<c:url value='/searchCatches'/>">Search</a></li>
 
