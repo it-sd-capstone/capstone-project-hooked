@@ -38,13 +38,15 @@
            id="name"
            name="name"
            value="${not empty baitToEdit ? baitToEdit.name : ''}"
+           placeholder="ex. Nightcrawler"
            required />
 
     <label for="notes">Notes:</label>
     <input type="text"
            id="notes"
            name="notes"
-           value="${not empty baitToEdit ? baitToEdit.notes : ''}" />
+           value="${not empty baitToEdit ? baitToEdit.notes : ''}"
+           placeholder="ex. Live Bait"/>
 
     <input type="submit"
            value="${not empty baitToEdit ? 'Update Bait' : 'Add Bait'}" />

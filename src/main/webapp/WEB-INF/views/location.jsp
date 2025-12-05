@@ -34,6 +34,7 @@
            id="locationName"
            name="locationName"
            value="${not empty locationToEdit ? locationToEdit.locationName : ''}"
+           placeholder="ex. Chippewa River"
            required />
 
     <label for="state">State (2-letter):</label>
@@ -42,6 +43,7 @@
            name="state"
            maxlength="2"
            value="${not empty locationToEdit ? locationToEdit.state : ''}"
+           placeholder="ex. WI"
            required />
 
     <input type="submit"

@@ -40,7 +40,7 @@
 
         <label for="addSpecies">Species Name:</label>
         <input type="text" id="addSpecies" name="addSpecies"
-               placeholder="ex. smallmouth bass"
+               placeholder="ex. Smallmouth Bass"
                value="${editing ? editSpecies.speciesName : ''}"
                required>
 
