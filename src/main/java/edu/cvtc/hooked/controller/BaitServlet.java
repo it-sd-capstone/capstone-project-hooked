@@ -91,6 +91,8 @@ public class BaitServlet extends HttpServlet {
 
                         if (name == null || name.isBlank()) {
                             req.setAttribute("error", "Bait name cannot be empty.");
+                        } else if (!name.trim().matches("^[A-Za-z0-9\\-' ]{2,50}$")) {
+                             req.setAttribute("error", "Bait name must be 2–50 characters: letters, numbers, spaces, dashes, or apostrophes.");
                         } else {
                             String normalizedName = name.trim().toLowerCase();
 
@@ -119,6 +121,8 @@ public class BaitServlet extends HttpServlet {
 
                     if (name == null || name.isBlank()) {
                         req.setAttribute("error", "Bait name is required.");
+                    } else if (!name.trim().matches("^[A-Za-z0-9\\-' ]{2,50}$")) {
+                        req.setAttribute("error", "Bait name must be 2–50 characters: letters, numbers, spaces, dashes, or apostrophes.");
                     } else {
                         String normalizedName = name.trim().toLowerCase();
 
