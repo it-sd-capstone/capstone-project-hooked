@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.sql.*;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 // Map every route you want to support
 @WebServlet(urlPatterns = {
@@ -107,19 +109,31 @@ public class FrontController extends HttpServlet {
             return;
         }
 
-        // Normalize whitespace and convert to lower case for storage
         String normalized = species.trim().replaceAll("\\s+", " ");
-        String formatted  = normalized.toLowerCase();
+        if (!normalized.matches("^[A-Za-z\\-' ]{2,50}$")) {
+            resp.sendRedirect(req.getContextPath() + "/species?error=" +
+                    url("Species name must be 2–50 letters, spaces, dashes or apostrophes.") +
+                    "#speciesTable");
+            return;
+        }
+
+        String formatted = Arrays.stream(normalized.toLowerCase().split(" "))
+                .map(word -> word.substring(0,1).toUpperCase() + word.substring(1))
+                .collect(Collectors.joining(" "));
 
         double maxLen;
         double maxWt;
         try {
             maxLen = Double.parseDouble(maxLenStr);
             maxWt  = Double.parseDouble(maxWtStr);
+
+            if (maxLen <= 0 || maxWt <= 0) {
+                throw new NumberFormatException();
+            }
+
         } catch (NumberFormatException e) {
             resp.sendRedirect(req.getContextPath() + "/species?error=" +
-                    url("Max length and max weight must be numeric.") +
-                    "#speciesTable");
+                    url("Max length and weight must be positive numbers.") + "#speciesTable");
             return;
         }
 
