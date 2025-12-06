@@ -12,6 +12,8 @@
         <h1>Login</h1>
     </div>
 
+    <%@include file="/WEB-INF/includes/navigation.jsp"%>
+
     <!-- Success message display -->
     <% if (session.getAttribute("SuccessMessage") != null) { %>
     <div class="success" style="padding: 10px; margin: 10px auto; max-width: 500px; border: 1px solid #10b981; background-color: rgba(16, 185, 129, 0.2); border-radius: 10px;">
@@ -46,7 +48,6 @@
     <ul class="nav nav-tabs">
         <li><a id="passwordReset" href="<%= request.getContextPath() %>/passwordReset">Forgot Password?</a></li>
         <li><a id="createAccount" href="<%= request.getContextPath() %>/Register">Don't Have an Account?</a></li>
-        <li><a href="index.jsp">Home</a></li>
     </ul>
 
     <%@include file="/WEB-INF/includes/footer.jsp"%>
