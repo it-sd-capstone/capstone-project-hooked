@@ -55,6 +55,11 @@ public class FrontController extends HttpServlet {
         if ("/species".equals(path)) {
             handleSpeciesAdminActions(req);
             loadSpecies(req);
+
+            String error = req.getParameter("error");
+            String success = req.getParameter("success");
+            if (error != null) req.setAttribute("error", error);
+            if (success != null) req.setAttribute("success", success);
         }
 
         req.getRequestDispatcher(viewFor(path)).forward(req, resp);
@@ -112,7 +117,7 @@ public class FrontController extends HttpServlet {
         String normalized = species.trim().replaceAll("\\s+", " ");
         if (!normalized.matches("^[A-Za-z\\-' ]{2,50}$")) {
             resp.sendRedirect(req.getContextPath() + "/species?error=" +
-                    url("Species name must be 2–50 letters, spaces, dashes or apostrophes.") +
+                    url("Species name must be 2–50 letters, spaces, dashes, or apostrophes.") +
                     "#speciesTable");
             return;
         }
@@ -133,7 +138,8 @@ public class FrontController extends HttpServlet {
 
         } catch (NumberFormatException e) {
             resp.sendRedirect(req.getContextPath() + "/species?error=" +
-                    url("Max length and weight must be positive numbers.") + "#speciesTable");
+                    url("Max length and weight must be positive numbers.") +
+                    "#speciesTable");
             return;
         }
 
@@ -146,20 +152,20 @@ public class FrontController extends HttpServlet {
                 Species s = new Species(id, formatted, maxLen, maxWt, null);
                 dao.update(s);
                 resp.sendRedirect(req.getContextPath() + "/species?success=" +
-                        url("Species updated successfully.") + "#speciesTable");
+                        url("The species (" + formatted + ") updated successfully.") + "#speciesTable");
 
             } else {
                 // ADD new
                 if (dao.exists(formatted)) {
                     resp.sendRedirect(req.getContextPath() + "/species?error=" +
-                            url("That species already exists.") + "#speciesTable");
+                            url("The species (" + formatted + ") already exists.") + "#speciesTable");
                     return;
                 }
 
                 Species s = new Species(formatted, maxLen, maxWt, userId);
                 dao.insert(s);
                 resp.sendRedirect(req.getContextPath() + "/species?success=" +
-                        url("Species added successfully.") + "#speciesTable");
+                        url("The species (" + formatted + ") added successfully.") + "#speciesTable");
             }
 
         } catch (Exception e) {

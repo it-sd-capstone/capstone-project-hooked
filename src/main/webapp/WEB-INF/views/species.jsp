@@ -17,20 +17,6 @@
 
     <img src="<c:url value='/assets/img/temporarySpecies.jpg' />" alt="sturgeon image" class="page-image"><br><br>
 
-    <c:if test="${not empty param.error}">
-        <div class="error-message" style="color:red; font-weight:bold;">
-                ${param.error}
-        </div>
-    </c:if>
-
-    <c:if test="${not empty param.success}">
-        <div class="success-message" style="color:green; font-weight:bold;">
-            New Species added successfully!
-        </div>
-    </c:if>
-
-    <c:set var="editing" value="${not empty editSpecies}" />
-
     <a id="speciesTableOne"></a>
 
     <form action="${pageContext.request.contextPath}/species" method="post">
@@ -68,6 +54,16 @@
     </form>
 
     <br>
+
+    <c:if test="${not empty error}">
+        <div class="error-message">${error}</div>
+    </c:if>
+
+    <c:if test="${not empty success}">
+        <div class="success-message">${success}</div>
+    </c:if>
+
+    <c:set var="editing" value="${not empty editSpecies}" />
 
     <a id="speciesTable"></a>
     <h2>Supported Species & Maximum Recorded Size</h2>
