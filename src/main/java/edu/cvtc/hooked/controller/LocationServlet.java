@@ -91,10 +91,12 @@ public class LocationServlet extends HttpServlet {
 
                         if (locationName == null || locationName.isBlank()) {
                             req.setAttribute("error", "Location name cannot be empty.");
+                        } else if (!locationName.trim().matches("^[A-Za-z\\-' ]{2,50}$")) {
+                            req.setAttribute("error", "Location name must be 2–50 letters, spaces, dashes, or apostrophes.");
                         } else if (state == null || state.isBlank()) {
                             req.setAttribute("error", "State is required.");
-                        } else if (state.trim().length() != 2) {
-                            req.setAttribute("error", "State must be a 2-letter code (e.g., WI).");
+                        } else if (!state.trim().matches("^[a-zA-Z]{2}$")) {
+                            req.setAttribute("error", "State must be exactly 2 letters (e.g., WI).");
                         } else {
                             String trimmedName  = locationName.trim();
                             String trimmedState = state.trim().toUpperCase();
@@ -126,10 +128,12 @@ public class LocationServlet extends HttpServlet {
 
                     if (locationName == null || locationName.isBlank()) {
                         req.setAttribute("error", "Location name is required.");
+                    } else if (!locationName.trim().matches("^[A-Za-z\\-' ]{2,50}$")) {
+                        req.setAttribute("error", "Location name must be 2–50 letters, spaces, dashes, or apostrophes.");
                     } else if (state == null || state.isBlank()) {
                         req.setAttribute("error", "State is required.");
-                    } else if (state.trim().length() != 2) {
-                        req.setAttribute("error", "State must be a 2-letter code (e.g., WI).");
+                    } else if (!state.trim().matches("^[a-zA-Z]{2}$")) {
+                        req.setAttribute("error", "State must be exactly 2 letters (e.g., WI).");
                     } else {
                         String trimmedName  = locationName.trim();
                         String trimmedState = state.trim().toUpperCase();
