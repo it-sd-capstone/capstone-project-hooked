@@ -117,12 +117,7 @@ public class AddCatchServlet extends HttpServlet {
             return;
         }
 
-        String speciesKey = speciesName.toLowerCase();
-        if (!SpeciesRestrictions.ALL.containsKey(speciesKey)) {
-            req.setAttribute("error", "Invalid species. Please select a valid species.");
-            forwardWithCatches(req, resp, ownerUserId);
-            return;
-        }
+
 
         double length = 0;
         double weight = 0;
