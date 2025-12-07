@@ -12,6 +12,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class UserDaoTest {
 
+    static {
+        System.setProperty("hooked.test.db", "true");
+    }
+
     @BeforeAll
     static void setupDatabase() {
         // Make sure all the tables exist before any of these tests run.

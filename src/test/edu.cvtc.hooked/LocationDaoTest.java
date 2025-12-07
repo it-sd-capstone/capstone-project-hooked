@@ -15,6 +15,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class LocationDaoTest {
 
+    static {
+        System.setProperty("hooked.test.db", "true");
+    }
+
     private static LocationDao locationDao;
 
     @BeforeAll

@@ -14,6 +14,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class BaitDaoTest {
 
+    static {
+        System.setProperty("hooked.test.db", "true");
+    }
+
     @BeforeAll
     static void setupDatabase() throws Exception {
         // Use the test DB location (same convention as SpeciesDaoTest)

@@ -15,6 +15,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class SpeciesDaoTest {
 
+    static {
+        System.setProperty("hooked.test.db", "true");
+    }
+
     @BeforeAll
     static void setupDatabase() throws Exception {
         try (Connection c = DbUtil.getConnection();

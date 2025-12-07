@@ -4,6 +4,7 @@ import edu.cvtc.hooked.dao.CatchDao;
 import edu.cvtc.hooked.model.Catch;
 import edu.cvtc.hooked.model.SpeciesRestrictions;
 import edu.cvtc.hooked.util.DbUtil;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,6 +15,13 @@ public class MainTest {
 
     static {
         System.setProperty("hooked.test.db", "true");
+    }
+
+    @BeforeAll
+    static void setupDatabase() {
+        // Make sure all tables exist so we can insert users and catches.
+        System.setProperty("hooked.test.db", "true");
+        DbUtil.ensureSchema();
     }
 
     @Test

@@ -1,11 +1,24 @@
 package edu.cvtc.hooked;
 
 import edu.cvtc.hooked.model.Bait;
+import edu.cvtc.hooked.util.DbUtil;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BaitTest {
+
+    static {
+        System.setProperty("hooked.test.db", "true");
+    }
+
+    @BeforeAll
+    static void setupDatabase() {
+        // Make sure all tables exist so we can insert users and catches.
+        System.setProperty("hooked.test.db", "true");
+        DbUtil.ensureSchema();
+    }
 
     @Test
     void testFullConstructor() {

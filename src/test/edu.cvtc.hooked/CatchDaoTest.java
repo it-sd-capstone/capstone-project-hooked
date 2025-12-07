@@ -15,6 +15,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CatchDaoTest {
 
+    static {
+        System.setProperty("hooked.test.db", "true");
+    }
+
     @BeforeAll
     static void setupDatabase() {
         // Make sure all tables exist so we can insert users and catches.
