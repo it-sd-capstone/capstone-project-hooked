@@ -1,6 +1,7 @@
-package edu.cvtc.hooked.model;
+package edu.cvtc.hooked;
 
 import org.junit.jupiter.api.Test;
+import edu.cvtc.hooked.model.Location;
 
 import static org.junit.jupiter.api.Assertions.*;
 

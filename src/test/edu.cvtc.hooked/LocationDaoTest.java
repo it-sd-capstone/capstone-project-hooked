@@ -1,5 +1,6 @@
-package edu.cvtc.hooked.dao;
+package edu.cvtc.hooked;
 
+import edu.cvtc.hooked.dao.LocationDao;
 import edu.cvtc.hooked.model.Location;
 import edu.cvtc.hooked.util.DbUtil;
 import org.junit.jupiter.api.*;
@@ -99,5 +100,21 @@ class LocationDaoTest {
 
         Optional<Location> deleted = locationDao.findById(id);
         assertFalse(deleted.isPresent(), "Location should be deleted");
+    }
+
+    @Test
+    @Order(6)
+    void testExists() throws SQLException {
+        // Insert record for exists test
+        Location loc = new Location("Exists Lake", "WI");
+        locationDao.insert(loc);
+
+        // Should return true
+        assertTrue(locationDao.exists("Exists Lake", "WI"),
+                "exists() should return true for an inserted location");
+
+        // Should return false
+        assertFalse(locationDao.exists("NotARealLake", "WI"),
+                "exists() should return false for non-existing location");
     }
 }

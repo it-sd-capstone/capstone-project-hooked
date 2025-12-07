@@ -58,4 +58,23 @@ public class SpeciesTest {
         assertEquals(40.0, s2.getMaxLength());
         assertEquals(20.0, s2.getMaxWeight());
     }
+
+    @Test
+    public void testNameFormatting() {
+        Species s = new Species();
+        s.setSpeciesName("   largeMOUTH    bass   ");
+
+        assertEquals("Largemouth Bass", s.getSpeciesName());
+    }
+
+    @Test
+    public void testParameterizedConstructor() {
+        Species s = new Species("crappie", 15.0, 2.0, 10);
+
+        assertNull(s.getSpeciesId()); // Correct for constructor that doesn't take ID
+        assertEquals("Crappie", s.getSpeciesName());
+        assertEquals(15.0, s.getMaxLength());
+        assertEquals(2.0, s.getMaxWeight());
+        assertEquals(10, s.getCreatedByUserId());
+    }
 }

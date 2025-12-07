@@ -20,9 +20,9 @@ public class BaitTest {
     void testNameNotesConstructor() {
         Bait bait = new Bait("Leech", "Used often in summer");
 
+        assertNull(bait.getId());
         assertEquals("Leech", bait.getName());
         assertEquals("Used often in summer", bait.getNotes());
-        assertEquals(0, bait.getId()); // default int value
     }
 
     @Test
@@ -34,16 +34,15 @@ public class BaitTest {
 
         assertEquals(10, bait.getId());
         assertEquals("Nightcrawler", bait.getName());
-        assertEquals("Classic worm", bait.getNotes());
+        assertEquals("Classic Worm", bait.getNotes());
     }
 
     @Test
-    void testTwoObjectsNotEqualById() {
-        Bait a = new Bait(1, "Test", "A");
-        Bait b = new Bait(2, "Test", "A");
+    void testFormattingHandlesMultipleWords() {
+        Bait bait = new Bait("cut bait", "smells very strong");
 
-        // No custom equals method, so compare manually
-        assertNotEquals(a.getId(), b.getId());
+        assertEquals("Cut Bait", bait.getName());
+        assertEquals("smells very strong", bait.getNotes());
     }
 }
 

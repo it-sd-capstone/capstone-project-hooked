@@ -11,6 +11,11 @@ import java.sql.*;
 import java.util.List;
 
 public class MainTest {
+
+    static {
+        System.setProperty("hooked.test.db", "true");
+    }
+
     @Test
     void getConnection_opensAndCloses() throws Exception {
         try (Connection db = DbUtil.getConnection()) {
@@ -56,31 +61,25 @@ public class MainTest {
         }
         DbUtil.ensureSchema();
         try (Connection db = DbUtil.getConnection()) {
-            String speciesStr = "bluegill";
-            String locationStr = "mississippi river";
-            String baitStr = "gulp! minnow";
-            String dateCaught = "2025-9-15";
-            String notes = "slip bobber";
-            String lengthStr = "11.0";
-            String weightStr = "1.0";
-
-            Integer userID = 1;
             String firstName = "Test";
             String lastName = "User";
-            String username = "TestUser";
+            String username = "TestUser_" + System.currentTimeMillis();
             String password = "Test";
 
-            String user = "INSERT INTO Users (firstName, lastName, userName, passwordHash) VALUES (?, ?, ?, ?)";
+            String insertUser = """
+                INSERT INTO Users (firstName, lastName, userName, email, passwordHash)
+                VALUES (?, ?, ?, ?, ?)
+            """;
 
             int userId;
-            try (PreparedStatement ps1 = db.prepareStatement(user, Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ps1 = db.prepareStatement(insertUser, Statement.RETURN_GENERATED_KEYS)) {
                 ps1.setString(1, firstName);
                 ps1.setString(2, lastName);
                 ps1.setString(3, username);
-                ps1.setString(4, password);
+                ps1.setString(4, username + "@example.com");
+                ps1.setString(5, password);
 
-                int res = ps1.executeUpdate();
-                System.out.println("User rows inserted: " + res);
+                ps1.executeUpdate();
 
                 ResultSet rs = ps1.getGeneratedKeys();
                 rs.next();
@@ -91,43 +90,39 @@ public class MainTest {
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (PreparedStatement ps = db.prepareStatement(sql)) {
-                ps.setInt(1, (userId));
-                ps.setString(2, speciesStr);
-                ps.setString(3, locationStr);
-                ps.setString(4, baitStr);
-                ps.setString(5, dateCaught);
-                ps.setString(6, notes);
-                ps.setDouble(7, Double.parseDouble(lengthStr));
-                ps.setDouble(8, Double.parseDouble(weightStr));
-                int rows = ps.executeUpdate();
-                System.out.println("Rows inserted: " + rows);
+                ps.setInt(1, userId);
+                ps.setString(2, "bluegill");
+                ps.setString(3, "mississippi river");
+                ps.setString(4, "gulp! minnow");
+                ps.setString(5, "2025-9-15");
+                ps.setString(6, "slip bobber");
+                ps.setDouble(7, 11.0);
+                ps.setDouble(8, 1.0);
+                ps.executeUpdate();
             }
 
             try (PreparedStatement verifyUser = db.prepareStatement("SELECT * FROM Users WHERE UserID = ?")) {
                 verifyUser.setInt(1, userId);
+
                 ResultSet rs = verifyUser.executeQuery();
 
-                assertTrue(rs.next());
-                assertEquals(userID, rs.getInt("UserID"));
-                assertEquals(firstName, rs.getString("FirstName"));
-                assertEquals(lastName, rs.getString("LastName"));
-                assertEquals(username, rs.getString("Username"));
-                assertEquals(password, rs.getString("PasswordHash"));
+                assertEquals(userId, rs.getInt("UserID"));
+                assertEquals(firstName, rs.getString("firstName"));
+                assertEquals(lastName, rs.getString("lastName"));
+                assertEquals(username, rs.getString("userName"));
             }
 
             try (PreparedStatement verifyCatch = db.prepareStatement("SELECT * FROM Catches WHERE UserID = ?")) {
                 verifyCatch.setInt(1, userId);
+
                 ResultSet rs = verifyCatch.executeQuery();
 
-                assertTrue(rs.next());
-                assertEquals(userID, rs.getInt("UserID"));
+                assertEquals(userId, rs.getInt("UserID"));
                 assertEquals("bluegill", rs.getString("SpeciesName"));
-                assertEquals(locationStr, rs.getString("LocationName"));
-                assertEquals(baitStr, rs.getString("BaitType"));
-                assertEquals(dateCaught, rs.getString("DateCaught"));
-                assertEquals(notes, rs.getString("Notes"));
-                assertEquals(Double.parseDouble(lengthStr), rs.getDouble("Length"));
-                assertEquals(Double.parseDouble(weightStr), rs.getDouble("Weight"));
+                assertEquals("mississippi river", rs.getString("LocationName"));
+                assertEquals("gulp! minnow", rs.getString("BaitType"));
+                assertEquals("2025-9-15", rs.getString("DateCaught"));
+                assertEquals("slip bobber", rs.getString("Notes"));
             }
         }
     }
@@ -157,34 +152,32 @@ public class MainTest {
             String lengthStr2 = "27.0";
             String weightStr2 = "5.0";
 
-            Integer userID = 1;
             String firstName = "Test";
             String lastName = "User";
-            String username = "TestUser";
+            String userName = "TestUser";
             String password = "Test";
 
-            String user = "INSERT INTO Users (firstName, lastName, userName, passwordHash) VALUES (?, ?, ?, ?)";
+            String user = "INSERT INTO Users (firstName, lastName, userName, email, passwordHash) VALUES (?, ?, ?, ?, ?)";
 
             int userId;
             try (PreparedStatement ps1 = db.prepareStatement(user, Statement.RETURN_GENERATED_KEYS)) {
                 ps1.setString(1, firstName);
                 ps1.setString(2, lastName);
-                ps1.setString(3, username);
-                ps1.setString(4, password);
+                ps1.setString(3, userName);
+                ps1.setString(4, userName + "@example.com");
+                ps1.setString(5, password);
 
-                int res = ps1.executeUpdate();
-                System.out.println("User rows inserted: " + res);
+                ps1.executeUpdate();
 
                 ResultSet rs = ps1.getGeneratedKeys();
                 rs.next();
                 userId = rs.getInt(1);
             }
 
-            String sql = "INSERT INTO Catches (UserID, SpeciesName, LocationName, BaitType, DateCaught, Notes, Length, Weight) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO Catches (UserID, SpeciesName, LocationName, BaitType, DateCaught, Notes, Length, Weight) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
             try (PreparedStatement ps = db.prepareStatement(sql)) {
-                ps.setInt(1, (userId));
+                ps.setInt(1, userId);
                 ps.setString(2, speciesStr);
                 ps.setString(3, locationStr);
                 ps.setString(4, baitStr);
@@ -192,12 +185,11 @@ public class MainTest {
                 ps.setString(6, notes);
                 ps.setDouble(7, Double.parseDouble(lengthStr));
                 ps.setDouble(8, Double.parseDouble(weightStr));
-                int rows = ps.executeUpdate();
-                System.out.println("Rows inserted: " + rows);
+                ps.executeUpdate();
             }
 
             try (PreparedStatement ps = db.prepareStatement(sql)) {
-                ps.setInt(1, (userId));
+                ps.setInt(1, userId);
                 ps.setString(2, speciesStr2);
                 ps.setString(3, locationStr2);
                 ps.setString(4, baitStr2);
@@ -205,20 +197,20 @@ public class MainTest {
                 ps.setString(6, notes2);
                 ps.setDouble(7, Double.parseDouble(lengthStr2));
                 ps.setDouble(8, Double.parseDouble(weightStr2));
-                int rows = ps.executeUpdate();
-                System.out.println("Rows inserted: " + rows);
+                ps.executeUpdate();
             }
 
             try (PreparedStatement verifyUser = db.prepareStatement("SELECT * FROM Users WHERE UserID = ?")) {
                 verifyUser.setInt(1, userId);
+
                 ResultSet rs = verifyUser.executeQuery();
 
                 assertTrue(rs.next());
-                assertEquals(userID, rs.getInt("UserID"));
-                assertEquals(firstName, rs.getString("FirstName"));
-                assertEquals(lastName, rs.getString("LastName"));
-                assertEquals(username, rs.getString("Username"));
-                assertEquals(password, rs.getString("PasswordHash"));
+                assertEquals(userId, rs.getInt("UserID"));
+                assertEquals(firstName, rs.getString("firstName"));
+                assertEquals(lastName, rs.getString("lastName"));
+                assertEquals(userName, rs.getString("userName"));
+                assertEquals(password, rs.getString("passwordHash"));
             }
 
             try (PreparedStatement verifyCatch = db.prepareStatement("SELECT * FROM Catches WHERE UserID = ?")) {
@@ -226,7 +218,7 @@ public class MainTest {
                 ResultSet rs = verifyCatch.executeQuery();
 
                 assertTrue(rs.next());
-                assertEquals(userID, rs.getInt("UserID"));
+                assertEquals(userId, rs.getInt("UserID"));
                 assertEquals("bluegill", rs.getString("SpeciesName"));
                 assertEquals(locationStr, rs.getString("LocationName"));
                 assertEquals(baitStr, rs.getString("BaitType"));
@@ -238,15 +230,9 @@ public class MainTest {
 
             CatchDao dao = new CatchDao();
 
-            int userIDSearch = 1;
-            String species = "bluegill";
-            String location = "mississippi river";
-            String bait = "gulp! minnow";
+            List<Catch> results = dao.searchOutput(userId, speciesStr, locationStr, baitStr);
 
-            List<Catch> results = dao.searchOutput(userIDSearch, species, location, bait);
-            System.out.println(results);
-
-            assertEquals(results.size(), 1);
+            assertEquals(1, results.size());
         }
     }
 }

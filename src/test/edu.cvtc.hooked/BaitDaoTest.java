@@ -29,32 +29,48 @@ class BaitDaoTest {
         DbUtil.ensureSchema();
     }
 
+    private String formatted(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        String[] words = input.trim().toLowerCase().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+
+        for (String w : words) {
+            sb.append(Character.toUpperCase(w.charAt(0)))
+                    .append(w.substring(1))
+                    .append(" ");
+        }
+
+        return sb.toString().trim();
+    }
+
     @Test
     void insertAndExists_roundTrip() throws Exception {
         BaitDao dao = new BaitDao();
 
-        String uniqueName = "JUnitBait_" + System.currentTimeMillis();
+        String rawName = "JUnitBait_" + System.currentTimeMillis();
+        String expectedName = formatted(rawName);
 
         Bait b = new Bait();
-        b.setName(uniqueName);
+        b.setName(rawName);
         b.setNotes("Test bait notes");
 
         dao.insert(b);
 
         assertNotNull(b.getId(), "After insert, BaitID should be set");
 
-        boolean exists = dao.exists(uniqueName);
-        assertTrue(exists, "exists(uniqueName) should return true after insert");
+        assertTrue(dao.exists(expectedName));
     }
 
     @Test
     void findAll_containsInsertedBaitWithFields() throws Exception {
         BaitDao dao = new BaitDao();
 
-        String uniqueName = "JUnitBaitFindAll_" + System.currentTimeMillis();
+        String rawName = "JUnitBaitFindAll_" + System.currentTimeMillis();
+        String expectedName = formatted(rawName);
 
         Bait b = new Bait();
-        b.setName(uniqueName);
+        b.setName(rawName);
         b.setNotes("Special notes for findAll test");
 
         dao.insert(b);
@@ -62,22 +78,22 @@ class BaitDaoTest {
         List<Bait> all = dao.findAll();
 
         Bait found = all.stream()
-                .filter(bt -> uniqueName.equals(bt.getName()))
+                .filter(bt -> expectedName.equals(bt.getName()))
                 .findFirst()
                 .orElseThrow(() ->
                         new AssertionError("findAll should include the bait we just inserted"));
 
-        assertEquals(uniqueName, found.getName());
-        assertEquals("Special notes for findAll test", found.getNotes());
+        assertEquals(expectedName, found.getName());
+        assertEquals(formatted("Special notes for findAll test"), found.getNotes());
     }
 
     @Test
     void exists_returnsFalseForUnknownBait() throws Exception {
         BaitDao dao = new BaitDao();
 
-        String missingName = "DoesNotExistBait_" + System.currentTimeMillis();
+        String rawMissing = "DoesNotExistBait_" + System.currentTimeMillis();
+        String expectedMissing = formatted(rawMissing);
 
-        assertFalse(dao.exists(missingName),
-                "exists() should be false for a bait that is not in the DB");
+        assertFalse(dao.exists(expectedMissing));
     }
 }
