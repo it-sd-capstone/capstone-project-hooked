@@ -43,3 +43,10 @@ These tests verify that the database connection and basic query functionality wo
 3) Use next version label (Hooked-0.0.x) > click deploy
 # Website URL
 http://Hooked-App.eba-psp7th8j.us-east-1.elasticbeanstalk.com
+
+# Admin Login Information
+Description: Logging in as admin gives edit/delete permissions for Species, Location & Bait database along
+with overall added catch table database. Individual user can edit/delete their own entries only.
+Admin Login Details:
+Username: admin
+Password: admin
