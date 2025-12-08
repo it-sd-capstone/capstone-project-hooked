@@ -13,24 +13,6 @@
 </head>
 <body>
 <div class="container">
-    <script>
-        window.onload = function () {
-            const passwordShow = document.getElementById("passwordView")
-            const passwordViewButton = document.getElementById("passwordViewButton")
-
-            passwordViewButton.addEventListener('mousedown', () => {
-                passwordShow.type = 'text';
-            });
-
-            passwordViewButton.addEventListener('mouseup', () => {
-                passwordShow.type = 'password';
-            });
-
-            passwordViewButton.addEventListener('mouseleave', () => {
-                passwordShow.type = 'password';
-            })
-        }
-    </script>
 
     <div class="header">
         <h1>Reset Password</h1>
@@ -46,16 +28,49 @@
         <input type="submit" value="Send Reset Link">
     </form>
     <% } else { %>
+    <h3>Your password must be 6-100 characters long, and contain no spaces.</h3>
     <form action="<%= request.getContextPath() %>/resetPassword" method="post">
         <input type="hidden" name="hash" value="<%= hash %>">
-        <input type="password" id="passwordView" name="newPassword" placeholder="Enter new password" required>
+        <input type="password" id="passwordView" name="newPassword" minlength="6" maxlength="100" placeholder="Enter new password" required>
         <input type="button" id="passwordViewButton" value="View Password" style="width: 120px; margin: 0 auto; text-align: center;">
-        <input type="password" name="newPasswordConfirmed" placeholder="Confirm new password" required>
-        <input type="submit" value="Reset Password">
+        <input type="password" name="newPasswordConfirmed" id="newPasswordConfirmed" minlength="6" maxlength="100" placeholder="Confirm new password" required>
+        <small id="passwordError" style="display: none; color: #fecaca; margin-top: 5px;"></small>
+        <input type="submit"  value="Reset Password">
     </form>
+
     <% } %>
 
     <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>
+<script>
+    const passwordShow = document.getElementById("passwordView");
+    const newPasswordConfirmed = document.getElementById("newPasswordConfirmed");
+    const passwordViewButton = document.getElementById("passwordViewButton");
+
+    passwordViewButton.addEventListener('mousedown', () => {
+        passwordShow.type = 'text';
+    });
+
+    passwordViewButton.addEventListener('mouseup', () => {
+        passwordShow.type = 'password';
+    });
+
+    passwordViewButton.addEventListener('mouseleave', () => {
+        passwordShow.type = 'password';
+    });
+
+    newPasswordConfirmed.addEventListener('input', function() {
+        const password = passwordShow.value;
+        const confirmPassword = newPasswordConfirmed.value;
+        const errorElement = document.getElementById('passwordError');
+
+        if (confirmPassword && password !== confirmPassword) {
+            errorElement.textContent = 'Passwords do not match!';
+            errorElement.style.display = 'block';
+        } else {
+            errorElement.style.display = 'none';
+        }
+        });
+</script>
 </body>
 </html>

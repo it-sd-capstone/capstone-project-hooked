@@ -27,18 +27,28 @@ public class PasswordReset extends HttpServlet {
 
         String email = request.getParameter("email");
         String hash = request.getParameter("hash");
-        String newPassword = request.getParameter("newPassword");
         String message = "";
-        String newPasswordConfirmed = request.getParameter("newPasswordConfirmed");
-
 
         try (Connection c = DbUtil.getConnection()) {
 
             if (hash != null && !hash.isEmpty()) {
-                if (newPassword == null || newPassword.trim().isEmpty() ||
-                        newPasswordConfirmed == null || newPasswordConfirmed.trim().isEmpty()
-                      || !newPassword.equals(newPasswordConfirmed)) {
-                    message = "Passwords do not match";
+                String newPassword = request.getParameter("newPassword");
+                String newPasswordConfirmed = request.getParameter("newPasswordConfirmed");
+
+                if (newPassword != null) {
+                    newPassword = newPassword.trim();
+                }
+
+                if (newPasswordConfirmed != null) {
+                    newPasswordConfirmed = newPasswordConfirmed.trim();
+                }
+
+                if (newPassword == null || newPasswordConfirmed == null
+                        || newPassword.isBlank() || newPasswordConfirmed.isBlank()
+                        || newPassword.length() < 6 || newPasswordConfirmed.length() < 6
+                        || newPassword.length() > 100 || newPasswordConfirmed.length() > 100
+                        || !newPassword.equals(newPasswordConfirmed)) {
+                    message = "The password was invalid, ensure you followed all criteria, and try again.";
                 } else {
 
                     PreparedStatement ps = c.prepareStatement(
@@ -55,10 +65,7 @@ public class PasswordReset extends HttpServlet {
                         // Sets timer for 15 minutes before link goes invalid
                         if (resetTime.toLocalDateTime().isBefore(LocalDateTime.now().minusMinutes(15))) {
                             message = "Reset link expired.";
-                        } else if (newPassword.length() < 6 || newPasswordConfirmed.length() < 6) {
-                            message = "Your password is too short";
                         } else {
-
                             PreparedStatement ps2 = c.prepareStatement(
                                     "UPDATE Users SET passwordHash = ?, resetHash = NULL, resetTime = NULL WHERE resetHash = ?");
                             ps2.setString(1, newPassword);
@@ -69,9 +76,7 @@ public class PasswordReset extends HttpServlet {
                         }
                     }
                 }
-            }
-
-            else if (email != null) {
+            } else if (email != null) {
 
                 PreparedStatement ps = c.prepareStatement(
                         "SELECT UserID FROM Users WHERE email = ?");
@@ -100,7 +105,9 @@ public class PasswordReset extends HttpServlet {
                             "Click here to reset your password:\n" + resetLink +
                                     "\nIf you did not request to change your password, ignore this email.");
 
-                    message = "A reset link has been sent to your email. You will have 15 minutes to complete the change.";
+                    message = "A reset link has been sent to your email." +
+                            " You will have 15 minutes to complete the change." +
+                            " Each reset is only valid for one attempt.";
 
                 } else {
                     message = "Email not found.";

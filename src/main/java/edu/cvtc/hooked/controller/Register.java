@@ -2,6 +2,7 @@ package edu.cvtc.hooked.controller;
 
 import edu.cvtc.hooked.dao.UserDao;
 import edu.cvtc.hooked.model.User;
+import edu.cvtc.hooked.util.EmailUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -60,6 +61,15 @@ public class Register extends HttpServlet {
             // success message after creating account
             HttpSession session = request.getSession();
             session.setAttribute("SuccessMessage", "Account created successfully! Please log in with your credentials.");
+            EmailUtil.sendEmail(email, "Welcome to Hooked!",
+                    "Hello, and welcome to Hooked!\n\n" +
+                            "Your Hooked account has been created successfully! " +
+                            "You can now log in and start logging catches.\n" +
+                            "If you did not create this account," +
+                            " please reply to this email, " +
+                            "and we will help secure your account."
+            );
+
             response.sendRedirect(request.getContextPath() + "/Login");
 
         } catch (SQLException e) {
