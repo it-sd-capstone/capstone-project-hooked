@@ -15,6 +15,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class CatchDaoTest {
 
+    static {
+        System.setProperty("hooked.test.db", "true");
+    }
+
     @BeforeAll
     static void setupDatabase() {
         // Make sure all tables exist so we can insert users and catches.
@@ -146,6 +150,112 @@ public class CatchDaoTest {
 
         assertTrue(results.isEmpty(), "Fake species should not return results.");
     }
+
+    @Test
+    public void update_changesFields() throws Exception {
+        int userId = createTestUser();
+        CatchDao dao = new CatchDao();
+
+        Catch c = new Catch(userId, "Bass", "Shore", "Worm", "2024-01-01", "test", 10.0, 1.2);
+        dao.insert(c);
+
+        c.setSpeciesName("UpdatedBass");
+        c.setLength(55.5);
+        dao.update(c);
+
+        Catch updated = dao.findById(c.getCatchId()).get();
+        assertEquals("UpdatedBass", updated.getSpeciesName());
+        assertEquals(55.5, updated.getLength());
+    }
+
+    @Test
+    public void deleteForUser_removesCatch() throws Exception {
+        int userId = createTestUser();
+        CatchDao dao = new CatchDao();
+
+        Catch c = new Catch(userId, "Walleye", "Bay", "Minnow",
+                "2024-05-05", "note", 19, 3);
+        dao.insert(c);
+
+        dao.deleteForUser(c.getCatchId(), userId);
+
+        assertTrue(dao.findById(c.getCatchId()).isEmpty());
+    }
+
+    @Test
+    public void deleteById_adminDeletesCatch() throws Exception {
+        int userId = createTestUser();
+        CatchDao dao = new CatchDao();
+
+        Catch c = new Catch(userId, "Carp", "Slough", "Corn",
+                "2024-06-10", "muddy", 25, 8);
+        dao.insert(c);
+
+        dao.deleteById(c.getCatchId());
+        assertTrue(dao.findById(c.getCatchId()).isEmpty());
+    }
+
+    @Test
+    public void deleteAll_removesEverything() throws Exception {
+        int userId = createTestUser();
+        CatchDao dao = new CatchDao();
+
+        dao.insert(new Catch(userId, "A", "L1", "B1", "2024", "", 1, 1));
+        dao.insert(new Catch(userId, "B", "L2", "B2", "2024", "", 2, 2));
+
+        dao.deleteAll();
+
+        assertTrue(dao.findAll().isEmpty());
+    }
+
+    @Test
+    public void updateAsAdmin_canChangeOwner() throws Exception {
+        int user1 = createTestUser();
+        int user2 = createTestUser();
+
+        CatchDao dao = new CatchDao();
+
+        Catch c = new Catch(user1, "Crappie", "Pond", "Jig",
+                "2024-02-02", "", 9, 0.6);
+
+        dao.insert(c);
+
+        c.setUserId(user2); // Admin takes ownership
+        c.setSpeciesName("AdminUpdated");
+        dao.updateAsAdmin(c);
+
+        Catch found = dao.findById(c.getCatchId()).get();
+        assertEquals("AdminUpdated", found.getSpeciesName());
+        assertEquals(user2, found.getUserId());
+    }
+
+    @Test
+    public void findAll_returnsMultipleCatches() throws Exception {
+        int userId = createTestUser();
+        CatchDao dao = new CatchDao();
+
+        dao.insert(new Catch(userId, "Bluegill", "Dock1", "Bobber", "2024", "", 5, 0.2));
+        dao.insert(new Catch(userId, "Perch", "Dock2", "Jig", "2024", "", 8, 0.4));
+
+        List<Catch> list = dao.findAll();
+        assertTrue(list.size() >= 2);
+    }
+
+    @Test
+    public void searchOutput_multiSpeciesFuzzy() throws Exception {
+        int userId = createTestUser();
+        CatchDao dao = new CatchDao();
+
+        dao.insert(new Catch(userId, "Lake Trout", "Deep", "Spoon", "2024", "", 30, 10));
+        dao.insert(new Catch(userId, "Brown Trout", "Shallow", "Fly", "2024", "", 18, 3));
+
+        List<String> speciesTerms = List.of("trout");
+
+        List<Catch> results = dao.searchOutput(userId, speciesTerms, null, null);
+
+        assertTrue(results.size() >= 2);
+    }
+
 }
 
 

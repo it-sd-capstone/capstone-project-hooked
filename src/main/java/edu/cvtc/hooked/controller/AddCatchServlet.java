@@ -1,7 +1,9 @@
 package edu.cvtc.hooked.controller;
 
+import edu.cvtc.hooked.dao.BaitDao;
 import edu.cvtc.hooked.dao.CatchDao;
 import edu.cvtc.hooked.dao.SpeciesDao;
+import edu.cvtc.hooked.dao.LocationDao;   // <-- NEW
 import edu.cvtc.hooked.model.Catch;
 import edu.cvtc.hooked.model.SpeciesRestrictions;
 
@@ -13,8 +15,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @WebServlet("/addCatch")
@@ -71,6 +71,8 @@ public class AddCatchServlet extends HttpServlet {
         }
 
         addSpeciesList(req);
+        addBaitList(req);
+        addLocationList(req);  // <-- NEW
         req.getRequestDispatcher("/WEB-INF/views/addCatch.jsp").forward(req, resp);
     }
 
@@ -102,7 +104,7 @@ public class AddCatchServlet extends HttpServlet {
         boolean isUpdate      = catchIdStr != null && !catchIdStr.isBlank();
 
         String speciesName      = req.getParameter("speciesName"); // from dropdown
-        String locationName     = req.getParameter("locationName");
+        String locationName     = req.getParameter("locationName"); // from dropdown now
         String baitType         = req.getParameter("baitType");
         String dateCaught       = req.getParameter("dateCaught");
         String notes            = req.getParameter("notes");
@@ -115,12 +117,7 @@ public class AddCatchServlet extends HttpServlet {
             return;
         }
 
-        String speciesKey = speciesName.toLowerCase();
-        if (!edu.cvtc.hooked.model.SpeciesRestrictions.ALL.containsKey(speciesKey)) {
-            req.setAttribute("error", "Invalid species. Please select a valid species.");
-            forwardWithCatches(req, resp, ownerUserId);
-            return;
-        }
+
 
         double length = 0;
         double weight = 0;
@@ -134,6 +131,34 @@ public class AddCatchServlet extends HttpServlet {
             }
         } catch (NumberFormatException e) {
             req.setAttribute("error", "Length and weight must be numeric.");
+            forwardWithCatches(req, resp, ownerUserId);
+            return;
+        }
+
+        // Lookup species in DB and enforce size limits
+        SpeciesDao speciesDao = new SpeciesDao();
+        try {
+            var optSpecies = speciesDao.findByName(speciesName);
+            if (optSpecies.isEmpty()) {
+                req.setAttribute("error", "Invalid species. Please select a valid species.");
+                forwardWithCatches(req, resp, ownerUserId);
+                return;
+            }
+
+            var sp = optSpecies.get();
+            if (length <= 0 || weight <= 0 ||
+                    length > sp.getMaxLength() ||
+                    weight > sp.getMaxWeight()) {
+
+                req.setAttribute("error", "Length/weight exceed allowed max for " + sp.getSpeciesName() +
+                        " (Max length: " + sp.getMaxLength() +
+                        ", Max weight: " + sp.getMaxWeight() + ").");
+                forwardWithCatches(req, resp, ownerUserId);
+                return;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            req.setAttribute("error", "Could not validate species limits. Please try again.");
             forwardWithCatches(req, resp, ownerUserId);
             return;
         }
@@ -184,12 +209,40 @@ public class AddCatchServlet extends HttpServlet {
             }
         }
         addSpeciesList(req);
+        addBaitList(req);
+        addLocationList(req);  // <-- NEW, so dropdown still works on validation error
         req.getRequestDispatcher("/WEB-INF/views/addCatch.jsp").forward(req, resp);
     }
 
     private void addSpeciesList(HttpServletRequest req) {
-        List<String> species = new ArrayList<>(SpeciesRestrictions.ALL.keySet());
-        Collections.sort(species);
-        req.setAttribute("speciesList", species);
+        try {
+            SpeciesDao dao = new SpeciesDao();
+            req.setAttribute("speciesList", dao.findAll());
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("speciesList", java.util.Collections.emptyList());
+        }
+    }
+
+    private void addBaitList(HttpServletRequest req) {
+        try {
+            BaitDao dao = new BaitDao();
+            req.setAttribute("baitList", dao.findAll());
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("baitList", java.util.Collections.emptyList());
+        }
+    }
+
+    // --- NEW: location list for dropdown ---
+    private void addLocationList(HttpServletRequest req) {
+        try {
+            LocationDao dao = new LocationDao();
+            // sorted by name ascending; or dao.findAll() if you prefer
+            req.setAttribute("locationList", dao.findAllSorted("locationName", "asc"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("locationList", java.util.Collections.emptyList());
+        }
     }
 }

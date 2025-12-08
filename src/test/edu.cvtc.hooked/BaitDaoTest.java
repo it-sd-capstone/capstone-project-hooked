@@ -12,60 +12,92 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class BaitDaoTest {
+class BaitDaoTest {
+
+    static {
+        System.setProperty("hooked.test.db", "true");
+    }
 
     @BeforeAll
-    static void setup() throws Exception {
+    static void setupDatabase() throws Exception {
+        // Use the test DB location (same convention as SpeciesDaoTest)
         System.setProperty("hooked.test.db", "true");
-        DbUtil.ensureSchema();
 
-        try (Connection conn = DbUtil.getConnection();
-             Statement st = conn.createStatement()) {
-            st.executeUpdate("DELETE FROM Bait");
+        // Clean the Bait table so tests are predictable
+        try (Connection c = DbUtil.getConnection();
+             Statement stmt = c.createStatement()) {
+            stmt.executeUpdate("DROP TABLE IF EXISTS Bait");
         }
+
+        // Recreate schema including Bait table
+        DbUtil.ensureSchema();
+    }
+
+    private String formatted(String input) {
+        if (input == null || input.isEmpty()) return input;
+
+        String[] words = input.trim().toLowerCase().split("\\s+");
+        StringBuilder sb = new StringBuilder();
+
+        for (String w : words) {
+            sb.append(Character.toUpperCase(w.charAt(0)))
+                    .append(w.substring(1))
+                    .append(" ");
+        }
+
+        return sb.toString().trim();
     }
 
     @Test
-    void testInsertAndFindById() {
+    void insertAndExists_roundTrip() throws Exception {
         BaitDao dao = new BaitDao();
 
-        Bait b = new Bait("Nightcrawler", "Common worm bait");
-        dao.insert(b);  // ID assigned by DB
+        String rawName = "JUnitBait_" + System.currentTimeMillis();
+        String expectedName = formatted(rawName);
 
-        // Find the inserted record by name since ID is not assigned back onto the object
-        List<Bait> list = dao.searchByTerm("Nightcrawler");
+        Bait b = new Bait();
+        b.setName(rawName);
+        b.setNotes("Test bait notes");
 
-        assertTrue(list.size() >= 1);
-        Bait fromDb = list.get(0);
+        dao.insert(b);
 
-        assertEquals("Nightcrawler", fromDb.getName());
-        assertEquals("Common worm bait", fromDb.getNotes());
+        assertNotNull(b.getId(), "After insert, BaitID should be set");
+
+        assertTrue(dao.exists(expectedName));
     }
 
     @Test
-    void testFindAllReturnsInsertedRows() {
+    void findAll_containsInsertedBaitWithFields() throws Exception {
         BaitDao dao = new BaitDao();
 
-        dao.insert(new Bait("Minnow", "Live bait"));
-        dao.insert(new Bait("Crankbait", "Hard lure"));
+        String rawName = "JUnitBaitFindAll_" + System.currentTimeMillis();
+        String expectedName = formatted(rawName);
 
-        List<Bait> list = dao.findAll();
+        Bait b = new Bait();
+        b.setName(rawName);
+        b.setNotes("Special notes for findAll test");
 
-        assertTrue(list.size() >= 2);
-        assertTrue(list.stream().anyMatch(b -> b.getName().equals("Minnow")));
-        assertTrue(list.stream().anyMatch(b -> b.getName().equals("Crankbait")));
+        dao.insert(b);
+
+        List<Bait> all = dao.findAll();
+
+        Bait found = all.stream()
+                .filter(bt -> expectedName.equals(bt.getName()))
+                .findFirst()
+                .orElseThrow(() ->
+                        new AssertionError("findAll should include the bait we just inserted"));
+
+        assertEquals(expectedName, found.getName());
+        assertEquals(formatted("Special notes for findAll test"), found.getNotes());
     }
 
     @Test
-    void testSearchByTerm() {
+    void exists_returnsFalseForUnknownBait() throws Exception {
         BaitDao dao = new BaitDao();
 
-        dao.insert(new Bait("Spinnerbait", "Flash lure"));
-        dao.insert(new Bait("Jig", "Good for bass"));
+        String rawMissing = "DoesNotExistBait_" + System.currentTimeMillis();
+        String expectedMissing = formatted(rawMissing);
 
-        List<Bait> results = dao.searchByTerm("bass");
-
-        assertTrue(results.size() >= 1);
-        assertTrue(results.stream().anyMatch(b -> b.getName().equals("Jig")));
+        assertFalse(dao.exists(expectedMissing));
     }
 }

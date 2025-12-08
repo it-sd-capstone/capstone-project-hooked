@@ -3,53 +3,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Hooked - Bait</title>
+  <title>Hooked - Locations</title>
   <%@include file="/WEB-INF/includes/header.jsp"%>
 </head>
 <body>
 <div class="container">
 
   <div class="header">
-    <h1>Bait</h1>
+    <h1>Locations</h1>
   </div>
 
   <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
-  <img src="<c:url value='/assets/img/temporaryBait.jpg' />"
-       alt="tackle box"
-       class="page-image"><br><br>
+  <a id="locationFormOne"></a>
 
-  <a id="baitForm"></a>
-
-  <!-- Add / Update form (same pattern as species) -->
-  <form action="${pageContext.request.contextPath}/bait" method="post">
+  <!-- Add / Update form -->
+  <form action="${pageContext.request.contextPath}/location" method="post">
     <c:choose>
-      <c:when test="${not empty baitToEdit}">
+      <c:when test="${not empty locationToEdit}">
         <input type="hidden" name="action" value="update" />
-        <input type="hidden" name="baitId" value="${baitToEdit.id}" />
+        <input type="hidden" name="locationId" value="${locationToEdit.locationId}" />
       </c:when>
       <c:otherwise>
         <input type="hidden" name="action" value="create" />
       </c:otherwise>
     </c:choose>
 
-    <label for="name">Bait:</label>
+    <label for="locationName">Location:</label>
     <input type="text"
-           id="name"
-           name="name"
-           value="${not empty baitToEdit ? baitToEdit.name : ''}"
-           placeholder="ex. Nightcrawler"
+           id="locationName"
+           name="locationName"
+           value="${not empty locationToEdit ? locationToEdit.locationName : ''}"
+           placeholder="ex. Chippewa River"
            required />
 
-    <label for="notes">Notes:</label>
+    <label for="state">State (2-letter):</label>
     <input type="text"
-           id="notes"
-           name="notes"
-           value="${not empty baitToEdit ? baitToEdit.notes : ''}"
-           placeholder="ex. Live Bait"/>
+           id="state"
+           name="state"
+           maxlength="2"
+           value="${not empty locationToEdit ? locationToEdit.state : ''}"
+           placeholder="ex. WI"
+           required />
 
     <input type="submit"
-           value="${not empty baitToEdit ? 'Update Bait' : 'Add Bait'}" />
+           value="${not empty locationToEdit ? 'Update Location' : 'Add Location'}" />
   </form>
 
   <br/>
@@ -61,22 +59,22 @@
     <div class="success-message">${success}</div>
   </c:if>
 
-  <a id="baitTable"></a>
-  <h2>Bait List</h2>
+  <a id="locationTable"></a>
+  <h2>Location List</h2>
 
   <table>
     <thead>
     <tr>
       <th>
-        <a href="${pageContext.request.contextPath}/bait?sort=${sortOrder == 'asc' ? 'desc' : 'asc'}#baitTable">
-          Bait Name
+        <a href="${pageContext.request.contextPath}/location?sort=${sortOrder == 'asc' ? 'desc' : 'asc'}#locationTable">
+          Location Name
           <c:choose>
             <c:when test="${sortOrder == 'asc'}">▲</c:when>
             <c:otherwise>▼</c:otherwise>
           </c:choose>
         </a>
       </th>
-      <th>Notes</th>
+      <th>State</th>
       <th>Added By</th>
       <c:if test="${sessionScope.isAdmin}">
         <th>Actions</th>
@@ -84,14 +82,14 @@
     </tr>
     </thead>
     <tbody>
-    <c:forEach var="b" items="${baitList}">
+    <c:forEach var="loc" items="${locationList}">
       <tr>
-        <td>${b.name}</td>
-        <td>${b.notes}</td>
+        <td>${loc.locationName}</td>
+        <td>${loc.state}</td>
         <td>
           <c:choose>
-            <c:when test="${not empty b.createdByUserId}">
-              User ID ${b.createdByUserId}
+            <c:when test="${not empty loc.createdByUserId}">
+              User ID ${loc.createdByUserId}
             </c:when>
             <c:otherwise>(preloaded)</c:otherwise>
           </c:choose>
@@ -99,19 +97,19 @@
 
         <c:if test="${sessionScope.isAdmin}">
           <td>
-            <!-- Edit: reloads page with baitToEdit -->
-            <a href="${pageContext.request.contextPath}/bait?editId=${b.id}#baitForm">
+            <!-- Edit: reload page with locationToEdit -->
+            <a href="${pageContext.request.contextPath}/location?editId=${loc.locationId}#locationForm">
               Edit
             </a>
             |
             <!-- Delete: POST with action=delete -->
-            <form action="${pageContext.request.contextPath}/bait#baitTable"
+            <form action="${pageContext.request.contextPath}/location#locationTable"
                   method="post"
                   style="display:inline">
               <input type="hidden" name="action" value="delete" />
-              <input type="hidden" name="baitId" value="${b.id}" />
+              <input type="hidden" name="locationId" value="${loc.locationId}" />
               <button type="submit"
-                      onclick="return confirm('Are you sure you want to delete this bait?');">
+                      onclick="return confirm('Are you sure you want to delete this location?');">
                 Delete
               </button>
             </form>

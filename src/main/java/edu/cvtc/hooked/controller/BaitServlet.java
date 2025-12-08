@@ -4,12 +4,12 @@ import edu.cvtc.hooked.dao.BaitDao;
 import edu.cvtc.hooked.model.Bait;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet(name = "BaitServlet", urlPatterns = "/bait")
 public class BaitServlet extends HttpServlet {
@@ -20,39 +20,136 @@ public class BaitServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String searchTerm = req.getParameter("searchTerm");
-        List<Bait> baits;
-
-        if (searchTerm != null && !searchTerm.isBlank()) {
-            baits = baitDao.searchByTerm(searchTerm.trim());
-            req.setAttribute("searchActive", true);
-        } else {
-            baits = baitDao.findAll();
-            req.setAttribute("searchActive", false);
+        // Existing editId logic stays the same:
+        String editIdParam = req.getParameter("editId");
+        if (editIdParam != null && !editIdParam.isBlank()) {
+            try {
+                int editId = Integer.parseInt(editIdParam);
+                baitDao.findById(editId).ifPresent(b -> req.setAttribute("baitToEdit", b));
+            } catch (Exception e) {
+                e.printStackTrace();
+                req.setAttribute("error", "Unable to load bait for editing.");
+            }
         }
 
-        req.setAttribute("baits", baits);
+        // NEW: simple ASC / DESC toggle based on ?sort=asc|desc
+        String sortParam = req.getParameter("sort");      // "asc" or "desc"
+        String sortDir   = "desc".equalsIgnoreCase(sortParam) ? "desc" : "asc";  // default asc
 
-        req.getRequestDispatcher("/WEB-INF/views/bait.jsp")
-                .forward(req, resp);
+        try {
+            // Use your existing sorted method
+            List<Bait> all = baitDao.findAllSorted("name", sortDir);
+            req.setAttribute("baitList", all);
+            req.setAttribute("sortOrder", sortDir);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            req.setAttribute("error", "Unable to load bait list.");
+        }
+
+        req.getRequestDispatcher("/WEB-INF/views/bait.jsp").forward(req, resp);
     }
-
-
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Handle "Add Bait" form submission
-        String name = req.getParameter("addBait");
-        String notes = req.getParameter("notes");
+        HttpSession session = req.getSession(false);
+        Integer userId  = (session != null) ? (Integer) session.getAttribute("userId") : null;
+        Boolean isAdmin = (session != null) ? (Boolean) session.getAttribute("isAdmin") : null;
 
-        if (name != null && !name.isBlank()) {
-            Bait bait = new Bait(name.trim(), notes);
-            baitDao.insert(bait);
+        if (userId == null) {
+            resp.sendRedirect(req.getContextPath() + "/Login");
+            return;
+        }
+        if (isAdmin == null) {
+            isAdmin = Boolean.FALSE;
         }
 
-        // Post/Redirect/Get pattern to avoid resubmission
-        resp.sendRedirect(req.getContextPath() + "/bait");
+        String action = req.getParameter("action"); // "create", "update", "delete"
+        if (action == null || action.isBlank()) {
+            action = "create";
+        }
+
+        try {
+            switch (action) {
+                case "delete" -> {
+                    if (!isAdmin) {
+                        req.setAttribute("error", "You are not authorized to delete baits.");
+                    } else {
+                        int baitId = Integer.parseInt(req.getParameter("baitId"));
+                        baitDao.deleteById(baitId);
+                        req.setAttribute("success", "Bait deleted successfully.");
+                    }
+                }
+                case "update" -> {
+                    if (!isAdmin) {
+                        req.setAttribute("error", "You are not authorized to edit baits.");
+                    } else {
+                        int baitId   = Integer.parseInt(req.getParameter("baitId"));
+                        String name  = req.getParameter("name");
+                        String notes = req.getParameter("notes");
+
+                        if (name == null || name.isBlank()) {
+                            req.setAttribute("error", "Bait name cannot be empty.");
+                        } else if (!name.trim().matches("^[A-Za-z0-9\\-' ]{2,50}$")) {
+                             req.setAttribute("error", "Bait name must be 2–50 characters: letters, numbers, spaces, dashes, or apostrophes.");
+                        } else {
+                            String normalizedName = name.trim().toLowerCase();
+
+                            boolean nameTakenByAnother = baitDao.findByName(normalizedName)
+                                    .filter(b -> b.getId() != baitId)
+                                    .isPresent();
+
+                            if (nameTakenByAnother) {
+                                req.setAttribute("error", "That bait name is already used by another record.");
+                            } else {
+                                Bait updated = new Bait();
+                                updated.setId(baitId);
+                                updated.setName(normalizedName);
+                                updated.setNotes(notes);
+                                updated.setCreatedByUserId(userId);
+
+                                baitDao.update(updated);
+                                req.setAttribute("success", "Bait updated successfully.");
+                            }
+                        }
+                    }
+                }
+                case "create" -> {
+                    String name  = req.getParameter("name");
+                    String notes = req.getParameter("notes");
+
+                    if (name == null || name.isBlank()) {
+                        req.setAttribute("error", "Bait name is required.");
+                    } else if (!name.trim().matches("^[A-Za-z0-9\\-' ]{2,50}$")) {
+                        req.setAttribute("error", "Bait name must be 2–50 characters: letters, numbers, spaces, dashes, or apostrophes.");
+                    } else {
+                        String normalizedName = name.trim().toLowerCase();
+
+                        if (baitDao.exists(normalizedName)) {
+                            req.setAttribute("error", "The bait '" + normalizedName + "' already exists.");
+                        } else {
+                            Bait bait = new Bait();
+                            bait.setName(normalizedName);
+                            bait.setNotes(notes);
+                            bait.setCreatedByUserId(userId);
+
+                            baitDao.insert(bait);
+                            req.setAttribute("success", "Bait '" + normalizedName + "' added successfully.");
+                        }
+                    }
+                }
+                default -> {
+                    // no-op
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            req.setAttribute("error", "Database error: " + e.getMessage());
+        }
+
+        // Reload page like SpeciesServlet
+        doGet(req, resp);
     }
 }

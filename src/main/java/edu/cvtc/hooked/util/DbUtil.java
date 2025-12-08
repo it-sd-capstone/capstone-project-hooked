@@ -70,26 +70,14 @@ public final class DbUtil {
                 )
             """);
 
-//            try {command.executeUpdate("ALTER TABLE Users ADD COLUMN email TEXT");}
-//            catch (SQLException e) { e.printStackTrace(); }
-//            try {command.executeUpdate("ALTER TABLE Users ADD COLUMN resetHash TEXT");}
-//            catch (SQLException e) { e.printStackTrace(); }
-//            try {command.executeUpdate("ALTER TABLE Users ADD COLUMN resetTime TIMESTAMP");}
-//            catch (SQLException e) { e.printStackTrace(); }
-
             command.executeUpdate("""
-            CREATE TABLE IF NOT EXISTS Species (
-              SpeciesID    INTEGER PRIMARY KEY AUTOINCREMENT,
-              SpeciesName  VARCHAR(50) NOT NULL UNIQUE
-            );
-            """);
-
-            command.executeUpdate("""
-            CREATE TABLE IF NOT EXISTS Location (
-              LocationID   INTEGER PRIMARY KEY AUTOINCREMENT,
-              LocationName VARCHAR(100) NOT NULL,
-              State        VARCHAR(2) NOT NULL
-            );
+                CREATE TABLE IF NOT EXISTS Location (
+                  LocationID      INTEGER PRIMARY KEY AUTOINCREMENT,
+                  LocationName    TEXT NOT NULL,
+                  State           TEXT NOT NULL,
+                  CreatedByUserID INTEGER,
+                  FOREIGN KEY (CreatedByUserID) REFERENCES Users(UserID)
+                );
             """);
 
 
@@ -110,11 +98,31 @@ public final class DbUtil {
 
             command.executeUpdate("""
                 CREATE TABLE IF NOT EXISTS Bait (
-                    BaitID   INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Name     TEXT NOT NULL,
-                    Notes    TEXT
+                    BaitID          INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name            TEXT NOT NULL,
+                    Notes           TEXT,
+                    CreatedByUserID INTEGER,
+                    FOREIGN KEY (CreatedByUserID) REFERENCES Users(UserID)
                 );
             """);
+
+            try (Statement s = c.createStatement()) {
+                s.executeUpdate("ALTER TABLE Bait ADD COLUMN CreatedByUserID INTEGER");
+            } catch (SQLException ex) {
+                // If the column already exists, you’ll get "duplicate column name"
+                // Ignore that — it just means we're up to date.
+                if (!ex.getMessage().toLowerCase().contains("duplicate column name")) {
+                    throw ex;
+                }
+            }
+
+            try (Statement s = c.createStatement()) {
+                s.executeUpdate("ALTER TABLE Location ADD COLUMN CreatedByUserID INTEGER");
+            } catch (SQLException ex) {
+                if (!ex.getMessage().toLowerCase().contains("duplicate column name")) {
+                    throw ex;
+                }
+            }
 
             command.executeUpdate("""
                 INSERT INTO Users(firstName, lastName, userName, email, passwordHash)
@@ -125,19 +133,162 @@ public final class DbUtil {
             """);
 
             command.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS SpeciesRequests (
-                  RequestID   INTEGER PRIMARY KEY AUTOINCREMENT,
-                  SpeciesName TEXT NOT NULL,
-                  UserID      INTEGER,
-                  RequestedAt TEXT DEFAULT (datetime('now')),
-                  FOREIGN KEY (UserID) REFERENCES Users(UserID)
+                CREATE TABLE IF NOT EXISTS Species (
+                    SpeciesID       INTEGER PRIMARY KEY AUTOINCREMENT,
+                    SpeciesName     TEXT NOT NULL UNIQUE,
+                    MaxLength       DECIMAL(5,2) NOT NULL,
+                    MaxWeight       DECIMAL(5,2) NOT NULL,
+                    CreatedByUserID INTEGER,
+                    FOREIGN KEY (CreatedByUserID) REFERENCES Users(UserID)
                 )
             """);
 
+            seedSpeciesIfEmpty(c);
+            seedBaitIfEmpty(c);
+            seedLocationIfEmpty(c);
+
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Failed to ensure schema", e);
         }
     }
+
+    private static void seedSpeciesIfEmpty(Connection conn) throws SQLException {
+        // Check if Species already has data
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Species")) {
+            if (rs.next() && rs.getInt(1) > 0) {
+                // Already seeded – do nothing
+                return;
+            }
+        }
+
+        String sql = "INSERT INTO Species (SpeciesName, MaxLength, MaxWeight) VALUES (?,?,?)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            insertSpecies(ps, "Bighead Carp",        50.0, 68.0);
+            insertSpecies(ps, "Bigmouth Buffalo",    50.0, 77.0);
+            insertSpecies(ps, "Black Bullhead",      22.0, 6.0);
+            insertSpecies(ps, "Black Crappie",       20.0, 5.0);
+            insertSpecies(ps, "Bluegill",            12.0, 3.0);
+            insertSpecies(ps, "Bowfin",              32.0, 14.0);
+            insertSpecies(ps, "Brooke Trout",        25.0, 11.0);
+            insertSpecies(ps, "Brown Bullhead",      18.0, 5.0);
+            insertSpecies(ps, "Brown Trout",         41.0, 42.0);
+            insertSpecies(ps, "Burbot",              38.0, 19.0);
+            insertSpecies(ps, "Channel Catfish",     50.0, 44.0);
+            insertSpecies(ps, "Common Carp",         50.0, 58.0);
+            insertSpecies(ps, "Flathead Catfish",    53.0, 75.0);
+            insertSpecies(ps, "Freshwater Drum",     38.0, 36.0);
+            insertSpecies(ps, "Golden Redhorse",     24.0, 6.0);
+            insertSpecies(ps, "Greater Redhorse",    29.0, 11.0);
+            insertSpecies(ps, "Lake Sturgeon",       80.0, 171.0);
+            insertSpecies(ps, "Lake Trout",          45.0, 50.0);
+            insertSpecies(ps, "Largemouth Bass",     24.0, 12.0);
+            insertSpecies(ps, "Longnose Gar",        53.0, 22.0);
+            insertSpecies(ps, "Muskellunge",         64.0, 70.0);
+            insertSpecies(ps, "Northern Pike",       46.0, 38.0);
+            insertSpecies(ps, "Pumpkinseed",         12.0, 2.0);
+            insertSpecies(ps, "Rock Bass",           14.0, 3.0);
+            insertSpecies(ps, "Sauger",              24.0, 7.0);
+            insertSpecies(ps, "Shorthead Redhorse",  24.0, 5.0);
+            insertSpecies(ps, "Shortnose Gar",       32.0, 5.0);
+            insertSpecies(ps, "Shovelnose Sturgeon", 40.0, 8.0);
+            insertSpecies(ps, "Silver Redhorse",     30.0, 12.0);
+            insertSpecies(ps, "Walleye",             30.0, 19.0);
+            insertSpecies(ps, "Longnose Sucker",     22.0, 5.0);
+            insertSpecies(ps, "Northern Hog Sucker", 17.0, 2.0);
+            insertSpecies(ps, "Sucker Spotted",      22.0, 5.0);
+
+            ps.executeBatch();
+        }
+    }
+
+    private static void insertSpecies(PreparedStatement ps,
+                                      String name,
+                                      double maxLength,
+                                      double maxWeight) throws SQLException {
+        ps.setString(1, name);
+        ps.setDouble(2, maxLength);
+        ps.setDouble(3, maxWeight);
+        ps.addBatch();
+    }
+
+    private static void seedBaitIfEmpty(Connection conn) throws SQLException {
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Bait")) {
+            if (rs.next() && rs.getInt(1) > 0) {
+                // already has rows
+                return;
+            }
+        }
+
+        String sql = "INSERT INTO Bait (Name, Notes) VALUES (?, ?)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            insertBait(ps, "Nightcrawler",       "Live Bait");
+            insertBait(ps, "Leeches",            "Live Bait");
+            insertBait(ps, "Fathead Minnows",    "Live Bait");
+            insertBait(ps, "Shiners",            "Live Bait");
+            insertBait(ps, "Gulp! Minnow",       "Soft Plastic");
+            insertBait(ps, "Plastic Worm",       "Soft Plastic");
+            insertBait(ps, "Tube Jig",           "Soft Plastic");
+            insertBait(ps, "Swimbait",           "Soft Plastic");
+            insertBait(ps, "Spinnerbait",        "Lure");
+            insertBait(ps, "Crankbait",          "Lure");
+            insertBait(ps, "Jerkbait",           "Lure");
+            insertBait(ps, "Topwater Frog",      "Lure");
+            insertBait(ps, "Inline Spinner",     "Lure");
+            insertBait(ps, "Jig & Minnow",       "Combo");
+            insertBait(ps, "Slip Bobber Rig",    "Rig");
+
+            ps.executeBatch();
+        }
+    }
+
+    private static void insertBait(PreparedStatement ps,
+                                   String name,
+                                   String notes) throws SQLException {
+        ps.setString(1, name);
+        ps.setString(2, notes);
+        ps.addBatch();
+    }
+
+    private static void seedLocationIfEmpty(Connection conn) throws SQLException {
+        // Check if Location already has data
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Location")) {
+            if (rs.next() && rs.getInt(1) > 0) {
+                // Already seeded – do nothing
+                return;
+            }
+        }
+
+        String sql = "INSERT INTO Location (LocationName, State) VALUES (?, ?)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            insertLocation(ps, "Lake Wissota",     "WI");
+            insertLocation(ps, "Lake Hallie",      "WI");
+            insertLocation(ps, "Chippewa River",   "WI");
+            insertLocation(ps, "Lake Altoona",     "WI");
+            insertLocation(ps, "Lake Eau Claire",  "WI");
+            insertLocation(ps, "Mississippi River","WI");
+            insertLocation(ps, "Lake Superior",    "WI");
+            insertLocation(ps, "Lake Menomin",     "WI");
+            insertLocation(ps, "Lake Chetek",      "WI");
+
+            ps.executeBatch();
+        }
+    }
+
+    private static void insertLocation(PreparedStatement ps,
+                                       String locationName,
+                                       String state) throws SQLException {
+        ps.setString(1, locationName);
+        ps.setString(2, state);
+        ps.addBatch();
+    }
+
+
 
     public static ResultSet queryRaw(Connection db, String sql) throws SQLException {
         Statement st = db.createStatement();

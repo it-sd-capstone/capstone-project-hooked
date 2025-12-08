@@ -1,114 +1,87 @@
 package edu.cvtc.hooked.controller;
 
-import edu.cvtc.hooked.model.SpeciesRestrictions;
-import edu.cvtc.hooked.dao.SpeciesRequestDao;
-
+import edu.cvtc.hooked.dao.SpeciesDao;
+import edu.cvtc.hooked.model.Species;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.List;
 
-@WebServlet("/species")
+// @WebServlet("/species")
 public class SpeciesServlet extends HttpServlet {
 
-    private final SpeciesRequestDao requestDao = new SpeciesRequestDao();
+    private final SpeciesDao speciesDao = new SpeciesDao();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Read search + clear params
-        String clearParam = req.getParameter("clear");
-        String speciesSearch = req.getParameter("speciesSearch");
-
-        // If the user clicked "Clear Search", ignore the speciesSearch
-        if ("1".equals(clearParam)) {
-            speciesSearch = null;
+        try {
+            List<Species> all = speciesDao.findAll();
+            req.setAttribute("speciesList", all);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            req.setAttribute("error", "Unable to load species list.");
         }
-
-        // Build full sorted name list for the dropdown
-        List<String> allNames = new ArrayList<>(SpeciesRestrictions.ALL.keySet());
-        Collections.sort(allNames);
-        req.setAttribute("speciesNames", allNames);
-
-        // Build full sorted entry list for the table
-        List<Map.Entry<String, SpeciesRestrictions>> allEntries =
-                new ArrayList<>(SpeciesRestrictions.ALL.entrySet());
-        allEntries.sort(Map.Entry.comparingByKey());
-
-        // Decide what to show in the table
-        List<Map.Entry<String, SpeciesRestrictions>> restrictionList;
-
-        if (speciesSearch != null && !speciesSearch.isBlank()) {
-            List<Map.Entry<String, SpeciesRestrictions>> filtered = new ArrayList<>();
-            for (Map.Entry<String, SpeciesRestrictions> e : allEntries) {
-                if (e.getKey().equalsIgnoreCase(speciesSearch)) {
-                    filtered.add(e);
-                }
-            }
-            // If nothing matches for some reason, fall back to full list
-            restrictionList = filtered.isEmpty() ? allEntries : filtered;
-        } else {
-            restrictionList = allEntries;
-        }
-
-        // For JSP: tells it whether we’re currently filtered
-        req.setAttribute("currentSpeciesSearch", speciesSearch);
-        req.setAttribute("restrictionList", restrictionList);
 
         req.getRequestDispatcher("/WEB-INF/views/species.jsp").forward(req, resp);
     }
-
-
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        String rawName = req.getParameter("addSpecies");
-        if (rawName == null || rawName.isBlank()) {
-            resp.sendRedirect(req.getContextPath() + "/species?error=Species+name+is+required");
+        HttpSession session = req.getSession(false);
+        Integer userId = (session != null) ? (Integer) session.getAttribute("userId") : null;
+
+        if (userId == null) {
+            resp.sendRedirect(req.getContextPath() + "/Login");
             return;
         }
 
-        String formatted = toTitleCase(rawName.trim());
+        String name = req.getParameter("addSpecies");
+        String maxLenStr = req.getParameter("maxLength");
+        String maxWtStr  = req.getParameter("maxWeight");
 
-        // logged-in userId if available
-        Integer userId = (Integer) req.getSession().getAttribute("userId");
+        if (name == null || name.isBlank() ||
+                maxLenStr == null || maxLenStr.isBlank() ||
+                maxWtStr == null || maxWtStr.isBlank()) {
+
+            req.setAttribute("error", "Species name, max length, and max weight are required.");
+            doGet(req, resp);
+            return;
+        }
+
+        double maxLen;
+        double maxWt;
+        try {
+            maxLen = Double.parseDouble(maxLenStr);
+            maxWt  = Double.parseDouble(maxWtStr);
+        } catch (NumberFormatException e) {
+            req.setAttribute("error", "Max length and max weight must be numeric.");
+            doGet(req, resp);
+            return;
+        }
+
+        Species s = new Species(name.trim().toLowerCase(), maxLen, maxWt, userId);
 
         try {
-            requestDao.insert(formatted, userId);
+            if (speciesDao.exists(s.getSpeciesName())) {
+                req.setAttribute("error", "That species already exists.");
+                doGet(req, resp);
+                return;
+            }
+
+            speciesDao.insert(s);
+            req.setAttribute("success", "Species added successfully.");
         } catch (SQLException e) {
             e.printStackTrace();
-            resp.sendRedirect(req.getContextPath() + "/species?error=Unable+to+save+request");
-            return;
+            req.setAttribute("error", "Failed to save species: " + e.getMessage());
         }
 
-        // redirect back with success + the formatted name (your JSP already uses param.success/param.formatted)
-        String redirectUrl = String.format("%s/species?success=1&formatted=%s",
-                req.getContextPath(),
-                URLEncoder.encode(formatted, StandardCharsets.UTF_8));
-        resp.sendRedirect(redirectUrl);
-    }
-
-    private String toTitleCase(String input) {
-        String[] parts = input.toLowerCase().split("\\s+");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < parts.length; i++) {
-            if (parts[i].isEmpty()) continue;
-            sb.append(Character.toUpperCase(parts[i].charAt(0)));
-            if (parts[i].length() > 1) {
-                sb.append(parts[i].substring(1));
-            }
-            if (i < parts.length - 1) sb.append(" ");
-        }
-        return sb.toString();
+        doGet(req, resp);
     }
 }

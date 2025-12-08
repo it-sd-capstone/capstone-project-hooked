@@ -1,11 +1,24 @@
 package edu.cvtc.hooked;
 
 import edu.cvtc.hooked.model.Bait;
+import edu.cvtc.hooked.util.DbUtil;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class BaitTest {
+
+    static {
+        System.setProperty("hooked.test.db", "true");
+    }
+
+    @BeforeAll
+    static void setupDatabase() {
+        // Make sure all tables exist so we can insert users and catches.
+        System.setProperty("hooked.test.db", "true");
+        DbUtil.ensureSchema();
+    }
 
     @Test
     void testFullConstructor() {
@@ -20,9 +33,9 @@ public class BaitTest {
     void testNameNotesConstructor() {
         Bait bait = new Bait("Leech", "Used often in summer");
 
+        assertNull(bait.getId());
         assertEquals("Leech", bait.getName());
         assertEquals("Used often in summer", bait.getNotes());
-        assertEquals(0, bait.getId()); // default int value
     }
 
     @Test
@@ -34,16 +47,15 @@ public class BaitTest {
 
         assertEquals(10, bait.getId());
         assertEquals("Nightcrawler", bait.getName());
-        assertEquals("Classic worm", bait.getNotes());
+        assertEquals("Classic Worm", bait.getNotes());
     }
 
     @Test
-    void testTwoObjectsNotEqualById() {
-        Bait a = new Bait(1, "Test", "A");
-        Bait b = new Bait(2, "Test", "A");
+    void testFormattingHandlesMultipleWords() {
+        Bait bait = new Bait("cut bait", "smells very strong");
 
-        // No custom equals method, so compare manually
-        assertNotEquals(a.getId(), b.getId());
+        assertEquals("Cut Bait", bait.getName());
+        assertEquals("smells very strong", bait.getNotes());
     }
 }
 
