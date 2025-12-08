@@ -24,7 +24,7 @@ public class SpeciesDao {
             orderCol = "MaxWeight";
         } else {
             // default / "species"
-            orderCol = "SpeciesName";
+            orderCol = "SpeciesName COLLATE NOCASE";
         }
 
         String direction = "desc".equalsIgnoreCase(sortDir) ? "DESC" : "ASC";
