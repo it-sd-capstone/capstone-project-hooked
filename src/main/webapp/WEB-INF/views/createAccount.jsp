@@ -42,7 +42,6 @@
         <label for="passwordHash">Password:</label>
         <input type="password" id="passwordHash" name="passwordHash" placeholder="Password (minimum 6 characters)" required
                minlength="6" maxlength="100" title="Password must be at least 6 characters long">
-        <small style="display: block; color: var(--text-muted); margin-top: 5px;">Minimum 6 characters</small>
 
         <label for="confirmPassword">Confirm Password:</label>
         <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" required
