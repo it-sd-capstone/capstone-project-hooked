@@ -26,3 +26,4 @@ edu\cvtc\hooked\dao\UserDao.class
 edu\cvtc\hooked\controller\AddCatchServlet.class
 edu\cvtc\hooked\controller\AdminCatchesServlet.class
 edu\cvtc\hooked\model\User.class
+edu\cvtc\hooked\dao\UsersDao.class

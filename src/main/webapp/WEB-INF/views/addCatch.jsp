@@ -130,7 +130,7 @@
       Can't find Bait
     </a>
     <br>
-    
+
     <label for="dateCaught">Date Caught (mm/dd/yyyy):</label>
 
     <input type="date" id="dateCaught" name="dateCaught" placeholder="ex. 2025-09-15" value="${editCatch != null ? editCatch.dateCaught : param.dateCaught}"><br>

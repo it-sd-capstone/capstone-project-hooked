@@ -179,7 +179,7 @@ public final class DbUtil {
 
             // ---- Seed data (only if tables are empty) ----
             seedSpeciesIfEmpty(c);
-            seedBaitIfEmpty(c);
+            seedBaitIfMissing(c);
             seedLocationIfEmpty(c);
 
         } catch (Exception e) {
@@ -249,37 +249,53 @@ public final class DbUtil {
         ps.addBatch();
     }
 
-    private static void seedBaitIfEmpty(Connection conn) throws SQLException {
+    private static void seedBaitIfMissing(Connection conn) throws SQLException {
+        // 1) Collect existing bait names (lowercased) so we don't duplicate
+        java.util.Set<String> existing = new java.util.HashSet<>();
+
         try (Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM Bait")) {
-            if (rs.next() && rs.getInt(1) > 0) {
-                // already has rows
-                return;
+             ResultSet rs = stmt.executeQuery("SELECT LOWER(Name) AS n FROM Bait")) {
+            while (rs.next()) {
+                existing.add(rs.getString("n"));
             }
         }
 
         String sql = "INSERT INTO Bait (Name, Notes) VALUES (?, ?)";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            insertBait(ps, "Nightcrawler",       "Live Bait");
-            insertBait(ps, "Leeches",            "Live Bait");
-            insertBait(ps, "Fathead Minnows",    "Live Bait");
-            insertBait(ps, "Shiners",            "Live Bait");
-            insertBait(ps, "Gulp! Minnow",       "Soft Plastic");
-            insertBait(ps, "Plastic Worm",       "Soft Plastic");
-            insertBait(ps, "Tube Jig",           "Soft Plastic");
-            insertBait(ps, "Swimbait",           "Soft Plastic");
-            insertBait(ps, "Spinnerbait",        "Lure");
-            insertBait(ps, "Crankbait",          "Lure");
-            insertBait(ps, "Jerkbait",           "Lure");
-            insertBait(ps, "Topwater Frog",      "Lure");
-            insertBait(ps, "Inline Spinner",     "Lure");
-            insertBait(ps, "Jig & Minnow",       "Combo");
-            insertBait(ps, "Slip Bobber Rig",    "Rig");
+            insertBaitIfMissing(ps, existing, "Nightcrawler",       "Live Bait");
+            insertBaitIfMissing(ps, existing, "Leeches",            "Live Bait");
+            insertBaitIfMissing(ps, existing, "Fathead Minnows",    "Live Bait");
+            insertBaitIfMissing(ps, existing, "Shiners",            "Live Bait");
+            insertBaitIfMissing(ps, existing, "Gulp! Minnow",       "Soft Plastic");
+            insertBaitIfMissing(ps, existing, "Plastic Worm",       "Soft Plastic");
+            insertBaitIfMissing(ps, existing, "Tube Jig",           "Soft Plastic");
+            insertBaitIfMissing(ps, existing, "Swimbait",           "Soft Plastic");
+            insertBaitIfMissing(ps, existing, "Spinnerbait",        "Lure");
+            insertBaitIfMissing(ps, existing, "Crankbait",          "Lure");
+            insertBaitIfMissing(ps, existing, "Jerkbait",           "Lure");
+            insertBaitIfMissing(ps, existing, "Topwater Frog",      "Lure");
+            insertBaitIfMissing(ps, existing, "Inline Spinner",     "Lure");
+            insertBaitIfMissing(ps, existing, "Jig & Minnow",       "Combo");
+            insertBaitIfMissing(ps, existing, "Slip Bobber Rig",    "Rig");
 
             ps.executeBatch();
         }
     }
+
+    private static void insertBaitIfMissing(PreparedStatement ps,
+                                            java.util.Set<String> existing,
+                                            String name,
+                                            String notes) throws SQLException {
+        String key = name.toLowerCase();
+        if (existing.contains(key)) {
+            return; // already there, skip (no duplicates)
+        }
+        ps.setString(1, name);
+        ps.setString(2, notes);
+        ps.addBatch();
+    }
+
 
     private static void insertBait(PreparedStatement ps,
                                    String name,
