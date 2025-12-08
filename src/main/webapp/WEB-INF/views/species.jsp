@@ -44,11 +44,11 @@
 
         <c:choose>
             <c:when test="${editing}">
-                <input type="submit" value="Save Changes">
+                <input type="submit" class="btn" value="Save Changes">
                 <a href="${pageContext.request.contextPath}/species#speciesTable">Cancel</a>
             </c:when>
             <c:otherwise>
-                <input type="submit" value="Add Species">
+                <input type="submit" class="btn" value="Add Species">
             </c:otherwise>
         </c:choose>
     </form>

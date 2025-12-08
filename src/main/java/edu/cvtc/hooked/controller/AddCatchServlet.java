@@ -33,6 +33,30 @@ public class AddCatchServlet extends HttpServlet {
             return;
         }
 
+        Boolean isAdmin = (Boolean) req.getSession().getAttribute("isAdmin");
+
+        // handle deleteId for normal user deletes ---
+        String deleteIdStr = req.getParameter("deleteId");
+        if (deleteIdStr != null && !deleteIdStr.isBlank()) {
+            try {
+                int deleteId = Integer.parseInt(deleteIdStr);
+
+                if (isAdmin != null && isAdmin) {
+                    catchDao.deleteById(deleteId);
+                } else {
+                    // Normal user: only delete their own catch
+                    catchDao.deleteForUser(deleteId, userId);
+                }
+
+                resp.sendRedirect(req.getContextPath() + "/addCatch?deleted=1");
+                return;
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                req.setAttribute("error", "Failed to delete catch.");
+            }
+        }
+
         // Success messages
         if ("1".equals(req.getParameter("added"))) {
             req.setAttribute("success", "Your catch has been added!");
@@ -43,9 +67,6 @@ public class AddCatchServlet extends HttpServlet {
         if ("1".equals(req.getParameter("deleted"))) {
             req.setAttribute("success", "Your catch has been deleted.");
         }
-
-        // If editId is present, load that catch for editing
-        Boolean isAdmin = (Boolean) req.getSession().getAttribute("isAdmin");
 
         String editIdStr = req.getParameter("editId");
         if (editIdStr != null && !editIdStr.isBlank()) {
@@ -72,7 +93,7 @@ public class AddCatchServlet extends HttpServlet {
 
         addSpeciesList(req);
         addBaitList(req);
-        addLocationList(req);  // <-- NEW
+        addLocationList(req);
         req.getRequestDispatcher("/WEB-INF/views/addCatch.jsp").forward(req, resp);
     }
 
@@ -88,7 +109,6 @@ public class AddCatchServlet extends HttpServlet {
             return;
         }
 
-        //Figure out whose catch this is supposed to belong to
         String ownerUserIdStr = req.getParameter("ownerUserId");
         Integer ownerUserId = sessionUserId;
 
@@ -104,8 +124,8 @@ public class AddCatchServlet extends HttpServlet {
         boolean isUpdate      = catchIdStr != null && !catchIdStr.isBlank();
 
         String speciesName      = req.getParameter("speciesName"); // from dropdown
-        String locationName     = req.getParameter("locationName"); // from dropdown now
-        String baitType         = req.getParameter("baitType");
+        String locationName     = req.getParameter("locationName"); // from dropdown
+        String baitType         = req.getParameter("baitType");  // from dropdown
         String dateCaught       = req.getParameter("dateCaught");
         String notes            = req.getParameter("notes");
         String lengthStr        = req.getParameter("length");
@@ -116,8 +136,6 @@ public class AddCatchServlet extends HttpServlet {
             forwardWithCatches(req, resp, ownerUserId);
             return;
         }
-
-
 
         double length = 0;
         double weight = 0;
@@ -210,7 +228,7 @@ public class AddCatchServlet extends HttpServlet {
         }
         addSpeciesList(req);
         addBaitList(req);
-        addLocationList(req);  // <-- NEW, so dropdown still works on validation error
+        addLocationList(req);
         req.getRequestDispatcher("/WEB-INF/views/addCatch.jsp").forward(req, resp);
     }
 
@@ -238,7 +256,7 @@ public class AddCatchServlet extends HttpServlet {
     private void addLocationList(HttpServletRequest req) {
         try {
             LocationDao dao = new LocationDao();
-            // sorted by name ascending; or dao.findAll() if you prefer
+            // sorted by name ascending;
             req.setAttribute("locationList", dao.findAllSorted("locationName", "asc"));
         } catch (Exception e) {
             e.printStackTrace();

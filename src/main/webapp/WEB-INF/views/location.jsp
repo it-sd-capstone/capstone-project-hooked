@@ -46,7 +46,7 @@
            placeholder="ex. WI"
            required />
 
-    <input type="submit"
+    <input type="submit" class="btn"
            value="${not empty locationToEdit ? 'Update Location' : 'Add Location'}" />
   </form>
 

@@ -40,7 +40,7 @@
         <label for="passwordHash">Password:</label>
         <input type="password" id="passwordHash" name="passwordHash" placeholder="Password" required>
 
-        <input type="submit" value="Login">
+        <input type="submit" class="btn" value="Login">
     </form>
 
     <br>

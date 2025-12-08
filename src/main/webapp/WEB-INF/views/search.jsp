@@ -26,17 +26,17 @@
         <label for="searchSpecies">Species:</label>
         <input type="text" id="searchSpecies" name="searchSpecies"
                placeholder="ex. walleye, bluegill"
-               value="${fn:escapeXml(param.searchSpecies)}"> <br><br>
+               value="${fn:escapeXml(param.searchSpecies)}">
 
         <label for="searchLocation">Location:</label>
         <input type="text" id="searchLocation" name="searchLocation"
                placeholder="ex. Chippewa River"
-               value="${fn:escapeXml(param.searchLocation)}"> <br><br>
+               value="${fn:escapeXml(param.searchLocation)}">
 
         <label for="searchBait">Bait:</label>
         <input type="text" id="searchBait" name="searchBait"
                placeholder="ex. Jerkbait"
-               value="${fn:escapeXml(param.searchBait)}"> <br><br>
+               value="${fn:escapeXml(param.searchBait)}">
 
         <label for="dateFrom">Date from:</label>
         <input type="date" id="dateFrom" name="dateFrom"
@@ -44,11 +44,12 @@
 
         <label for="dateTo">to:</label>
         <input type="date" id="dateTo" name="dateTo"
-               value="${fn:escapeXml(param.dateTo)}"> <br><br>
+               value="${fn:escapeXml(param.dateTo)}"> <br>
 
-        <input type="submit" value="Search Catches">
+        <input type="submit" value="Search Catches" class="btn">
 
         <button type="button"
+                class="btn"
                 onclick="window.location='${pageContext.request.contextPath}/searchCatches'">
             Clear Search
         </button>

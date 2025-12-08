@@ -19,7 +19,9 @@
   <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
   <h4>To log a catch, enter the information into the corresponding field.
-   <br> When finished, click Add Catch and you will be directed to the successful entry page.
+    <br>If you do not see your Species, Location or Bait in the dropdown,
+    <br>click the button below to add for future use.
+   <br> When finished, click Add Catch and you will see your catch added to your logged catches table.
   </h4>
 
   <c:if test="${not empty error}">
@@ -137,7 +139,7 @@
     <label for="notes">Notes:</label>
     <input type="text" id="notes" name="notes" placeholder="ex. Slip Bobber" value="${editCatch != null ? editCatch.notes : param.notes}"><br>
 
-    <input type="submit" value="${editCatch != null ? 'Update Catch' : 'Add Catch'}">
+    <input type="submit" class="btn" value="${editCatch != null ? 'Update Catch' : 'Add Catch'}">
 
   </form>
 
@@ -169,25 +171,15 @@
           <td>${c.dateCaught}</td>
           <td>${c.baitType}</td>
           <td>${c.notes}</td>
-          <td class="actions-cell">
-            <div class="actions-wrapper">
-              <!-- Edit button -->
-              <a href="${pageContext.request.contextPath}/addCatch?editId=${c.catchId}"
-                 class="btn-action btn-edit">
-                Edit
-              </a>
-
-              <!-- Delete button -->
-              <form action="${pageContext.request.contextPath}/deleteCatch"
-                    method="post"
-                    class="inline-form"
-                    onsubmit="return confirm('Are you sure you want to delete this catch?');">
-                <input type="hidden" name="catchId" value="${c.catchId}">
-                <button type="submit" class="btn-action btn-delete">
-                  Delete
-                </button>
-              </form>
-            </div>
+          <td>
+            <a href="${pageContext.request.contextPath}/addCatch?editId=${c.catchId}">
+              Edit
+            </a>
+            |
+            <a href="${pageContext.request.contextPath}/addCatch?deleteId=${c.catchId}"
+               onclick="return confirm('Are you sure you want to delete this catch?');">
+              Delete
+            </a>
           </td>
         </tr>
       </c:forEach>

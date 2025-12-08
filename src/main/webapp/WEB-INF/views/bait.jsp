@@ -48,7 +48,7 @@
            value="${not empty baitToEdit ? baitToEdit.notes : ''}"
            placeholder="ex. Live Bait"/>
 
-    <input type="submit"
+    <input type="submit" class="btn"
            value="${not empty baitToEdit ? 'Update Bait' : 'Add Bait'}" />
   </form>
 

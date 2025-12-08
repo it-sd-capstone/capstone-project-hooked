@@ -180,7 +180,7 @@ form select {
     margin-bottom: 0.35rem;
 }
 
-form input[type="submit"] {
+form .btn {
     margin-top: 0.25rem;
     align-self: center;
     width: auto;
