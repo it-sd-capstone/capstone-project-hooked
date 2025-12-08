@@ -79,7 +79,7 @@
       <th>Notes</th>
       <th>Added By</th>
       <c:if test="${sessionScope.isAdmin}">
-        <th>Actions</th>
+        <th>Admin</th>
       </c:if>
     </tr>
     </thead>
@@ -99,22 +99,14 @@
 
         <c:if test="${sessionScope.isAdmin}">
           <td>
-            <!-- Edit: reloads page with baitToEdit -->
-            <a href="${pageContext.request.contextPath}/bait?editId=${b.id}#baitForm">
+            <a href="${pageContext.request.contextPath}/bait?editId=${b.id}#baitTable">
               Edit
             </a>
             |
-            <!-- Delete: POST with action=delete -->
-            <form action="${pageContext.request.contextPath}/bait#baitTable"
-                  method="post"
-                  style="display:inline">
-              <input type="hidden" name="action" value="delete" />
-              <input type="hidden" name="baitId" value="${b.id}" />
-              <button type="submit"
-                      onclick="return confirm('Are you sure you want to delete this bait?');">
-                Delete
-              </button>
-            </form>
+            <a href="${pageContext.request.contextPath}/bait?deleteId=${b.id}#baitTable"
+               onclick="return confirm('Are you sure you want to delete this bait?');">
+              Delete
+            </a>
           </td>
         </c:if>
       </tr>

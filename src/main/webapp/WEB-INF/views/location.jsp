@@ -77,7 +77,7 @@
       <th>State</th>
       <th>Added By</th>
       <c:if test="${sessionScope.isAdmin}">
-        <th>Actions</th>
+        <th>Admin</th>
       </c:if>
     </tr>
     </thead>
@@ -97,22 +97,14 @@
 
         <c:if test="${sessionScope.isAdmin}">
           <td>
-            <!-- Edit: reload page with locationToEdit -->
-            <a href="${pageContext.request.contextPath}/location?editId=${loc.locationId}#locationForm">
+            <a href="${pageContext.request.contextPath}/location?editId=${loc.locationId}#locationTable">
               Edit
             </a>
             |
-            <!-- Delete: POST with action=delete -->
-            <form action="${pageContext.request.contextPath}/location#locationTable"
-                  method="post"
-                  style="display:inline">
-              <input type="hidden" name="action" value="delete" />
-              <input type="hidden" name="locationId" value="${loc.locationId}" />
-              <button type="submit"
-                      onclick="return confirm('Are you sure you want to delete this location?');">
-                Delete
-              </button>
-            </form>
+            <a href="${pageContext.request.contextPath}/location?deleteId=${loc.locationId}#locationTable"
+               onclick="return confirm('Are you sure you want to delete this location?');">
+              Delete
+            </a>
           </td>
         </c:if>
       </tr>

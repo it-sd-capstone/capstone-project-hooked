@@ -102,7 +102,7 @@
                     <th>Date</th>
                     <th>Bait</th>
                     <th>Notes</th>
-                    <th>Actions</th>
+                    <th>Admin</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -123,19 +123,13 @@
                                 <td>${c.baitType}</td>
                                 <td>${c.notes}</td>
                                 <td>
-                                    <!-- delete single catch -->
-                                    <form action="${pageContext.request.contextPath}/admin/catches"
-                                          method="post"
-                                          style="display:inline"
-                                          onsubmit="return confirm('Delete this catch?');">
-                                        <input type="hidden" name="action" value="deleteOne">
-                                        <input type="hidden" name="catchId" value="${c.catchId}">
-                                        <input type="submit" value="Delete">
-                                    </form>
-
-                                    <!-- edit as admin (your existing link) -->
-                                    <a href="${pageContext.request.contextPath}/addCatch?editId=${c.catchId}">
+                                    <a href="${pageContext.request.contextPath}/admin/editCatch?catchId=${c.catchId}">
                                         Edit
+                                    </a>
+                                    |
+                                    <a href="${pageContext.request.contextPath}/admin/deleteCatch?catchId=${c.catchId}"
+                                       onclick="return confirm('Delete this catch?');">
+                                        Delete
                                     </a>
                                 </td>
                             </tr>
@@ -146,60 +140,6 @@
             </table>
         </c:otherwise>
     </c:choose>
-
-    <h2>Requested Species</h2>
-
-    <table>
-        <thead>
-        <tr>
-            <th>RequestID</th>
-            <th>Species Name</th>
-            <th>UserID</th>
-            <th>Requested At</th>
-            <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody>
-        <c:choose>
-            <c:when test="${empty speciesRequests}">
-                <tr>
-                    <td colspan="5">No species requests yet.</td>
-                </tr>
-            </c:when>
-            <c:otherwise>
-                <c:forEach var="r" items="${speciesRequests}">
-                    <tr>
-                        <td>${r.requestId}</td>
-                        <td>${r.speciesName}</td>
-                        <td>
-                            <c:choose>
-                                <c:when test="${r.userId != null}">
-                                    ${r.userId}
-                                </c:when>
-                                <c:otherwise>
-                                    (guest)
-                                </c:otherwise>
-                            </c:choose>
-                        </td>
-                        <td>${r.requestedAt}</td>
-                        <td>
-                            <form action="${pageContext.request.contextPath}/admin/catches"
-                                  method="post"
-                                  style="display:inline"
-                                  onsubmit="return confirm('Delete this species request?');">
-                                <input type="hidden" name="action" value="deleteSpeciesRequest">
-                                <input type="hidden" name="requestId" value="${r.requestId}">
-                                <input type="hidden" name="view" value="${view}">
-                                <input type="submit" value="Delete">
-                            </form>
-                        </td>
-                    </tr>
-                </c:forEach>
-            </c:otherwise>
-        </c:choose>
-        </tbody>
-    </table>
-
 
     <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>

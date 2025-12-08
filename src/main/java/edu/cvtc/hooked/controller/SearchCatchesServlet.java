@@ -27,6 +27,8 @@ public class SearchCatchesServlet extends HttpServlet {
         String speciesRaw  = req.getParameter("searchSpecies");
         String location    = req.getParameter("searchLocation");
         String bait        = req.getParameter("searchBait");
+        String dateFrom    = req.getParameter("dateFrom"); // "yyyy-MM-dd" or null
+        String dateTo      = req.getParameter("dateTo");
 
         // sort parameters from the links in search.jsp
         String sort = req.getParameter("sort");
@@ -49,7 +51,7 @@ public class SearchCatchesServlet extends HttpServlet {
 
         List<Catch> matches = Collections.emptyList();
         try {
-            matches = catchDao.searchOutput(userIdFilter, speciesList, location, bait, sort, dir);
+            matches = catchDao.searchOutput(userIdFilter, speciesList, location, bait, dateFrom, dateTo, sort, dir);
         } catch (SQLException e) {
             e.printStackTrace();
             req.setAttribute("error", "Search failed: " + e.getMessage());
@@ -60,6 +62,8 @@ public class SearchCatchesServlet extends HttpServlet {
         req.setAttribute("searchSpecies", speciesRaw);
         req.setAttribute("searchLocation", location);
         req.setAttribute("searchBait", bait);
+        req.setAttribute("dateFrom", dateFrom);
+        req.setAttribute("dateTo", dateTo);
 
         req.getRequestDispatcher("/WEB-INF/views/search.jsp").forward(req, resp);
     }

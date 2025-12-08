@@ -121,21 +121,14 @@ public class CatchDao {
         return results;
     }
 
-    public List<Catch> searchOutput(
-            Integer userId,
-            List<String> speciesList,
-            String location,
-            String bait) throws SQLException {
-
-        // default: newest first
-        return searchOutput(userId, speciesList, location, bait, null, null);
-    }
-
+    // Find/search catches (core overload with date range + sorting)
     public List<Catch> searchOutput(
             Integer userId,
             List<String> speciesList,
             String location,
             String bait,
+            String dateFrom,
+            String dateTo,
             String sortField,
             String sortDir) throws SQLException {
 
@@ -180,7 +173,18 @@ public class CatchDao {
             params.add("%" + bait.toLowerCase() + "%");
         }
 
-        // 🧮 Choose ORDER BY column (same logic you had in searchAll)
+        // 📅 Date range filters (DATE or TEXT 'yyyy-MM-dd' works fine in SQLite)
+        if (dateFrom != null && !dateFrom.isBlank()) {
+            sb.append(" AND DateCaught >= ?");
+            params.add(dateFrom); // "yyyy-MM-dd"
+        }
+
+        if (dateTo != null && !dateTo.isBlank()) {
+            sb.append(" AND DateCaught <= ?");
+            params.add(dateTo);   // "yyyy-MM-dd"
+        }
+
+        // 🧮 Choose ORDER BY column (same logic you had)
         String orderCol;
         if ("species".equalsIgnoreCase(sortField)) {
             orderCol = "SpeciesName";
@@ -201,7 +205,6 @@ public class CatchDao {
         }
 
         String direction = "desc".equalsIgnoreCase(sortDir) ? "DESC" : "ASC";
-
         sb.append(" ORDER BY ").append(orderCol).append(" ").append(direction);
 
         List<Catch> results = new ArrayList<>();
@@ -234,7 +237,33 @@ public class CatchDao {
         return results;
     }
 
-    // Convenience overload for a single species
+    // Convenience: no date range, no explicit sort (default: newest first)
+    public List<Catch> searchOutput(
+            Integer userId,
+            List<String> speciesList,
+            String location,
+            String bait) throws SQLException {
+
+        return searchOutput(userId, speciesList, location, bait,
+                null, null,  // dateFrom, dateTo
+                null, null); // sortField, sortDir
+    }
+
+    // Convenience: no date range, but explicit sortField/sortDir
+    public List<Catch> searchOutput(
+            Integer userId,
+            List<String> speciesList,
+            String location,
+            String bait,
+            String sortField,
+            String sortDir) throws SQLException {
+
+        return searchOutput(userId, speciesList, location, bait,
+                null, null,       // dateFrom, dateTo
+                sortField, sortDir);
+    }
+
+    // Convenience overload for a single species (no date range)
     public List<Catch> searchOutput(
             Integer userId,
             String species,
@@ -249,7 +278,6 @@ public class CatchDao {
 
         return searchOutput(userId, speciesList, location, bait);
     }
-
 
     // UPDATE an existing catch
     public void update(Catch c) throws SQLException {

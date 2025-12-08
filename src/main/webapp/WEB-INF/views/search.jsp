@@ -38,6 +38,14 @@
                placeholder="ex. Jerkbait"
                value="${fn:escapeXml(param.searchBait)}"> <br><br>
 
+        <label for="dateFrom">Date from:</label>
+        <input type="date" id="dateFrom" name="dateFrom"
+               value="${fn:escapeXml(param.dateFrom)}">
+
+        <label for="dateTo">to:</label>
+        <input type="date" id="dateTo" name="dateTo"
+               value="${fn:escapeXml(param.dateTo)}"> <br><br>
+
         <input type="submit" value="Search Catches">
 
         <button type="button"
@@ -66,6 +74,8 @@
                 <c:param name="searchSpecies" value="${param.searchSpecies}" />
                 <c:param name="searchLocation" value="${param.searchLocation}" />
                 <c:param name="searchBait" value="${param.searchBait}" />
+                <c:param name="dateFrom" value="${param.dateFrom}" />
+                <c:param name="dateTo" value="${param.dateTo}" />
                 <c:param name="sort" value="species" />
                 <c:param name="dir" value="${speciesDir}" />
             </c:url>
@@ -78,6 +88,8 @@
                 <c:param name="searchSpecies" value="${param.searchSpecies}" />
                 <c:param name="searchLocation" value="${param.searchLocation}" />
                 <c:param name="searchBait" value="${param.searchBait}" />
+                <c:param name="dateFrom" value="${param.dateFrom}" />
+                <c:param name="dateTo" value="${param.dateTo}" />
                 <c:param name="sort" value="length" />
                 <c:param name="dir" value="${lengthDir}" />
             </c:url>
@@ -90,6 +102,8 @@
                 <c:param name="searchSpecies" value="${param.searchSpecies}" />
                 <c:param name="searchLocation" value="${param.searchLocation}" />
                 <c:param name="searchBait" value="${param.searchBait}" />
+                <c:param name="dateFrom" value="${param.dateFrom}" />
+                <c:param name="dateTo" value="${param.dateTo}" />
                 <c:param name="sort" value="weight" />
                 <c:param name="dir" value="${weightDir}" />
             </c:url>
@@ -102,6 +116,8 @@
                 <c:param name="searchSpecies" value="${param.searchSpecies}" />
                 <c:param name="searchLocation" value="${param.searchLocation}" />
                 <c:param name="searchBait" value="${param.searchBait}" />
+                <c:param name="dateFrom" value="${param.dateFrom}" />
+                <c:param name="dateTo" value="${param.dateTo}" />
                 <c:param name="sort" value="location" />
                 <c:param name="dir" value="${locationDir}" />
             </c:url>
@@ -114,6 +130,8 @@
                 <c:param name="searchSpecies" value="${param.searchSpecies}" />
                 <c:param name="searchLocation" value="${param.searchLocation}" />
                 <c:param name="searchBait" value="${param.searchBait}" />
+                <c:param name="dateFrom" value="${param.dateFrom}" />
+                <c:param name="dateTo" value="${param.dateTo}" />
                 <c:param name="sort" value="date" />
                 <c:param name="dir" value="${dateDir}" />
             </c:url>
@@ -126,6 +144,8 @@
                 <c:param name="searchSpecies" value="${param.searchSpecies}" />
                 <c:param name="searchLocation" value="${param.searchLocation}" />
                 <c:param name="searchBait" value="${param.searchBait}" />
+                <c:param name="dateFrom" value="${param.dateFrom}" />
+                <c:param name="dateTo" value="${param.dateTo}" />
                 <c:param name="sort" value="bait" />
                 <c:param name="dir" value="${baitDir}" />
             </c:url>

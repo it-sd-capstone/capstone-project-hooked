@@ -186,6 +186,22 @@ form input[type="submit"] {
     width: auto;
 }
 
+/* Make real placeholders grey for normal text inputs */
+input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.8;
+}
+
+/* Date inputs: default to muted grey text so they look like placeholders */
+input[type="date"] {
+    color: var(--text-muted);
+}
+
+/* When the user is interacting with the date field, show normal white text */
+input[type="date"]:focus {
+    color: var(--text-main);
+}
+
 /*  Special Login / Links  */
 
 #passwordReset {
