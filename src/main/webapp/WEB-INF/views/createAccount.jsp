@@ -49,7 +49,7 @@
         <small id="passwordError" style="display: none; color: #fecaca; margin-top: 5px;"></small>
 
         <br>
-        <input type="submit" value="Create Account">
+        <input type="submit" class="btn" value="Create Account">
     </form>
 
     <%@include file="/WEB-INF/includes/footer.jsp"%>
