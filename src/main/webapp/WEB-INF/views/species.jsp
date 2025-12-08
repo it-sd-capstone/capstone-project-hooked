@@ -114,13 +114,21 @@
                 <td>
                     <c:choose>
                         <c:when test="${not empty s.createdByUserId}">
-                            User ID ${s.createdByUserId}
+                            <c:set var="userName" value="${createdByNames[s.createdByUserId]}" />
+                            <c:choose>
+                                <c:when test="${not empty userName}">
+                                    ${userName}
+                                </c:when>
+                                <c:otherwise>
+                                    (unknown user)
+                                </c:otherwise>
+                            </c:choose>
                         </c:when>
-                        <c:otherwise>
-                            (preloaded)
-                        </c:otherwise>
+                        <c:otherwise>(preloaded)</c:otherwise>
                     </c:choose>
                 </td>
+
+
                 <c:if test="${sessionScope.isAdmin}">
                     <td>
                         <a href="${pageContext.request.contextPath}/species?editId=${s.speciesId}#speciesTable">

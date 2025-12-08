@@ -8,8 +8,10 @@ import jakarta.servlet.http.*;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @WebServlet(name = "BaitServlet", urlPatterns = "/bait")
 public class BaitServlet extends HttpServlet {
@@ -52,8 +54,7 @@ public class BaitServlet extends HttpServlet {
             } else {
                 try {
                     int editId = Integer.parseInt(editIdParam);
-                    baitDao.findById(editId)
-                            .ifPresent(b -> req.setAttribute("baitToEdit", b));
+                    baitDao.findById(editId).ifPresent(b -> req.setAttribute("baitToEdit", b));
                 } catch (Exception e) {
                     e.printStackTrace();
                     req.setAttribute("error", "Unable to load bait for editing.");
@@ -70,6 +71,17 @@ public class BaitServlet extends HttpServlet {
             List<Bait> all = baitDao.findAllSorted("name", sortDir);
             req.setAttribute("baitList", all);
             req.setAttribute("sortOrder", sortDir);
+
+            java.util.Set<Integer> ids = all.stream()
+                    .map(Bait::getCreatedByUserId)
+                    .filter(java.util.Objects::nonNull)
+                    .collect(java.util.stream.Collectors.toSet());
+
+            edu.cvtc.hooked.dao.UsersDao usersDao = new edu.cvtc.hooked.dao.UsersDao();
+            java.util.Map<Integer,String> createdByNames = usersDao.findUsernamesByIds(ids);
+
+            req.setAttribute("createdByNames", createdByNames);
+
         } catch (SQLException e) {
             e.printStackTrace();
             req.setAttribute("error", "Unable to load bait list.");
@@ -122,11 +134,20 @@ public class BaitServlet extends HttpServlet {
                         if (name == null || name.isBlank()) {
                             req.setAttribute("error", "Bait name cannot be empty.");
                         } else if (!name.trim().matches("^[A-Za-z0-9\\-' ]{2,50}$")) {
-                             req.setAttribute("error", "Bait name must be 2–50 characters: letters, numbers, spaces, dashes, or apostrophes.");
+                            req.setAttribute("error",
+                                    "Bait name must be 2–50 characters: letters, numbers, spaces, dashes, or apostrophes.");
                         } else {
-                            String normalizedName = name.trim().toLowerCase();
+                            // Normalize spaces
+                            String normalized = name.trim().replaceAll("\\s+", " ");
 
-                            boolean nameTakenByAnother = baitDao.findByName(normalizedName)
+                            // Title-case, e.g. "horse fly" -> "Horse Fly"
+                            String formatted = Arrays.stream(normalized.toLowerCase().split(" "))
+                                    .map(w -> w.isEmpty()
+                                            ? w
+                                            : Character.toUpperCase(w.charAt(0)) + w.substring(1))
+                                    .collect(Collectors.joining(" "));
+
+                            boolean nameTakenByAnother = baitDao.findByName(formatted)
                                     .filter(b -> b.getId() != baitId)
                                     .isPresent();
 
@@ -135,16 +156,17 @@ public class BaitServlet extends HttpServlet {
                             } else {
                                 Bait updated = new Bait();
                                 updated.setId(baitId);
-                                updated.setName(normalizedName);
+                                updated.setName(formatted);
                                 updated.setNotes(notes);
                                 updated.setCreatedByUserId(userId);
 
+                                req.setAttribute("success", "Bait (" + formatted + ") updated successfully.");
                                 baitDao.update(updated);
-                                req.setAttribute("success", "Bait updated successfully.");
                             }
                         }
                     }
                 }
+
                 case "create" -> {
                     String name  = req.getParameter("name");
                     String notes = req.getParameter("notes");
@@ -152,23 +174,33 @@ public class BaitServlet extends HttpServlet {
                     if (name == null || name.isBlank()) {
                         req.setAttribute("error", "Bait name is required.");
                     } else if (!name.trim().matches("^[A-Za-z0-9\\-' ]{2,50}$")) {
-                        req.setAttribute("error", "Bait name must be 2–50 characters: letters, numbers, spaces, dashes, or apostrophes.");
+                        req.setAttribute("error",
+                                "Bait name must be 2–50 characters: letters, numbers, spaces, dashes, or apostrophes.");
                     } else {
-                        String normalizedName = name.trim().toLowerCase();
+                        // Normalize spaces
+                        String normalized = name.trim().replaceAll("\\s+", " ");
 
-                        if (baitDao.exists(normalizedName)) {
-                            req.setAttribute("error", "The bait '" + normalizedName + "' already exists.");
+                        // Title-case
+                        String formatted = Arrays.stream(normalized.toLowerCase().split(" "))
+                                .map(w -> w.isEmpty()
+                                        ? w
+                                        : Character.toUpperCase(w.charAt(0)) + w.substring(1))
+                                .collect(Collectors.joining(" "));
+
+                        if (baitDao.exists(formatted)) {
+                            req.setAttribute("error", "The bait (" + formatted + ") already exists.");
                         } else {
                             Bait bait = new Bait();
-                            bait.setName(normalizedName);
+                            bait.setName(formatted);
                             bait.setNotes(notes);
                             bait.setCreatedByUserId(userId);
 
                             baitDao.insert(bait);
-                            req.setAttribute("success", "Bait '" + normalizedName + "' added successfully.");
+                            req.setAttribute("success", "Bait (" + formatted + ") added successfully.");
                         }
                     }
                 }
+
                 default -> {
                     // no-op
                 }

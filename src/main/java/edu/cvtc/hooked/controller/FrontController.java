@@ -266,17 +266,35 @@ public class FrontController extends HttpServlet {
             }
 
             SpeciesDao dao = new SpeciesDao();
-            req.setAttribute("speciesList", dao.findAllSorted(sort, dir));
 
-            // so JSP can know current sort if needed
+            // ✅ get the list first
+            java.util.List<Species> list = dao.findAllSorted(sort, dir);
+
+            // expose to JSP like before
+            req.setAttribute("speciesList", list);
             req.setAttribute("currentSort", sort);
-            req.setAttribute("currentDir", dir);
+            req.setAttribute("currentDir",  dir);
+
+            // ✅ build set of user IDs from that list
+            java.util.Set<Integer> ids = list.stream()
+                    .map(Species::getCreatedByUserId)
+                    .filter(java.util.Objects::nonNull)
+                    .collect(java.util.stream.Collectors.toSet());
+
+            // look up usernames
+            edu.cvtc.hooked.dao.UsersDao usersDao = new edu.cvtc.hooked.dao.UsersDao();
+            java.util.Map<Integer, String> createdByNames =
+                    usersDao.findUsernamesByIds(ids);
+
+            // make map available to JSP
+            req.setAttribute("createdByNames", createdByNames);
 
         } catch (Exception e) {
             e.printStackTrace();
             req.setAttribute("speciesError", "Unable to load species.");
         }
     }
+
 
 
     private String capitalizeWords(String input) {

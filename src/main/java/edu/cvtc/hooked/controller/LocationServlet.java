@@ -69,6 +69,17 @@ public class LocationServlet extends HttpServlet {
             List<Location> all = locationDao.findAllSorted("locationName", sortDir);
             req.setAttribute("locationList", all);
             req.setAttribute("sortOrder", sortDir);
+
+            java.util.Set<Integer> ids = all.stream()
+                    .map(Location::getCreatedByUserId)
+                    .filter(java.util.Objects::nonNull)
+                    .collect(java.util.stream.Collectors.toSet());
+
+            edu.cvtc.hooked.dao.UsersDao usersDao = new edu.cvtc.hooked.dao.UsersDao();
+            java.util.Map<Integer,String> createdByNames = usersDao.findUsernamesByIds(ids);
+
+            req.setAttribute("createdByNames", createdByNames);
+
         } catch (SQLException e) {
             e.printStackTrace();
             req.setAttribute("error", "Unable to load location list.");

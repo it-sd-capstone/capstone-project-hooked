@@ -91,11 +91,20 @@
         <td>
           <c:choose>
             <c:when test="${not empty b.createdByUserId}">
-              User ID ${b.createdByUserId}
+              <c:set var="userName" value="${createdByNames[b.createdByUserId]}" />
+              <c:choose>
+                <c:when test="${not empty userName}">
+                  ${userName}
+                </c:when>
+                <c:otherwise>
+                  (unknown user)
+                </c:otherwise>
+              </c:choose>
             </c:when>
             <c:otherwise>(preloaded)</c:otherwise>
           </c:choose>
         </td>
+
 
         <c:if test="${sessionScope.isAdmin}">
           <td>

@@ -89,7 +89,15 @@
         <td>
           <c:choose>
             <c:when test="${not empty loc.createdByUserId}">
-              User ID ${loc.createdByUserId}
+              <c:set var="userName" value="${createdByNames[loc.createdByUserId]}" />
+              <c:choose>
+                <c:when test="${not empty userName}">
+                  ${userName}
+                </c:when>
+                <c:otherwise>
+                  (unknown user)
+                </c:otherwise>
+              </c:choose>
             </c:when>
             <c:otherwise>(preloaded)</c:otherwise>
           </c:choose>

@@ -25,7 +25,7 @@
     <form action="${pageContext.request.contextPath}/searchCatches" method="get">
         <label for="searchSpecies">Species:</label>
         <input type="text" id="searchSpecies" name="searchSpecies"
-               placeholder="ex. walleye, bluegill"
+               placeholder="ex. Walleye, Bluegill"
                value="${fn:escapeXml(param.searchSpecies)}">
 
         <label for="searchLocation">Location:</label>
