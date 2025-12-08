@@ -157,7 +157,6 @@ public class LocationDao {
     public void deleteById(int locationId) throws SQLException {
         try (Connection conn = DbUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement("DELETE FROM Location WHERE LocationID = ?")) {
-
             ps.setInt(1, locationId);
             ps.executeUpdate();
         }

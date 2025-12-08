@@ -20,20 +20,48 @@ public class LocationServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Optional: load one location to edit
-        String editIdParam = req.getParameter("editId");
-        if (editIdParam != null && !editIdParam.isBlank()) {
-            try {
-                int editId = Integer.parseInt(editIdParam);
-                Optional<Location> locOpt = locationDao.findById(editId);
-                locOpt.ifPresent(l -> req.setAttribute("locationToEdit", l));
-            } catch (Exception e) {
-                e.printStackTrace();
-                req.setAttribute("error", "Unable to load location for editing.");
+        HttpSession session = req.getSession(false);
+        Boolean isAdmin = (session != null) ? (Boolean) session.getAttribute("isAdmin") : null;
+        if (isAdmin == null) {
+            isAdmin = Boolean.FALSE;
+        }
+
+        String deleteIdParam = req.getParameter("deleteId");
+        String editIdParam   = req.getParameter("editId");
+
+        // --- DELETE (admin only) ---
+        if (deleteIdParam != null && !deleteIdParam.isBlank()) {
+            if (!isAdmin) {
+                req.setAttribute("error", "You are not authorized to delete locations.");
+            } else {
+                try {
+                    int deleteId = Integer.parseInt(deleteIdParam);
+                    locationDao.deleteById(deleteId);
+                    req.setAttribute("success", "Location deleted.");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    req.setAttribute("error", "Unable to delete location.");
+                }
             }
         }
 
-        // Sort parameter: asc/desc (default asc)
+        // --- EDIT (load location to prefill form) ---
+        if (editIdParam != null && !editIdParam.isBlank()) {
+            if (!isAdmin) {
+                req.setAttribute("error", "You are not authorized to edit locations.");
+            } else {
+                try {
+                    int editId = Integer.parseInt(editIdParam);
+                    locationDao.findById(editId)
+                            .ifPresent(loc -> req.setAttribute("locationToEdit", loc));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    req.setAttribute("error", "Unable to load location for editing.");
+                }
+            }
+        }
+
+        // --- Sorting (same as before) ---
         String sortParam = req.getParameter("sort");
         String sortDir   = "desc".equalsIgnoreCase(sortParam) ? "desc" : "asc";
 
@@ -48,6 +76,7 @@ public class LocationServlet extends HttpServlet {
 
         req.getRequestDispatcher("/WEB-INF/views/location.jsp").forward(req, resp);
     }
+
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)

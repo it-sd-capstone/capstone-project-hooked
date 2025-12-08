@@ -20,19 +20,48 @@ public class BaitServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        // Existing editId logic stays the same:
-        String editIdParam = req.getParameter("editId");
-        if (editIdParam != null && !editIdParam.isBlank()) {
-            try {
-                int editId = Integer.parseInt(editIdParam);
-                baitDao.findById(editId).ifPresent(b -> req.setAttribute("baitToEdit", b));
-            } catch (Exception e) {
-                e.printStackTrace();
-                req.setAttribute("error", "Unable to load bait for editing.");
+        HttpSession session = req.getSession(false);
+        Boolean isAdmin = (session != null) ? (Boolean) session.getAttribute("isAdmin") : null;
+        if (isAdmin == null) {
+            isAdmin = Boolean.FALSE;
+        }
+
+        String deleteIdParam = req.getParameter("deleteId");
+        String editIdParam   = req.getParameter("editId");
+
+        // --- DELETE (admin only) ---
+        if (deleteIdParam != null && !deleteIdParam.isBlank()) {
+            if (!isAdmin) {
+                req.setAttribute("error", "You are not authorized to delete baits.");
+            } else {
+                try {
+                    int deleteId = Integer.parseInt(deleteIdParam);
+                    baitDao.deleteById(deleteId);
+                    req.setAttribute("success", "Bait deleted.");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    req.setAttribute("error", "Unable to delete bait.");
+                }
             }
         }
 
-        // NEW: simple ASC / DESC toggle based on ?sort=asc|desc
+        // --- EDIT (load bait to prefill form) ---
+        if (editIdParam != null && !editIdParam.isBlank()) {
+            if (!isAdmin) {
+                req.setAttribute("error", "You are not authorized to edit baits.");
+            } else {
+                try {
+                    int editId = Integer.parseInt(editIdParam);
+                    baitDao.findById(editId)
+                            .ifPresent(b -> req.setAttribute("baitToEdit", b));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    req.setAttribute("error", "Unable to load bait for editing.");
+                }
+            }
+        }
+
+        // --- Sorting (same as before) ---
         String sortParam = req.getParameter("sort");      // "asc" or "desc"
         String sortDir   = "desc".equalsIgnoreCase(sortParam) ? "desc" : "asc";  // default asc
 
@@ -48,6 +77,7 @@ public class BaitServlet extends HttpServlet {
 
         req.getRequestDispatcher("/WEB-INF/views/bait.jsp").forward(req, resp);
     }
+
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)

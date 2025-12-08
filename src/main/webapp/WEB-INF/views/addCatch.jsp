@@ -19,8 +19,6 @@
   <%@include file="/WEB-INF/includes/navigation.jsp"%>
 
   <h4>To log a catch, enter the information into the corresponding field.
-    <br>If you do not see your Species, Location or Bait in the dropdown,
-    <br>click the button below to add for future use.
    <br> When finished, click Add Catch and you will see your catch added to your logged catches table.
   </h4>
 
@@ -66,7 +64,7 @@
     </select>
     <a href="${pageContext.request.contextPath}/species#speciesTableOne"
        class="btn">
-      Add Species
+      Can't find Species
     </a>
 
     <label for="length" id="lengthLabel">
@@ -107,7 +105,7 @@
 
     <a href="${pageContext.request.contextPath}/location#locationFormOne"
        class="btn">
-      Add Location
+      Can't Find Location
     </a>
 
     <label for="baitType">Bait:</label>
@@ -129,7 +127,7 @@
 
     <a href="${pageContext.request.contextPath}/bait#baitTableOne"
        class="btn">
-      Add Bait
+      Can't find Bait
     </a>
     <br>
 
@@ -238,7 +236,6 @@
       select.addEventListener('change', updateMaxLabels);
     });
   </script>
-
 
   <%@include file="/WEB-INF/includes/footer.jsp"%>
 </div>
