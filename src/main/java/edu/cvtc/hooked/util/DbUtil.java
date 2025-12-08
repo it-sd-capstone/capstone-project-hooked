@@ -57,65 +57,68 @@ public final class DbUtil {
         try (Connection c = getConnection();
              Statement command = c.createStatement()) {
 
+            // ---- Users table ----
             command.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Users (
-                  UserID       INTEGER PRIMARY KEY AUTOINCREMENT,
-                  firstName    TEXT NOT NULL,
-                  lastName     TEXT NOT NULL,
-                  userName     TEXT NOT NULL UNIQUE,
-                  email    TEXT NOT NULL UNIQUE,
-                  resetHash TEXT,
-                  resetTime TIMESTAMP,
-                  passwordHash TEXT NOT NULL
-                )
-            """);
+            CREATE TABLE IF NOT EXISTS Users (
+              UserID       INTEGER PRIMARY KEY AUTOINCREMENT,
+              firstName    TEXT NOT NULL,
+              lastName     TEXT NOT NULL,
+              userName     TEXT NOT NULL UNIQUE,
+              email        TEXT NOT NULL UNIQUE,
+              resetHash    TEXT,
+              resetTime    TIMESTAMP,
+              passwordHash TEXT NOT NULL
+            )
+        """);
 
+            // ---- Location table ----
             command.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Location (
-                  LocationID      INTEGER PRIMARY KEY AUTOINCREMENT,
-                  LocationName    TEXT NOT NULL,
-                  State           TEXT NOT NULL,
-                  CreatedByUserID INTEGER,
-                  FOREIGN KEY (CreatedByUserID) REFERENCES Users(UserID)
-                );
-            """);
+            CREATE TABLE IF NOT EXISTS Location (
+              LocationID      INTEGER PRIMARY KEY AUTOINCREMENT,
+              LocationName    TEXT NOT NULL,
+              State           TEXT NOT NULL,
+              CreatedByUserID INTEGER,
+              FOREIGN KEY (CreatedByUserID) REFERENCES Users(UserID)
+            );
+        """);
 
-
+            // ---- Catches table ----
             command.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Catches (
-                    CatchID      INTEGER PRIMARY KEY AUTOINCREMENT,
-                    UserID       INTEGER NOT NULL,
-                    SpeciesName  VARCHAR(50) NOT NULL,
-                    LocationName TEXT NOT NULL,
-                    BaitType     TEXT NOT NULL,
-                    Length       DECIMAL(5,2),
-                    Weight       DECIMAL(5,2),
-                    DateCaught   DATE,
-                    Notes        TEXT,
-                    FOREIGN KEY (UserID) REFERENCES Users(UserID)
-                );
-            """);
+            CREATE TABLE IF NOT EXISTS Catches (
+                CatchID      INTEGER PRIMARY KEY AUTOINCREMENT,
+                UserID       INTEGER NOT NULL,
+                SpeciesName  VARCHAR(50) NOT NULL,
+                LocationName TEXT NOT NULL,
+                BaitType     TEXT NOT NULL,
+                Length       DECIMAL(5,2),
+                Weight       DECIMAL(5,2),
+                DateCaught   DATE,
+                Notes        TEXT,
+                FOREIGN KEY (UserID) REFERENCES Users(UserID)
+            );
+        """);
 
+            // ---- Bait table ----
             command.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Bait (
-                    BaitID          INTEGER PRIMARY KEY AUTOINCREMENT,
-                    Name            TEXT NOT NULL,
-                    Notes           TEXT,
-                    CreatedByUserID INTEGER,
-                    FOREIGN KEY (CreatedByUserID) REFERENCES Users(UserID)
-                );
-            """);
+            CREATE TABLE IF NOT EXISTS Bait (
+                BaitID          INTEGER PRIMARY KEY AUTOINCREMENT,
+                Name            TEXT NOT NULL,
+                Notes           TEXT,
+                CreatedByUserID INTEGER,
+                FOREIGN KEY (CreatedByUserID) REFERENCES Users(UserID)
+            );
+        """);
 
+            // Make sure Bait.CreatedByUserID exists (old DBs might not have it)
             try (Statement s = c.createStatement()) {
                 s.executeUpdate("ALTER TABLE Bait ADD COLUMN CreatedByUserID INTEGER");
             } catch (SQLException ex) {
-                // If the column already exists, you’ll get "duplicate column name"
-                // Ignore that — it just means we're up to date.
                 if (!ex.getMessage().toLowerCase().contains("duplicate column name")) {
                     throw ex;
                 }
             }
 
+            // Make sure Location.CreatedByUserID exists (old DBs might not have it)
             try (Statement s = c.createStatement()) {
                 s.executeUpdate("ALTER TABLE Location ADD COLUMN CreatedByUserID INTEGER");
             } catch (SQLException ex) {
@@ -124,25 +127,57 @@ public final class DbUtil {
                 }
             }
 
+            // ---- Seed admin user ----
             command.executeUpdate("""
-                INSERT INTO Users(firstName, lastName, userName, email, passwordHash)
-                SELECT 'Admin', 'User', 'admin', 'hookedAdmin1@gmail.com', 'admin'
-                WHERE NOT EXISTS (
-                    SELECT 1 FROM Users WHERE userName = 'admin'
-                );
-            """);
+            INSERT INTO Users(firstName, lastName, userName, email, passwordHash)
+            SELECT 'Admin', 'User', 'admin', 'hookedAdmin1@gmail.com', 'admin'
+            WHERE NOT EXISTS (
+                SELECT 1 FROM Users WHERE userName = 'admin'
+            );
+        """);
 
+            // ---- Species table ----
             command.executeUpdate("""
-                CREATE TABLE IF NOT EXISTS Species (
-                    SpeciesID       INTEGER PRIMARY KEY AUTOINCREMENT,
-                    SpeciesName     TEXT NOT NULL UNIQUE,
-                    MaxLength       DECIMAL(5,2) NOT NULL,
-                    MaxWeight       DECIMAL(5,2) NOT NULL,
-                    CreatedByUserID INTEGER,
-                    FOREIGN KEY (CreatedByUserID) REFERENCES Users(UserID)
-                )
-            """);
+            CREATE TABLE IF NOT EXISTS Species (
+                SpeciesID       INTEGER PRIMARY KEY AUTOINCREMENT,
+                SpeciesName     TEXT NOT NULL UNIQUE,
+                MaxLength       DECIMAL(5,2) NOT NULL,
+                MaxWeight       DECIMAL(5,2) NOT NULL,
+                CreatedByUserID INTEGER,
+                FOREIGN KEY (CreatedByUserID) REFERENCES Users(UserID)
+            )
+        """);
 
+            // 🔧 NEW: migrations for older Species tables (like on AWS)
+
+            // Add MaxLength if missing
+            try (Statement s = c.createStatement()) {
+                s.executeUpdate("ALTER TABLE Species ADD COLUMN MaxLength DECIMAL(5,2)");
+            } catch (SQLException ex) {
+                if (!ex.getMessage().toLowerCase().contains("duplicate column name")) {
+                    throw ex;
+                }
+            }
+
+            // Add MaxWeight if missing
+            try (Statement s = c.createStatement()) {
+                s.executeUpdate("ALTER TABLE Species ADD COLUMN MaxWeight DECIMAL(5,2)");
+            } catch (SQLException ex) {
+                if (!ex.getMessage().toLowerCase().contains("duplicate column name")) {
+                    throw ex;
+                }
+            }
+
+            // Add CreatedByUserID if missing (in case some DBs were created before that field)
+            try (Statement s = c.createStatement()) {
+                s.executeUpdate("ALTER TABLE Species ADD COLUMN CreatedByUserID INTEGER");
+            } catch (SQLException ex) {
+                if (!ex.getMessage().toLowerCase().contains("duplicate column name")) {
+                    throw ex;
+                }
+            }
+
+            // ---- Seed data (only if tables are empty) ----
             seedSpeciesIfEmpty(c);
             seedBaitIfEmpty(c);
             seedLocationIfEmpty(c);
@@ -151,6 +186,7 @@ public final class DbUtil {
             throw new RuntimeException("Failed to ensure schema", e);
         }
     }
+
 
     private static void seedSpeciesIfEmpty(Connection conn) throws SQLException {
         // Check if Species already has data
