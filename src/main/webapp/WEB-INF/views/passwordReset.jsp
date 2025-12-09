@@ -32,7 +32,7 @@
     <form action="<%= request.getContextPath() %>/resetPassword" method="post">
         <input type="hidden" name="hash" value="<%= hash %>">
         <input type="password" id="passwordView" name="newPassword" minlength="6" maxlength="100" placeholder="Enter new password" required>
-        <input type="button" class="btn" id="passwordViewButton" value="View Password" style="width: 120px; margin: 0 auto; text-align: center;">
+        <input type="button" class="btn" id="passwordViewButton" value="View Password" style="width: 140px; margin: 0 auto; text-align: center;">
         <input type="password" name="newPasswordConfirmed" id="newPasswordConfirmed" minlength="6" maxlength="100" placeholder="Confirm new password" required>
         <small id="passwordError" style="display: none; color: #fecaca; margin-top: 5px;"></small>
         <input type="submit" class="btn" value="Reset Password">
