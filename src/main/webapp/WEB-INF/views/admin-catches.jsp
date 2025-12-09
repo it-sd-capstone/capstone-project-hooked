@@ -123,7 +123,7 @@
                                 <td>${c.baitType}</td>
                                 <td>${c.notes}</td>
                                 <td>
-                                    <a href="${pageContext.request.contextPath}/admin/editCatch?catchId=${c.catchId}">
+                                    <a href="${pageContext.request.contextPath}/addCatch?editId=${c.catchId}">
                                         Edit
                                     </a>
                                     |
